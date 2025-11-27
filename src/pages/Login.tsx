@@ -1,14 +1,22 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../lib/auth';
 import { Layers, ArrowLeft } from 'lucide-react';
 
 export default function Login() {
+  const { user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,9 +122,6 @@ export default function Login() {
             <cite className="not-italic text-zinc-500 font-medium">— Alex Chen, Senior Backend Engineer</cite>
          </div>
 
-         {/* If we had a real image, we would use an <img> tag with object-cover here.
-             Since we don't have one in the repo, I'm using a CSS pattern/placeholder that looks professional.
-             Alternatively, I can use a Unsplash placeholder if internet access is allowed/reliable, but CSS is safer. */}
          <img
            src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop"
            alt="Abstract Technology"
