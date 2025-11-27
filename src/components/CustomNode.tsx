@@ -15,28 +15,28 @@ const CustomNode = ({ data, selected }: NodeProps) => {
   const isActive = !!data.isActive;
 
   return (
-    <div className={`relative min-w-[140px] px-4 py-3 rounded-lg bg-white transition-all duration-200
+    <div className={`relative min-w-[140px] px-4 py-3 rounded-lg bg-white transition-all duration-300
       ${isActive
-        ? 'border border-black shadow-[0_0_0_1px_rgba(0,0,0,1)]'
+        ? 'border-indigo-600 shadow-[0_0_20px_rgba(79,70,229,0.3)] ring-1 ring-indigo-600 scale-105'
         : 'border border-zinc-200 hover:border-zinc-300 shadow-sm'
       }
       ${selected ? 'ring-2 ring-indigo-500 ring-offset-2' : ''}
     `}>
-      <Handle type="target" position={Position.Left} className="w-2 h-2 !bg-white !border-2 !border-black" />
+      <Handle type="target" position={Position.Left} className={`w-2 h-2 !bg-white !border-2 transition-colors ${isActive ? '!border-indigo-600' : '!border-zinc-400'}`} />
 
       <div className="flex flex-col items-center gap-3">
-        <div className={`p-2 rounded-md ${isActive ? 'bg-zinc-100 text-black' : 'bg-white text-zinc-400'}`}>
+        <div className={`p-2 rounded-md transition-colors duration-300 ${isActive ? 'bg-indigo-50 text-indigo-600' : 'bg-white text-zinc-400'}`}>
            <Icon
              size={20}
              strokeWidth={isActive ? 2 : 1.5}
            />
         </div>
-        <span className={`text-xs font-semibold tracking-tight ${isActive ? 'text-black' : 'text-zinc-500'}`}>
+        <span className={`text-xs font-semibold tracking-tight transition-colors duration-300 ${isActive ? 'text-indigo-900' : 'text-zinc-500'}`}>
           {data.label as string}
         </span>
       </div>
 
-      <Handle type="source" position={Position.Right} className="w-2 h-2 !bg-white !border-2 !border-black" />
+      <Handle type="source" position={Position.Right} className={`w-2 h-2 !bg-white !border-2 transition-colors ${isActive ? '!border-indigo-600' : '!border-zinc-400'}`} />
     </div>
   );
 };

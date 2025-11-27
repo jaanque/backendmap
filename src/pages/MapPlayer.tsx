@@ -5,7 +5,7 @@ import '@xyflow/react/dist/style.css';
 import { getScenarioBySlug, getSteps } from '../lib/api';
 import type { Scenario, Step } from '../types';
 import CustomNode from '../components/CustomNode';
-import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle } from 'lucide-react';
 
 const nodeTypes = {
   custom: CustomNode,
@@ -17,6 +17,7 @@ export default function MapPlayer() {
   const [steps, setSteps] = useState<Step[]>([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [isCompleted, setIsCompleted] = useState(false);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -40,7 +41,7 @@ export default function MapPlayer() {
   }, [slug, setNodes, setEdges]);
 
   useEffect(() => {
-    if (steps.length > 0) {
+    if (steps.length > 0 && !isCompleted) {
       const currentStep = steps[currentStepIndex];
 
       setNodes((nds) =>
@@ -58,20 +59,26 @@ export default function MapPlayer() {
           ...edge,
           animated: edge.id === currentStep.active_edge_id,
           style: edge.id === currentStep.active_edge_id
-            ? { stroke: '#000000', strokeWidth: 2 }
+            ? { stroke: '#4f46e5', strokeWidth: 3 }
             : { stroke: '#e5e7eb', strokeWidth: 1.5 }
         }))
       );
     }
-  }, [currentStepIndex, steps, setNodes, setEdges]);
+  }, [currentStepIndex, steps, setNodes, setEdges, isCompleted]);
 
   const handleNext = () => {
     if (currentStepIndex < steps.length - 1) {
       setCurrentStepIndex(prev => prev + 1);
+    } else {
+      setIsCompleted(true);
     }
   };
 
   const handlePrev = () => {
+    if (isCompleted) {
+      setIsCompleted(false);
+      return;
+    }
     if (currentStepIndex > 0) {
       setCurrentStepIndex(prev => prev - 1);
     }
@@ -79,6 +86,7 @@ export default function MapPlayer() {
 
   const handleReset = () => {
     setCurrentStepIndex(0);
+    setIsCompleted(false);
   }
 
   if (error) {
@@ -139,8 +147,10 @@ export default function MapPlayer() {
         {/* Scenario Header */}
         <div className="px-6 py-5 border-b border-zinc-100">
            <div className="flex items-center gap-2 mb-1">
-             <span className="w-2 h-2 rounded-full bg-green-500"></span>
-             <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Live Simulation</span>
+             <span className={`w-2 h-2 rounded-full ${isCompleted ? 'bg-indigo-500' : 'bg-green-500'}`}></span>
+             <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+               {isCompleted ? 'Completed' : 'Live Simulation'}
+             </span>
            </div>
            <h1 className="text-lg font-bold text-zinc-900 leading-tight">
              {scenario.title}
@@ -149,51 +159,70 @@ export default function MapPlayer() {
 
         {/* Step Content */}
         <div className="px-6 py-6 flex-grow overflow-y-auto">
-          <div className="flex items-center justify-between mb-6">
-             <span className="px-2 py-1 bg-zinc-100 text-zinc-600 rounded text-xs font-mono font-medium">
-               Step {currentStepIndex + 1}/{steps.length}
-             </span>
-             <button onClick={handleReset} className="text-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer" title="Reset">
-               <RotateCcw size={14} />
-             </button>
-          </div>
+          {isCompleted ? (
+            <div className="flex flex-col items-center justify-center h-full text-center animate-fade-in-up">
+              <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mb-4 text-green-600">
+                <CheckCircle size={32} />
+              </div>
+              <h2 className="text-2xl font-bold text-zinc-900 mb-2">Simulation Complete!</h2>
+              <p className="text-zinc-500 text-sm mb-6 max-w-xs mx-auto">
+                You have successfully navigated through the entire architecture flow.
+              </p>
+              <div className="flex flex-col gap-3 w-full max-w-xs">
+                 <Link to="/" className="btn-pro btn-primary w-full py-2.5">Explore Other Scenarios</Link>
+                 <button onClick={handleReset} className="btn-pro btn-secondary w-full py-2.5">Replay Scenario</button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center justify-between mb-6">
+                 <span className="px-2 py-1 bg-zinc-100 text-zinc-600 rounded text-xs font-mono font-medium">
+                   Step {currentStepIndex + 1}/{steps.length}
+                 </span>
+                 <button onClick={handleReset} className="text-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer" title="Reset">
+                   <RotateCcw size={14} />
+                 </button>
+              </div>
 
-          <div className="animate-fade-in-up" key={currentStepIndex}>
-            <h2 className="text-xl font-bold text-zinc-900 mb-4">{currentStep?.title}</h2>
-            <p className="text-zinc-600 leading-relaxed text-sm">
-              {currentStep?.content}
-            </p>
-          </div>
+              <div className="animate-fade-in-up" key={currentStepIndex}>
+                <h2 className="text-xl font-bold text-zinc-900 mb-4">{currentStep?.title}</h2>
+                <p className="text-zinc-600 leading-relaxed text-sm">
+                  {currentStep?.content}
+                </p>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Navigation Controls */}
-        <div className="p-6 border-t border-zinc-100 bg-zinc-50/50">
-          <div className="flex gap-3">
-            <button
-              onClick={handlePrev}
-              disabled={currentStepIndex === 0}
-              className="flex-1 btn-pro btn-secondary py-2.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            >
-              <ChevronLeft className="mr-1" size={16} />
-              Previous
-            </button>
-            <button
-              onClick={handleNext}
-              disabled={currentStepIndex === steps.length - 1}
-              className="flex-1 btn-pro btn-primary py-2.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm cursor-pointer"
-            >
-              Next Step
-              <ChevronRight className="ml-1" size={16} />
-            </button>
-          </div>
+        {!isCompleted && (
+          <div className="p-6 border-t border-zinc-100 bg-zinc-50/50">
+            <div className="flex gap-3">
+              <button
+                onClick={handlePrev}
+                disabled={currentStepIndex === 0}
+                className="flex-1 btn-pro btn-secondary py-2.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              >
+                <ChevronLeft className="mr-1" size={16} />
+                Previous
+              </button>
+              <button
+                onClick={handleNext}
+                className="flex-1 btn-pro btn-primary py-2.5 shadow-sm cursor-pointer"
+              >
+                {currentStepIndex === steps.length - 1 ? 'Finish' : 'Next Step'}
+                <ChevronRight className="ml-1" size={16} />
+              </button>
+            </div>
 
-          <div className="mt-4 h-1 w-full bg-zinc-200 rounded-full overflow-hidden">
-             <div
-               className="h-full bg-zinc-900 transition-all duration-300 ease-out"
-               style={{ width: `${((currentStepIndex + 1) / steps.length) * 100}%` }}
-             />
+            <div className="mt-4 h-1 w-full bg-zinc-200 rounded-full overflow-hidden">
+               <div
+                 className="h-full bg-zinc-900 transition-all duration-300 ease-out"
+                 style={{ width: `${((currentStepIndex + 1) / steps.length) * 100}%` }}
+               />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
