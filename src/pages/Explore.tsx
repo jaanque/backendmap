@@ -4,7 +4,7 @@ import { getScenarios } from '../lib/api';
 import type { Scenario } from '../types';
 import { ArrowRight, Search, Layers } from 'lucide-react';
 
-export default function Home() {
+export default function Explore() {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,48 +39,38 @@ export default function Home() {
     <div className="min-h-screen bg-white font-sans text-zinc-900 selection:bg-black selection:text-white">
       {/* Simple Top Bar */}
       <nav className="border-b border-zinc-100 h-16 flex items-center justify-between px-6 md:px-12 sticky top-0 bg-white/90 backdrop-blur z-50">
-        <div className="font-bold text-xl tracking-tight flex items-center gap-2">
+        <Link to="/" className="font-bold text-xl tracking-tight flex items-center gap-2 text-zinc-900 hover:text-black transition-colors">
           <div className="w-8 h-8 bg-black text-white rounded-lg flex items-center justify-center">
             <Layers className="w-4 h-4" />
           </div>
           BackendMap
-        </div>
+        </Link>
         <div className="flex gap-6 text-sm font-medium text-zinc-500">
-          <Link to="/explore" className="hover:text-black transition-colors">Explore Scenarios</Link>
+          <Link to="/explore" className="text-black transition-colors">Explore Scenarios</Link>
           <a href="#" className="hover:text-black transition-colors">About</a>
         </div>
       </nav>
 
-      {/* Hero */}
-      <header className="py-24 px-6 md:px-12 max-w-4xl mx-auto text-center">
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 text-zinc-900 leading-[1.1]">
-          System Architecture <br/>
-          <span className="text-zinc-400">Visualized.</span>
-        </h1>
-        <p className="text-xl text-zinc-500 mb-12 max-w-2xl mx-auto leading-relaxed">
-          A collection of interactive backend flows. <br/>
-          Understand how data moves through modern software stacks.
-        </p>
-
-        {/* Command Bar Search */}
+      {/* Search Header */}
+      <div className="py-12 px-6 md:px-12 max-w-5xl mx-auto">
         <div className="max-w-xl mx-auto relative group">
-          <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
             <Search className="h-5 w-5 text-zinc-400 group-focus-within:text-black transition-colors" />
-          </div>
-          <input
+            </div>
+            <input
             type="text"
             placeholder="Search scenarios (e.g., API, Database, AWS)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-12 pr-4 py-4 rounded-xl border border-zinc-200 bg-zinc-50/50 shadow-sm focus:bg-white focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all text-lg font-medium placeholder:text-zinc-400"
-          />
+            />
         </div>
-      </header>
+      </div>
 
       {/* Content - Technical List */}
       <main className="px-6 md:px-12 pb-32 max-w-5xl mx-auto">
         <div className="mb-6 flex items-end justify-between border-b border-zinc-100 pb-4">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-900">Catalog</h2>
+          <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-900">All Scenarios</h2>
           <span className="text-xs font-mono text-zinc-400 bg-zinc-100 px-2 py-1 rounded">{filteredScenarios.length} ITEMS</span>
         </div>
 

@@ -169,7 +169,7 @@ export default function MapPlayer() {
                 You have successfully navigated through the entire architecture flow.
               </p>
               <div className="flex flex-col gap-3 w-full max-w-xs">
-                 <Link to="/" className="btn-pro btn-primary w-full py-2.5">Explore Other Scenarios</Link>
+                 <Link to="/explore" className="btn-pro btn-primary w-full py-2.5">Explore Other Scenarios</Link>
                  <button onClick={handleReset} className="btn-pro btn-secondary w-full py-2.5">Replay Scenario</button>
               </div>
             </div>
