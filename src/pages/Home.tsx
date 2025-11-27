@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { getScenarios } from '../lib/api';
 import type { Scenario } from '../types';
-import { ArrowRight, Layout, Search, Grid, ListFilter, Terminal } from 'lucide-react';
+import { ArrowRight, Layout, Search, Command, Activity, Zap } from 'lucide-react';
 
 export default function Home() {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
@@ -11,9 +11,7 @@ export default function Home() {
 
   useEffect(() => {
     getScenarios()
-      .then(data => {
-        setScenarios(data);
-      })
+      .then(setScenarios)
       .catch((err) => setError(err.message));
   }, []);
 
@@ -29,144 +27,177 @@ export default function Home() {
   if (error) {
     return (
       <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center p-6">
-        <div className="bg-white border border-red-300 p-6 rounded-md shadow-sm max-w-md w-full animate-fade-in-up" style={{ animationDelay: '0ms' }}>
-          <h2 className="text-lg font-bold text-red-700 mb-2 flex items-center gap-2">
-            Error de Conexión
-          </h2>
-          <p className="text-slate-600">{error}</p>
+        <div className="bg-red-50 border border-red-200 p-6 rounded-lg max-w-md w-full text-center">
+          <h2 className="text-lg font-bold text-red-900 mb-2">Connection Error</h2>
+          <p className="text-red-700 text-sm">{error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-background)] font-sans flex flex-col">
+    <div className="min-h-screen bg-[var(--color-background)] font-sans selection:bg-black selection:text-white">
       {/* Navbar */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-[var(--color-border)] sticky top-0 z-40 transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-3 font-bold text-lg tracking-tight text-[var(--color-text-main)] hover:opacity-80 transition-opacity">
-                <div className="p-1.5 bg-[var(--color-primary)] text-white rounded shadow-sm">
-                  <Layout className="w-5 h-5" />
+      <header className="border-b border-[var(--color-border)] bg-white/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="container-pro h-16 flex items-center justify-between">
+            <Link to="/" className="flex items-center gap-2.5 group">
+                <div className="w-8 h-8 bg-[var(--color-primary)] text-white rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+                  <Layout className="w-4 h-4" />
                 </div>
-                BACKENDMAP
+                <span className="font-heading font-bold text-lg tracking-tight">BackendMap</span>
             </Link>
-            <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-[var(--color-text-secondary)]">
-                <a href="#" className="hover:text-[var(--color-primary)] transition-colors duration-200">Docs</a>
-                <a href="#" className="hover:text-[var(--color-primary)] transition-colors duration-200">Contribute</a>
-                <a href="#" className="text-white bg-[var(--color-primary)] px-5 py-2 rounded shadow-sm hover:bg-[var(--color-primary-hover)] hover:shadow transition-all duration-200 btn-press">Login</a>
+            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-[var(--color-muted)]">
+                <a href="#" className="hover:text-[var(--color-foreground)] transition-colors">Documentation</a>
+                <a href="#" className="hover:text-[var(--color-foreground)] transition-colors">Community</a>
+                <a href="#" className="btn-pro btn-secondary px-4 py-2 text-xs">Sign In</a>
+                <a href="#" className="btn-pro btn-primary px-4 py-2 text-xs">Get Started</a>
             </nav>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="bg-white border-b border-[var(--color-border)] relative overflow-hidden">
-        {/* Subtle Grid Background */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+      <section className="border-b border-[var(--color-border)] bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px]">
+        <div className="container-pro py-24 md:py-32 grid md:grid-cols-2 gap-12 items-center">
+          <div className="text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-xs font-semibold text-zinc-600 mb-8">
+              <span className="w-2 h-2 rounded-full bg-green-500"></span>
+              v1.0 is live
+            </div>
 
-        <div className="max-w-4xl mx-auto pt-24 pb-20 px-6 text-center relative z-10">
-          <div className="animate-fade-in-up" style={{ animationDelay: '0ms' }}>
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-xs font-bold text-slate-600 mb-8 shadow-sm">
-              <Terminal className="w-3 h-3" />
-              v1.0 RELEASE
-            </span>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 text-[var(--color-foreground)] leading-[1.1] tracking-tight">
+              Master System <br/>
+              <span className="text-[var(--color-muted)]">Architecture</span>
+            </h1>
+
+            <p className="text-xl text-[var(--color-muted)] mb-10 leading-relaxed font-normal max-w-lg">
+              Interactive flowcharts that narrate the journey of data. Built for developers who learn by seeing.
+            </p>
+
+            <div className="relative max-w-md group">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                <Search className="h-5 w-5 text-zinc-400 group-focus-within:text-[var(--color-primary)] transition-colors" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search scenarios..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-4 rounded-xl border border-[var(--color-border)] bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-zinc-400 transition-all font-medium text-[var(--color-foreground)]"
+              />
+              <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
+                <div className="flex items-center gap-1 px-2 py-1 rounded bg-zinc-100 border border-zinc-200 text-xs font-mono text-zinc-500">
+                  <Command className="w-3 h-3" /> K
+                </div>
+              </div>
+            </div>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-extrabold mb-6 text-[var(--color-text-main)] tracking-tight leading-tight animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-            Visualiza la <span className="text-[var(--color-accent)]">Arquitectura</span>.
-          </h1>
+          {/* Abstract Visual / Decorative */}
+          <div className="relative h-[400px] bg-white rounded-2xl border border-[var(--color-border)] shadow-2xl p-6 hidden md:block overflow-hidden">
+             {/* Mock UI Elements */}
+             <div className="flex items-center justify-between mb-8 border-b border-dashed border-zinc-100 pb-4">
+               <div className="flex gap-2">
+                 <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                 <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                 <div className="w-3 h-3 rounded-full bg-green-400"></div>
+               </div>
+               <div className="h-2 w-20 bg-zinc-100 rounded-full"></div>
+             </div>
 
-          <p className="text-xl text-[var(--color-text-secondary)] mb-12 leading-relaxed font-medium max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-            La plataforma definitiva para entender sistemas complejos. <br className="hidden md:block"/>
-            Estructurado. Interactivo. Técnico.
-          </p>
+             <div className="grid grid-cols-3 gap-4">
+                <div className="col-span-1 h-32 rounded-lg bg-zinc-50 border border-zinc-100 flex items-center justify-center">
+                   <div className="w-10 h-10 rounded-lg bg-white shadow-sm border border-zinc-200 flex items-center justify-center">
+                      <Zap className="w-5 h-5 text-indigo-500" />
+                   </div>
+                </div>
+                <div className="col-span-1 mt-12 h-32 rounded-lg bg-zinc-50 border border-zinc-100 flex items-center justify-center">
+                   <div className="w-10 h-10 rounded-lg bg-white shadow-sm border border-zinc-200 flex items-center justify-center">
+                      <Activity className="w-5 h-5 text-emerald-500" />
+                   </div>
+                </div>
+                <div className="col-span-1 h-32 rounded-lg bg-zinc-50 border border-zinc-100 flex items-center justify-center">
+                   <div className="w-10 h-10 rounded-lg bg-white shadow-sm border border-zinc-200 flex items-center justify-center">
+                      <Layout className="w-5 h-5 text-amber-500" />
+                   </div>
+                </div>
+             </div>
 
-          <div className="max-w-lg mx-auto relative group animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none transition-colors duration-300">
-              <Search className="h-5 w-5 text-slate-400 group-focus-within:text-[var(--color-accent)]" />
-            </div>
-            <input
-              type="text"
-              placeholder="Buscar escenarios (ej. API, Database)..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 rounded-lg border border-[var(--color-border-strong)] bg-slate-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-[var(--color-accent)] font-medium transition-all duration-300 placeholder:text-slate-400 text-[var(--color-text-main)] shadow-sm hover:border-slate-400"
-            />
+             {/* Connecting Lines (Fake) */}
+             <svg className="absolute inset-0 w-full h-full pointer-events-none z-10" style={{ opacity: 0.2 }}>
+               <path d="M100 150 Q 150 150 200 200" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" />
+               <path d="M250 200 Q 300 200 350 150" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" />
+             </svg>
           </div>
         </div>
       </section>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-16 flex-grow w-full">
-        <div className="flex items-center justify-between mb-8 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
-          <h2 className="text-lg font-bold text-[var(--color-text-main)] uppercase tracking-wider flex items-center gap-2">
-            <Grid className="w-5 h-5 text-[var(--color-text-muted)]" />
-            Catálogo
-          </h2>
-          <span className="text-xs font-mono font-bold text-[var(--color-text-muted)] bg-slate-200/50 border border-slate-200 px-3 py-1.5 rounded">
-            TOTAL: {filteredScenarios.length}
-          </span>
+      <main className="container-pro py-20 flex-grow w-full">
+        <div className="flex items-end justify-between mb-10">
+          <div>
+            <h2 className="text-2xl font-bold text-[var(--color-foreground)] mb-1">Explore Scenarios</h2>
+            <p className="text-[var(--color-muted)] text-sm">Select a system to analyze its data flow.</p>
+          </div>
+          <div className="text-xs font-medium text-[var(--color-muted)] bg-zinc-100 px-3 py-1 rounded-full">
+            {filteredScenarios.length} Systems
+          </div>
         </div>
 
         {filteredScenarios.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredScenarios.map((scenario, index) => (
-              <Link
-                key={scenario.id}
-                to={`/map/${scenario.slug}`}
-                className="group h-full block animate-fade-in-up"
-                style={{ animationDelay: `${500 + (index * 50)}ms` }}
-              >
-                <article className="bg-white border border-[var(--color-border)] rounded-xl p-6 h-full transition-all duration-300 hover:border-[var(--color-accent)] hover:shadow-lg hover:shadow-blue-900/5 hover:-translate-y-1 flex flex-col relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-[var(--color-accent)] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                  <div className="flex justify-between items-start mb-5">
-                     <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wide border transition-colors ${
-                      scenario.difficulty === 'Beginner' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 group-hover:bg-emerald-100' :
-                      scenario.difficulty === 'Intermediate' ? 'bg-amber-50 text-amber-700 border-amber-200 group-hover:bg-amber-100' :
-                      'bg-rose-50 text-rose-700 border-rose-200 group-hover:bg-rose-100'
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredScenarios.map((scenario) => (
+              <Link key={scenario.id} to={`/map/${scenario.slug}`} className="group h-full block">
+                <article className="card-pro h-full p-6 flex flex-col relative overflow-hidden">
+                  <div className="flex justify-between items-start mb-6">
+                     <div className="w-10 h-10 rounded-full bg-zinc-50 border border-zinc-100 flex items-center justify-center group-hover:bg-[var(--color-primary)] group-hover:text-white transition-colors duration-300">
+                        <Activity className="w-5 h-5" />
+                     </div>
+                     <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                      scenario.difficulty === 'Beginner' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                      scenario.difficulty === 'Intermediate' ? 'bg-amber-50 text-amber-700 border-amber-100' :
+                      'bg-rose-50 text-rose-700 border-rose-100'
                     }`}>
                       {scenario.difficulty}
                     </span>
                   </div>
 
-                  <h3 className="text-xl font-bold mb-3 text-[var(--color-text-main)] group-hover:text-[var(--color-accent)] transition-colors duration-300">
+                  <h3 className="text-lg font-bold mb-3 text-[var(--color-foreground)] group-hover:text-[var(--color-accent)] transition-colors">
                     {scenario.title}
                   </h3>
 
-                  <p className="text-[var(--color-text-secondary)] text-sm mb-8 leading-relaxed flex-grow border-b border-dashed border-slate-100 pb-6 group-hover:border-slate-200 transition-colors">
+                  <p className="text-[var(--color-muted)] text-sm mb-8 leading-relaxed flex-grow">
                     {scenario.description}
                   </p>
 
-                  <div className="flex items-center justify-between mt-auto">
-                    <span className="text-xs font-mono text-slate-400 group-hover:text-slate-500 transition-colors">ID: {scenario.slug.split('-')[0]}</span>
-                    <div className="flex items-center text-[var(--color-accent)] text-sm font-bold group-hover:underline decoration-2 underline-offset-4">
-                      ABRIR <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                    </div>
+                  <div className="flex items-center text-[var(--color-foreground)] text-sm font-semibold mt-auto border-t border-dashed border-zinc-100 pt-4 group-hover:border-zinc-200 transition-colors">
+                    Start Simulation <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </article>
               </Link>
             ))}
           </div>
         ) : (
-          <div className="text-center py-24 bg-white border border-[var(--color-border)] rounded-xl border-dashed animate-fade-in-up" style={{ animationDelay: '500ms' }}>
-            <div className="bg-slate-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
-               <ListFilter className="w-8 h-8 text-slate-300" />
-            </div>
-            <h3 className="text-lg font-bold text-[var(--color-text-main)] mb-2">Sin resultados</h3>
-            <p className="text-slate-500 mb-6">No encontramos escenarios que coincidan con tu búsqueda.</p>
+          <div className="text-center py-32 rounded-2xl border border-dashed border-[var(--color-border)] bg-zinc-50/50">
+            <h3 className="text-lg font-bold text-[var(--color-foreground)] mb-2">No scenarios found</h3>
+            <p className="text-[var(--color-muted)] mb-6">Try adjusting your search terms.</p>
             <button
               onClick={() => setSearchQuery('')}
-              className="text-[var(--color-accent)] font-bold hover:underline btn-press"
+              className="text-[var(--color-accent)] font-semibold hover:underline"
             >
-              Resetear Filtros
+              Clear Search
             </button>
           </div>
         )}
       </main>
 
-      <footer className="bg-white border-t border-[var(--color-border)] py-12 mt-auto">
-        <div className="max-w-7xl mx-auto px-6 text-center text-[var(--color-text-muted)] text-sm font-medium">
-          <p>&copy; 2025 BackendMap System. All rights reserved.</p>
+      <footer className="border-t border-[var(--color-border)] py-12 bg-zinc-50">
+        <div className="container-pro flex flex-col md:flex-row justify-between items-center text-sm text-[var(--color-muted)]">
+          <p>&copy; 2025 BackendMap. Crafted with precision.</p>
+          <div className="flex gap-6 mt-4 md:mt-0 font-medium">
+             <a href="#" className="hover:text-[var(--color-foreground)]">Privacy</a>
+             <a href="#" className="hover:text-[var(--color-foreground)]">Terms</a>
+             <a href="#" className="hover:text-[var(--color-foreground)]">Twitter</a>
+          </div>
         </div>
       </footer>
     </div>

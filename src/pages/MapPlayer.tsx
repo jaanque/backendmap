@@ -5,7 +5,7 @@ import '@xyflow/react/dist/style.css';
 import { getScenarioBySlug, getSteps } from '../lib/api';
 import type { Scenario, Step } from '../types';
 import CustomNode from '../components/CustomNode';
-import { ChevronLeft, ChevronRight, ArrowLeft, RefreshCw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw } from 'lucide-react';
 
 const nodeTypes = {
   custom: CustomNode,
@@ -32,7 +32,7 @@ export default function MapPlayer() {
 
             return getSteps(data.id).then(setSteps);
           } else {
-            setError('Escenario no encontrado');
+            setError('Scenario not found');
           }
         })
         .catch((err) => setError(err.message));
@@ -58,8 +58,8 @@ export default function MapPlayer() {
           ...edge,
           animated: edge.id === currentStep.active_edge_id,
           style: edge.id === currentStep.active_edge_id
-            ? { stroke: 'var(--color-accent)', strokeWidth: 2 }
-            : { stroke: '#cbd5e1', strokeWidth: 1.5 }
+            ? { stroke: '#000000', strokeWidth: 2 }
+            : { stroke: '#e5e7eb', strokeWidth: 1.5 }
         }))
       );
     }
@@ -77,33 +77,44 @@ export default function MapPlayer() {
     }
   };
 
+  const handleReset = () => {
+    setCurrentStepIndex(0);
+  }
+
   if (error) {
     return (
-      <div className="flex h-screen bg-[var(--color-background)] items-center justify-center p-6">
-         <div className="bg-white border border-red-300 p-8 rounded-lg shadow-sm text-center max-w-md w-full animate-fade-in-up">
-          <h2 className="text-xl font-bold text-red-700 mb-2">Error</h2>
-          <p className="text-slate-600">{error}</p>
-          <Link to="/" className="inline-block mt-6 text-[var(--color-accent)] font-bold hover:underline">Volver al Inicio</Link>
+      <div className="flex h-screen bg-white items-center justify-center p-6">
+         <div className="text-center">
+          <h2 className="text-xl font-bold text-zinc-900 mb-2">Error Loading Scenario</h2>
+          <p className="text-zinc-500 mb-6">{error}</p>
+          <Link to="/" className="btn-pro btn-secondary px-4 py-2 text-sm">Return Home</Link>
         </div>
       </div>
     );
   }
 
   if (!scenario) return (
-    <div className="flex h-screen bg-slate-50 items-center justify-center">
-      <RefreshCw className="w-8 h-8 text-[var(--color-accent)] animate-spin" />
+    <div className="flex h-screen bg-white items-center justify-center">
+      <div className="w-6 h-6 border-2 border-zinc-200 border-t-zinc-800 rounded-full animate-spin"></div>
     </div>
   );
 
   const currentStep = steps[currentStepIndex];
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden flex-col md:flex-row font-sans">
+    <div className="flex h-screen bg-white overflow-hidden flex-col md:flex-row font-sans">
+      {/* Header (Mobile only) */}
+      <div className="md:hidden h-14 border-b border-zinc-200 flex items-center px-4 justify-between bg-white z-20">
+         <Link to="/" className="text-zinc-500"><ArrowLeft size={20} /></Link>
+         <span className="font-bold text-sm">{scenario.title}</span>
+         <div />
+      </div>
+
       {/* Canvas Area */}
-      <div className="flex-grow h-[60%] md:h-full md:w-[70%] relative bg-slate-50 border-r border-slate-300">
-        <div className="absolute top-4 left-4 z-10">
-          <Link to="/" className="flex items-center text-slate-700 hover:text-[var(--color-primary)] transition-colors bg-white px-3 py-2 rounded border border-slate-300 shadow-sm text-sm font-bold hover:shadow-md active:scale-95 duration-200">
-            <ArrowLeft size={16} className="mr-2" /> Back
+      <div className="flex-grow h-[50%] md:h-full md:w-[70%] relative bg-[#fafafa]">
+        <div className="absolute top-6 left-6 z-10 hidden md:block">
+          <Link to="/" className="btn-pro btn-secondary px-3 py-2 text-xs shadow-sm bg-white">
+            <ArrowLeft size={14} className="mr-2" /> Back to Dashboard
           </Link>
         </div>
 
@@ -117,63 +128,70 @@ export default function MapPlayer() {
           fitView
           proOptions={{ hideAttribution: true }}
         >
-          <Background color="#cbd5e1" gap={20} size={1} variant={BackgroundVariant.Lines} />
-          <Controls className="!bg-white !border-slate-300 !shadow-sm !rounded-md [&>button]:!border-b-slate-200 hover:[&>button]:!bg-slate-50 !fill-slate-700" />
+          <Background color="#e5e5e5" gap={24} size={1} variant={BackgroundVariant.Dots} />
+          <Controls className="!bg-white !border-zinc-200 !shadow-sm !rounded-lg [&>button]:!border-b-zinc-100 hover:[&>button]:!bg-zinc-50 !fill-zinc-700" />
         </ReactFlow>
       </div>
 
-      {/* Sidebar - Solid Panel */}
-      <div className="w-full h-[40%] md:h-full md:w-[30%] bg-white border-t md:border-t-0 border-slate-300 flex flex-col z-20 shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)]">
+      {/* Sidebar - Pro Tool Panel */}
+      <div className="w-full h-[50%] md:h-full md:w-[30%] bg-white border-t md:border-t-0 md:border-l border-zinc-200 flex flex-col z-20 shadow-[0_0_40px_-10px_rgba(0,0,0,0.05)]">
 
-        {/* Sidebar Header */}
-        <div className="p-6 border-b border-slate-200 bg-slate-50/50">
-           <div className="flex items-center justify-between mb-2">
-             <span className="text-xs font-mono font-bold text-slate-500 uppercase">Step Controller</span>
-             <span className="px-2 py-0.5 bg-slate-200 text-slate-600 rounded text-[10px] font-bold font-mono">
-               {currentStepIndex + 1} / {steps.length}
-             </span>
+        {/* Scenario Header */}
+        <div className="px-6 py-5 border-b border-zinc-100">
+           <div className="flex items-center gap-2 mb-1">
+             <span className="w-2 h-2 rounded-full bg-green-500"></span>
+             <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Live Simulation</span>
            </div>
-           <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
-             <div
-               className="h-full bg-[var(--color-accent)] transition-all duration-300 ease-in-out"
-               style={{ width: `${((currentStepIndex + 1) / steps.length) * 100}%` }}
-             />
-           </div>
+           <h1 className="text-lg font-bold text-zinc-900 leading-tight">
+             {scenario.title}
+           </h1>
         </div>
 
-        {/* Content */}
-        <div className="p-6 flex-grow overflow-y-auto">
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold mb-4 text-[var(--color-text-main)] leading-tight tracking-tight">
-              {currentStep?.title || 'Loading...'}
-            </h1>
-            <div className="prose prose-slate prose-sm max-w-none">
-              <p className="whitespace-pre-line text-base text-slate-600 leading-relaxed font-medium">
-                {currentStep?.content || 'Select a step to begin.'}
-              </p>
-            </div>
+        {/* Step Content */}
+        <div className="px-6 py-6 flex-grow overflow-y-auto">
+          <div className="flex items-center justify-between mb-6">
+             <span className="px-2 py-1 bg-zinc-100 text-zinc-600 rounded text-xs font-mono font-medium">
+               Step {currentStepIndex + 1}/{steps.length}
+             </span>
+             <button onClick={handleReset} className="text-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer" title="Reset">
+               <RotateCcw size={14} />
+             </button>
+          </div>
+
+          <div className="animate-fade-in-up" key={currentStepIndex}>
+            <h2 className="text-xl font-bold text-zinc-900 mb-4">{currentStep?.title}</h2>
+            <p className="text-zinc-600 leading-relaxed text-sm">
+              {currentStep?.content}
+            </p>
           </div>
         </div>
 
-        {/* Navigation Controls - Hardware Style */}
-        <div className="p-6 border-t border-slate-200 bg-slate-50">
-          <div className="flex gap-4">
+        {/* Navigation Controls */}
+        <div className="p-6 border-t border-zinc-100 bg-zinc-50/50">
+          <div className="flex gap-3">
             <button
               onClick={handlePrev}
               disabled={currentStepIndex === 0}
-              className="flex-1 flex items-center justify-center py-3 rounded border border-slate-300 bg-white text-slate-700 font-bold hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm active:scale-95 duration-100"
+              className="flex-1 btn-pro btn-secondary py-2.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              <ChevronLeft className="mr-1" size={18} />
-              PREV
+              <ChevronLeft className="mr-1" size={16} />
+              Previous
             </button>
             <button
               onClick={handleNext}
               disabled={currentStepIndex === steps.length - 1}
-              className="flex-1 flex items-center justify-center py-3 rounded bg-[var(--color-primary)] text-white font-bold hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md active:scale-95 duration-100"
+              className="flex-1 btn-pro btn-primary py-2.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm cursor-pointer"
             >
-              NEXT
-              <ChevronRight className="ml-1" size={18} />
+              Next Step
+              <ChevronRight className="ml-1" size={16} />
             </button>
+          </div>
+
+          <div className="mt-4 h-1 w-full bg-zinc-200 rounded-full overflow-hidden">
+             <div
+               className="h-full bg-zinc-900 transition-all duration-300 ease-out"
+               style={{ width: `${((currentStepIndex + 1) / steps.length) * 100}%` }}
+             />
           </div>
         </div>
       </div>

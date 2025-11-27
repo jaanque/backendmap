@@ -10,39 +10,33 @@ const icons = {
   cloud: Cloud
 };
 
-const CustomNode = ({ data, id, selected }: NodeProps) => {
+const CustomNode = ({ data, selected }: NodeProps) => {
   const Icon = (icons[data.icon as keyof typeof icons] || Server) as ElementType;
   const isActive = !!data.isActive;
 
   return (
-    <div className={`relative min-w-[160px] bg-white transition-all duration-200
+    <div className={`relative min-w-[140px] px-4 py-3 rounded-lg bg-white transition-all duration-200
       ${isActive
-        ? 'border-2 border-[var(--color-accent)] shadow-md'
-        : 'border border-[var(--color-border-strong)] shadow-sm hover:border-slate-500'
+        ? 'border border-black shadow-[0_0_0_1px_rgba(0,0,0,1)]'
+        : 'border border-zinc-200 hover:border-zinc-300 shadow-sm'
       }
-      ${selected ? 'ring-2 ring-slate-400 ring-offset-2' : ''}
-      rounded-md
+      ${selected ? 'ring-2 ring-indigo-500 ring-offset-2' : ''}
     `}>
-      {/* Header/Icon Area */}
-      <div className={`px-3 py-2 border-b rounded-t-[4px] flex items-center justify-between ${isActive ? 'bg-blue-50/50 border-blue-100' : 'bg-slate-50 border-slate-200'}`}>
-        <Icon size={16} className={isActive ? 'text-[var(--color-accent)]' : 'text-slate-500'} />
-        {isActive && <div className="w-2 h-2 rounded-full bg-[var(--color-accent)]" />}
-      </div>
+      <Handle type="target" position={Position.Left} className="w-2 h-2 !bg-white !border-2 !border-black" />
 
-      {/* Content Area */}
-      <div className="px-3 py-3">
-        <div className={`text-sm font-bold leading-tight ${
-          isActive ? 'text-[var(--color-primary)]' : 'text-slate-700'
-        }`}>
+      <div className="flex flex-col items-center gap-3">
+        <div className={`p-2 rounded-md ${isActive ? 'bg-zinc-100 text-black' : 'bg-white text-zinc-400'}`}>
+           <Icon
+             size={20}
+             strokeWidth={isActive ? 2 : 1.5}
+           />
+        </div>
+        <span className={`text-xs font-semibold tracking-tight ${isActive ? 'text-black' : 'text-zinc-500'}`}>
           {data.label as string}
-        </div>
-        <div className="text-[10px] text-slate-400 font-mono mt-2 uppercase tracking-wider">
-           ID: {id}
-        </div>
+        </span>
       </div>
 
-      <Handle type="target" position={Position.Left} className="w-2.5 h-2.5 !bg-white !border-2 !border-slate-400 !rounded-sm" />
-      <Handle type="source" position={Position.Right} className="w-2.5 h-2.5 !bg-white !border-2 !border-slate-400 !rounded-sm" />
+      <Handle type="source" position={Position.Right} className="w-2 h-2 !bg-white !border-2 !border-black" />
     </div>
   );
 };
