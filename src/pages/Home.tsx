@@ -39,41 +39,41 @@ export default function Home() {
     <div className="min-h-screen bg-[var(--color-background)] font-sans selection:bg-black selection:text-white">
       {/* Navbar */}
       <header className="border-b border-[var(--color-border)] bg-white/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="container-pro h-16 flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2.5 group">
-                <div className="w-8 h-8 bg-[var(--color-primary)] text-white rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
-                  <Layout className="w-4 h-4" />
+        <div className="container-pro h-20 flex items-center justify-between">
+            <Link to="/" className="flex items-center gap-3 group">
+                <div className="w-9 h-9 bg-[var(--color-primary)] text-white rounded-xl flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+                  <Layout className="w-5 h-5" />
                 </div>
-                <span className="font-heading font-bold text-lg tracking-tight">BackendMap</span>
+                <span className="font-heading font-bold text-xl tracking-tight">BackendMap</span>
             </Link>
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-[var(--color-muted)]">
+            <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-[var(--color-muted)]">
                 <a href="#" className="hover:text-[var(--color-foreground)] transition-colors">Documentation</a>
                 <a href="#" className="hover:text-[var(--color-foreground)] transition-colors">Community</a>
-                <a href="#" className="btn-pro btn-secondary px-4 py-2 text-xs">Sign In</a>
-                <a href="#" className="btn-pro btn-primary px-4 py-2 text-xs">Get Started</a>
+                <a href="#" className="btn-pro btn-secondary px-5 py-2.5 text-sm">Sign In</a>
+                <a href="#" className="btn-pro btn-primary px-5 py-2.5 text-sm">Get Started</a>
             </nav>
         </div>
       </header>
 
       {/* Hero Section */}
       <section className="border-b border-[var(--color-border)] bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px]">
-        <div className="container-pro py-24 md:py-32 grid md:grid-cols-2 gap-16 items-center">
-          <div className="text-left">
-            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-[11px] font-semibold text-zinc-600 mb-8">
+        <div className="container-pro py-24 md:py-40 grid md:grid-cols-2 gap-20 items-center">
+          <div className="text-left flex flex-col justify-center">
+            <div className="inline-flex self-start items-center gap-2 px-2.5 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-[11px] font-semibold text-zinc-600 mb-8">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
               v1.0 is live
             </div>
 
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 text-[var(--color-foreground)] leading-[1.1] tracking-tight">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 text-[var(--color-foreground)] leading-[1.1] tracking-tight">
               Master System <br/>
               <span className="text-[var(--color-muted)]">Architecture</span>
             </h1>
 
-            <p className="text-lg text-[var(--color-muted)] mb-10 leading-relaxed font-normal max-w-md">
+            <p className="text-lg text-[var(--color-muted)] mb-8 leading-relaxed font-normal max-w-md">
               Interactive flowcharts that narrate the journey of data. Built for developers who learn by seeing.
             </p>
 
-            <div className="relative max-w-md group">
+            <div className="relative max-w-lg group">
               <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
                 <Search className="h-5 w-5 text-zinc-400 group-focus-within:text-[var(--color-primary)] transition-colors" />
               </div>
@@ -92,7 +92,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Abstract Visual / Decorative - Smaller Height */}
+          {/* Abstract Visual / Decorative */}
           <div className="relative h-[360px] bg-white rounded-2xl border border-[var(--color-border)] shadow-xl p-8 hidden md:block overflow-hidden rotate-1 hover:rotate-0 transition-transform duration-500 ease-out">
              {/* Mock UI Elements */}
              <div className="flex items-center justify-between mb-8 border-b border-dashed border-zinc-100 pb-4">
@@ -131,8 +131,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Main Content - Increased Top/Bottom Padding */}
-      <main className="container-pro pt-40 pb-40 flex-grow w-full">
+      {/* Main Content */}
+      <main className="container-pro pt-48 pb-40 flex-grow w-full">
         <div className="flex items-end justify-between mb-12">
           <div>
             <h2 className="text-2xl font-bold text-[var(--color-foreground)] mb-1">Explore Scenarios</h2>
