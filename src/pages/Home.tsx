@@ -92,8 +92,8 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Abstract Visual / Decorative */}
-          <div className="relative h-[420px] bg-white rounded-2xl border border-[var(--color-border)] shadow-xl p-8 hidden md:block overflow-hidden rotate-1 hover:rotate-0 transition-transform duration-500 ease-out">
+          {/* Abstract Visual / Decorative - Smaller Height */}
+          <div className="relative h-[360px] bg-white rounded-2xl border border-[var(--color-border)] shadow-xl p-8 hidden md:block overflow-hidden rotate-1 hover:rotate-0 transition-transform duration-500 ease-out">
              {/* Mock UI Elements */}
              <div className="flex items-center justify-between mb-8 border-b border-dashed border-zinc-100 pb-4">
                <div className="flex gap-2">
@@ -105,17 +105,17 @@ export default function Home() {
              </div>
 
              <div className="grid grid-cols-3 gap-6">
-                <div className="col-span-1 h-32 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center">
+                <div className="col-span-1 h-28 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center">
                    <div className="w-12 h-12 rounded-lg bg-white shadow-sm border border-zinc-200 flex items-center justify-center">
                       <Zap className="w-6 h-6 text-indigo-500" />
                    </div>
                 </div>
-                <div className="col-span-1 mt-12 h-32 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center">
+                <div className="col-span-1 mt-12 h-28 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center">
                    <div className="w-12 h-12 rounded-lg bg-white shadow-sm border border-zinc-200 flex items-center justify-center">
                       <Activity className="w-6 h-6 text-emerald-500" />
                    </div>
                 </div>
-                <div className="col-span-1 h-32 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center">
+                <div className="col-span-1 h-28 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center">
                    <div className="w-12 h-12 rounded-lg bg-white shadow-sm border border-zinc-200 flex items-center justify-center">
                       <Layout className="w-6 h-6 text-amber-500" />
                    </div>
@@ -131,8 +131,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Main Content */}
-      <main className="container-pro py-24 flex-grow w-full">
+      {/* Main Content - Increased Top/Bottom Padding */}
+      <main className="container-pro pt-40 pb-40 flex-grow w-full">
         <div className="flex items-end justify-between mb-12">
           <div>
             <h2 className="text-2xl font-bold text-[var(--color-foreground)] mb-1">Explore Scenarios</h2>
