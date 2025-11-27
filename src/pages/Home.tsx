@@ -40,9 +40,6 @@ export default function Home() {
       {/* Simple Top Bar */}
       <nav className="border-b border-zinc-100 h-16 flex items-center justify-between px-6 md:px-12 sticky top-0 bg-white/90 backdrop-blur z-50">
         <div className="font-bold text-xl tracking-tight flex items-center gap-2">
-          <div className="w-8 h-8 bg-black text-white rounded-lg flex items-center justify-center">
-            <Layers className="w-4 h-4" />
-          </div>
           BackendMap
         </div>
         <div className="flex gap-6 text-sm font-medium text-zinc-500">
