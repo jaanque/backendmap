@@ -6,21 +6,23 @@ import { ArrowRight, Search, Layers } from 'lucide-react';
 
 export default function Explore() {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     getScenarios()
       .then(setScenarios)
-      .catch((err) => setError(err.message));
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
   }, []);
 
   const filteredScenarios = useMemo(() => {
     if (!searchQuery) return scenarios;
     const lowerQuery = searchQuery.toLowerCase();
     return scenarios.filter(s =>
-      s.title.toLowerCase().includes(lowerQuery) ||
-      s.description.toLowerCase().includes(lowerQuery)
+      (s.title || '').toLowerCase().includes(lowerQuery) ||
+      (s.description || '').toLowerCase().includes(lowerQuery)
     );
   }, [scenarios, searchQuery]);
 
@@ -74,23 +76,27 @@ export default function Explore() {
           <span className="text-xs font-mono text-zinc-400 bg-zinc-100 px-2 py-1 rounded">{filteredScenarios.length} ITEMS</span>
         </div>
 
-        {filteredScenarios.length > 0 ? (
+        {loading ? (
+          <div className="flex justify-center py-24">
+             <div className="w-8 h-8 border-2 border-zinc-200 border-t-zinc-800 rounded-full animate-spin"></div>
+          </div>
+        ) : filteredScenarios.length > 0 ? (
           <div className="flex flex-col gap-4">
             {filteredScenarios.map((scenario) => (
               <Link key={scenario.id} to={`/map/${scenario.slug}`} className="block group">
                 <article className="border border-zinc-200 rounded-xl p-6 bg-white hover:border-zinc-400 hover:shadow-md transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div className="flex-grow">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-bold text-lg text-zinc-900 group-hover:text-indigo-600 transition-colors">{scenario.title}</h3>
+                      <h3 className="font-bold text-lg text-zinc-900 group-hover:text-indigo-600 transition-colors">{scenario.title || 'Untitled Scenario'}</h3>
                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${
                         scenario.difficulty === 'Beginner' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
                         scenario.difficulty === 'Intermediate' ? 'bg-amber-50 text-amber-700 border-amber-100' :
                         'bg-rose-50 text-rose-700 border-rose-100'
                       }`}>
-                        {scenario.difficulty}
+                        {scenario.difficulty || 'Unknown'}
                       </span>
                     </div>
-                    <p className="text-zinc-500 text-sm leading-relaxed max-w-2xl">{scenario.description}</p>
+                    <p className="text-zinc-500 text-sm leading-relaxed max-w-2xl">{scenario.description || 'No description available.'}</p>
                   </div>
 
                   <div className="flex-shrink-0 flex items-center">
