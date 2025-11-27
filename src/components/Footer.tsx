@@ -31,10 +31,9 @@ export default function Footer() {
           <div>
             <h4 className="font-bold text-zinc-900 mb-6 text-sm">Platform</h4>
             <ul className="space-y-3 text-sm text-zinc-500">
+              <li><Link to="/" className="hover:text-black transition-colors">Home</Link></li>
               <li><Link to="/explore" className="hover:text-black transition-colors">Browse Scenarios</Link></li>
-              <li><Link to="/about" className="hover:text-black transition-colors">How it Works</Link></li>
-              <li><a href="#" className="hover:text-black transition-colors">Pricing</a></li>
-              <li><a href="#" className="hover:text-black transition-colors">Changelog</a></li>
+              <li><Link to="/about" className="hover:text-black transition-colors">About & How it Works</Link></li>
             </ul>
           </div>
 
@@ -42,20 +41,8 @@ export default function Footer() {
           <div>
             <h4 className="font-bold text-zinc-900 mb-6 text-sm">Community</h4>
             <ul className="space-y-3 text-sm text-zinc-500">
-              <li><a href="#" className="hover:text-black transition-colors">GitHub Discussions</a></li>
-              <li><a href="#" className="hover:text-black transition-colors">Contributing</a></li>
-              <li><a href="#" className="hover:text-black transition-colors">Discord Server</a></li>
-              <li><a href="#" className="hover:text-black transition-colors">Events</a></li>
-            </ul>
-          </div>
-
-          {/* Links Column 3 */}
-          <div>
-            <h4 className="font-bold text-zinc-900 mb-6 text-sm">Legal</h4>
-            <ul className="space-y-3 text-sm text-zinc-500">
-              <li><a href="#" className="hover:text-black transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-black transition-colors">Terms of Service</a></li>
-              <li><a href="#" className="hover:text-black transition-colors">Cookie Policy</a></li>
+              <li><a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors">GitHub Repository</a></li>
+              <li><a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors">Contribute</a></li>
             </ul>
           </div>
         </div>
