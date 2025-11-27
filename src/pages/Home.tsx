@@ -26,107 +26,101 @@ export default function Home() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[var(--color-surface)] text-[var(--color-text-main)] p-8 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg shadow-sm border border-red-200 max-w-md text-center">
-          <h2 className="text-xl font-bold text-red-600 mb-2">Error de Conexión</h2>
-          <p className="text-slate-600 text-sm">{error}</p>
+      <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center p-6">
+        <div className="bg-white border border-red-300 p-6 rounded-md shadow-sm max-w-md w-full">
+          <h2 className="text-lg font-bold text-red-700 mb-2 flex items-center gap-2">
+            Error de Conexión
+          </h2>
+          <p className="text-slate-600">{error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-surface)] flex flex-col">
-      {/* Navbar */}
-      <header className="bg-white border-b border-[var(--color-border)] sticky top-0 z-30 shadow-sm">
+    <div className="min-h-screen bg-[var(--color-background)] font-sans">
+      {/* Navbar - Sticky & Solid */}
+      <header className="bg-white border-b border-[var(--color-border)] sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div className="flex items-center gap-2 font-bold text-xl text-[var(--color-text-main)] tracking-tight">
-                <div className="p-1.5 bg-[var(--color-primary)] text-white rounded-lg">
+            <div className="flex items-center gap-3 font-bold text-lg tracking-tight text-[var(--color-text-main)]">
+                <div className="p-1.5 bg-[var(--color-primary)] text-white rounded">
                   <Layout className="w-5 h-5" />
                 </div>
-                BackendMap
+                BACKENDMAP
             </div>
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
-                <a href="#" className="hover:text-[var(--color-primary)] transition-colors">Documentación</a>
-                <a href="#" className="hover:text-[var(--color-primary)] transition-colors">Contribuir</a>
-                <a href="#" className="text-[var(--color-primary)] bg-blue-50 px-4 py-2 rounded-full hover:bg-blue-100 transition-colors">Iniciar Sesión</a>
+            <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-[var(--color-text-secondary)]">
+                <a href="#" className="hover:text-[var(--color-primary)] transition-colors">Docs</a>
+                <a href="#" className="hover:text-[var(--color-primary)] transition-colors">Contribute</a>
+                <a href="#" className="text-white bg-[var(--color-primary)] px-5 py-2 rounded hover:bg-[var(--color-primary-hover)] transition-colors">Login</a>
             </nav>
         </div>
       </header>
 
-      {/* Hero Section */}
+      {/* Hero Section - Clean & Structured */}
       <section className="bg-white border-b border-[var(--color-border)]">
-        <div className="max-w-7xl mx-auto pt-24 pb-20 px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-xs font-semibold text-blue-700 mb-8">
-            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-            Nueva Versión 1.0
-          </div>
-          <h1 className="text-5xl md:text-7xl font-extrabold mb-6 text-[var(--color-text-main)] tracking-tight leading-tight">
-            Domina la <span className="text-[var(--color-primary)]">Arquitectura</span><br className="hidden md:block"/> de Software
+        <div className="max-w-4xl mx-auto pt-20 pb-16 px-6 text-center">
+          <h1 className="text-4xl md:text-6xl font-extrabold mb-6 text-[var(--color-text-main)] tracking-tight">
+            Visualiza la Arquitectura.
           </h1>
-          <p className="text-xl text-slate-500 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Explora diagramas interactivos de sistemas reales.
-            Aprende cómo fluyen los datos entre servidores, bases de datos y APIs.
+          <p className="text-xl text-[var(--color-text-secondary)] mb-10 leading-relaxed font-medium">
+            Plataforma educativa para diagramas de sistemas. <br/>
+            Estructurado. Interactivo. Técnico.
           </p>
 
-          {/* Search Bar in Hero */}
-          <div className="max-w-xl mx-auto relative group">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-slate-400 group-focus-within:text-[var(--color-primary)] transition-colors" />
+          <div className="max-w-lg mx-auto relative">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+              <Search className="h-5 w-5 text-slate-400" />
             </div>
             <input
               type="text"
-              placeholder="Buscar escenarios (ej: Amazon, API, Database)..."
+              placeholder="Buscar escenarios..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 rounded-xl border border-slate-200 shadow-lg shadow-slate-200/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent text-lg placeholder:text-slate-400 transition-all"
+              className="w-full pl-12 pr-4 py-3.5 rounded border border-[var(--color-border-strong)] bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent font-medium transition-all placeholder:text-slate-400 text-[var(--color-text-main)]"
             />
           </div>
         </div>
       </section>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-16 flex-grow w-full">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-bold text-[var(--color-text-main)] flex items-center gap-2">
-            <Grid className="w-6 h-6 text-slate-400" />
-            Escenarios Disponibles
+      {/* Main Content - Grid */}
+      <main className="max-w-7xl mx-auto px-6 py-12">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-bold text-[var(--color-text-main)] uppercase tracking-wider flex items-center gap-2">
+            <Grid className="w-5 h-5 text-[var(--color-text-muted)]" />
+            Catálogo
           </h2>
-          <div className="text-sm font-medium text-slate-500 bg-white px-3 py-1 rounded-md border border-slate-200 shadow-sm">
-            {filteredScenarios.length} resultados
-          </div>
+          <span className="text-xs font-mono font-bold text-[var(--color-text-muted)] bg-slate-200 px-2 py-1 rounded">
+            TOTAL: {filteredScenarios.length}
+          </span>
         </div>
 
         {filteredScenarios.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredScenarios.map((scenario) => (
-              <Link key={scenario.id} to={`/map/${scenario.slug}`} className="block group h-full">
-                <article className="bg-white border border-[var(--color-border)] rounded-2xl p-6 h-full transition-all duration-300 hover:border-blue-300 hover:shadow-xl hover:shadow-blue-100/50 hover:-translate-y-1 flex flex-col">
+              <Link key={scenario.id} to={`/map/${scenario.slug}`} className="group h-full block">
+                <article className="bg-white border border-[var(--color-border)] rounded-lg p-6 h-full transition-all hover:border-[var(--color-accent)] hover:shadow-md flex flex-col">
                   <div className="flex justify-between items-start mb-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                      scenario.difficulty === 'Beginner' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
-                      scenario.difficulty === 'Intermediate' ? 'bg-amber-50 text-amber-700 border border-amber-100' :
-                      'bg-rose-50 text-rose-700 border border-rose-100'
+                     <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide border ${
+                      scenario.difficulty === 'Beginner' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                      scenario.difficulty === 'Intermediate' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                      'bg-rose-50 text-rose-700 border-rose-200'
                     }`}>
                       {scenario.difficulty}
                     </span>
                   </div>
 
-                  <h3 className="text-xl font-bold mb-3 text-[var(--color-text-main)] group-hover:text-[var(--color-primary)] transition-colors">
+                  <h3 className="text-xl font-bold mb-2 text-[var(--color-text-main)] group-hover:text-[var(--color-accent)] transition-colors">
                     {scenario.title}
                   </h3>
 
-                  <p className="text-slate-500 text-sm mb-6 line-clamp-3 leading-relaxed flex-grow">
+                  <p className="text-[var(--color-text-secondary)] text-sm mb-6 leading-relaxed flex-grow border-b border-dashed border-slate-200 pb-4">
                     {scenario.description}
                   </p>
 
-                  <div className="pt-6 border-t border-slate-50 flex items-center justify-between">
-                    <div className="flex items-center text-slate-400 text-sm">
-                       <span className="w-2 h-2 rounded-full bg-slate-300 mr-2"></span>
-                       Interactivo
-                    </div>
-                    <div className="flex items-center text-[var(--color-primary)] text-sm font-bold group-hover:underline decoration-2 underline-offset-4">
-                      Ver Diagrama <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  <div className="flex items-center justify-between mt-auto">
+                    <span className="text-xs font-mono text-slate-400">ID: {scenario.slug.split('-')[0]}</span>
+                    <div className="flex items-center text-[var(--color-accent)] text-sm font-bold">
+                      ABRIR <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </div>
                 </article>
@@ -134,31 +128,22 @@ export default function Home() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-300">
-            <div className="bg-slate-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <ListFilter className="w-8 h-8 text-slate-400" />
-            </div>
-            <h3 className="text-lg font-bold text-slate-900 mb-2">No se encontraron resultados</h3>
-            <p className="text-slate-500">Intenta con otros términos de búsqueda.</p>
+          <div className="text-center py-24 bg-white border border-[var(--color-border)] rounded-lg border-dashed">
+            <ListFilter className="w-10 h-10 text-slate-300 mx-auto mb-4" />
+            <h3 className="text-lg font-bold text-[var(--color-text-main)]">Sin resultados</h3>
             <button
               onClick={() => setSearchQuery('')}
-              className="mt-6 text-[var(--color-primary)] font-semibold hover:underline cursor-pointer"
+              className="mt-4 text-[var(--color-accent)] font-bold hover:underline"
             >
-              Limpiar búsqueda
+              Resetear Filtros
             </button>
           </div>
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 py-12">
-        <div className="max-w-7xl mx-auto px-6 text-center text-slate-500 text-sm">
-          <p className="mb-4">&copy; 2025 BackendMap. Todos los derechos reservados.</p>
-          <div className="flex justify-center gap-6 font-medium">
-             <a href="#" className="hover:text-slate-900">Términos</a>
-             <a href="#" className="hover:text-slate-900">Privacidad</a>
-             <a href="#" className="hover:text-slate-900">Contacto</a>
-          </div>
+      <footer className="bg-white border-t border-[var(--color-border)] py-10 mt-auto">
+        <div className="max-w-7xl mx-auto px-6 text-center text-[var(--color-text-muted)] text-sm font-medium">
+          <p>&copy; 2025 BackendMap System. All rights reserved.</p>
         </div>
       </footer>
     </div>

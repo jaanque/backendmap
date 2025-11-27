@@ -1,6 +1,6 @@
 import { Handle, Position, type NodeProps } from '@xyflow/react';
 import { Monitor, Server, Cpu, Database, Cloud } from 'lucide-react';
-import { memo } from 'react';
+import { memo, type ElementType } from 'react';
 
 const icons = {
   monitor: Monitor,
@@ -10,36 +10,39 @@ const icons = {
   cloud: Cloud
 };
 
-const CustomNode = ({ data, selected }: NodeProps) => {
-  const Icon = (icons[data.icon as keyof typeof icons] || Server) as React.ElementType;
-  const isActive = data.isActive;
+const CustomNode = ({ data, id, selected }: NodeProps) => {
+  const Icon = (icons[data.icon as keyof typeof icons] || Server) as ElementType;
+  const isActive = !!data.isActive;
 
   return (
-    <div className={`px-4 py-3 min-w-[140px] rounded-lg border-2 transition-all duration-300 bg-white
+    <div className={`relative min-w-[160px] bg-white transition-all duration-200
       ${isActive
-        ? 'border-[var(--color-primary)] shadow-md ring-2 ring-blue-100'
-        : 'border-slate-200 hover:border-slate-300 shadow-sm'
+        ? 'border-2 border-[var(--color-accent)] shadow-md'
+        : 'border border-[var(--color-border-strong)] shadow-sm hover:border-slate-500'
       }
-      ${selected ? 'ring-2 ring-slate-400' : ''}
+      ${selected ? 'ring-2 ring-slate-400 ring-offset-2' : ''}
+      rounded-md
     `}>
-      <Handle type="target" position={Position.Left} className="w-2.5 h-2.5 !bg-slate-400 !border-2 !border-white" />
+      {/* Header/Icon Area */}
+      <div className={`px-3 py-2 border-b rounded-t-[4px] flex items-center justify-between ${isActive ? 'bg-blue-50/50 border-blue-100' : 'bg-slate-50 border-slate-200'}`}>
+        <Icon size={16} className={isActive ? 'text-[var(--color-accent)]' : 'text-slate-500'} />
+        {isActive && <div className="w-2 h-2 rounded-full bg-[var(--color-accent)]" />}
+      </div>
 
-      <div className="flex flex-col items-center gap-2">
-        <div className={`p-2 rounded-md ${
-          isActive
-            ? 'text-[var(--color-primary)] bg-blue-50'
-            : 'text-slate-600 bg-slate-100'
-        }`}>
-          <Icon size={20} strokeWidth={2} />
-        </div>
-        <div className={`text-sm font-bold ${
+      {/* Content Area */}
+      <div className="px-3 py-3">
+        <div className={`text-sm font-bold leading-tight ${
           isActive ? 'text-[var(--color-primary)]' : 'text-slate-700'
         }`}>
           {data.label as string}
         </div>
+        <div className="text-[10px] text-slate-400 font-mono mt-2 uppercase tracking-wider">
+           ID: {id}
+        </div>
       </div>
 
-      <Handle type="source" position={Position.Right} className="w-2.5 h-2.5 !bg-slate-400 !border-2 !border-white" />
+      <Handle type="target" position={Position.Left} className="w-2.5 h-2.5 !bg-white !border-2 !border-slate-400 !rounded-sm" />
+      <Handle type="source" position={Position.Right} className="w-2.5 h-2.5 !bg-white !border-2 !border-slate-400 !rounded-sm" />
     </div>
   );
 };
