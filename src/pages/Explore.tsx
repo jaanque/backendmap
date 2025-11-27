@@ -2,7 +2,8 @@ import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { getScenarios } from '../lib/api';
 import type { Scenario } from '../types';
-import { ArrowRight, Search, Layers } from 'lucide-react';
+import { ArrowRight, Search } from 'lucide-react';
+import Footer from '../components/Footer';
 
 export default function Explore() {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
@@ -46,7 +47,7 @@ export default function Explore() {
         </Link>
         <div className="flex gap-6 text-sm font-medium text-zinc-500">
           <Link to="/explore" className="text-black transition-colors">Explore Scenarios</Link>
-          <a href="#" className="hover:text-black transition-colors">About</a>
+          <Link to="/about" className="hover:text-black transition-colors">About</Link>
         </div>
       </nav>
 
@@ -113,15 +114,7 @@ export default function Explore() {
         )}
       </main>
 
-      <footer className="border-t border-zinc-100 py-12">
-        <div className="px-6 md:px-12 max-w-5xl mx-auto flex justify-between items-center text-xs text-zinc-400 uppercase tracking-widest">
-          <p>© 2025 BackendMap</p>
-          <div className="flex gap-6">
-             <a href="#" className="hover:text-zinc-900 transition-colors">Privacy</a>
-             <a href="#" className="hover:text-zinc-900 transition-colors">Terms</a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
