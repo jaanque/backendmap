@@ -6,10 +6,24 @@ import { ArrowRight } from 'lucide-react';
 
 export default function Home() {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    getScenarios().then(setScenarios);
+    getScenarios()
+      .then(setScenarios)
+      .catch((err) => setError(err.message));
   }, []);
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[var(--color-background)] text-white p-8 flex items-center justify-center">
+        <div className="bg-red-900/20 border border-red-500/50 p-6 rounded-lg max-w-md text-center">
+          <h2 className="text-xl font-bold text-red-400 mb-2">Error de Conexión</h2>
+          <p className="text-gray-300">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[var(--color-background)] text-white p-8">

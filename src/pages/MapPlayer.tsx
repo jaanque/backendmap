@@ -16,22 +16,27 @@ export default function MapPlayer() {
   const [scenario, setScenario] = useState<Scenario | null>(null);
   const [steps, setSteps] = useState<Step[]>([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
   useEffect(() => {
     if (slug) {
-      getScenarioBySlug(slug).then((data) => {
-        if (data) {
-          setScenario(data);
-          // Initialize nodes and edges from flow_data
-          setNodes(data.flow_data.initialNodes);
-          setEdges(data.flow_data.initialEdges);
+      getScenarioBySlug(slug)
+        .then((data) => {
+          if (data) {
+            setScenario(data);
+            // Initialize nodes and edges from flow_data
+            setNodes(data.flow_data.initialNodes);
+            setEdges(data.flow_data.initialEdges);
 
-          getSteps(data.id).then(setSteps);
-        }
-      });
+            return getSteps(data.id).then(setSteps);
+          } else {
+            setError('Escenario no encontrado');
+          }
+        })
+        .catch((err) => setError(err.message));
     }
   }, [slug, setNodes, setEdges]);
 
@@ -73,6 +78,18 @@ export default function MapPlayer() {
       setCurrentStepIndex(prev => prev - 1);
     }
   };
+
+  if (error) {
+    return (
+      <div className="flex h-screen bg-[var(--color-background)] text-white items-center justify-center">
+         <div className="bg-red-900/20 border border-red-500/50 p-6 rounded-lg max-w-md text-center">
+          <h2 className="text-xl font-bold text-red-400 mb-2">Error</h2>
+          <p className="text-gray-300">{error}</p>
+          <Link to="/" className="inline-block mt-4 text-[var(--color-primary)] hover:underline">Volver al Inicio</Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!scenario) return <div className="text-white p-10">Cargando escenario...</div>;
 
