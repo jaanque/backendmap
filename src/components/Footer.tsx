@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
 import { Github, Twitter, Layers } from 'lucide-react';
+import { useAuth } from '../lib/auth';
 
 export default function Footer() {
+  const { user } = useAuth();
+
   return (
     <footer className="border-t border-zinc-100 bg-white pt-16 pb-12">
       <div className="px-6 md:px-12 max-w-6xl mx-auto">
@@ -34,6 +37,12 @@ export default function Footer() {
               <li><Link to="/" className="hover:text-black transition-colors">Home</Link></li>
               <li><Link to="/explore" className="hover:text-black transition-colors">Browse Scenarios</Link></li>
               <li><Link to="/about" className="hover:text-black transition-colors">About & How it Works</Link></li>
+              {!user && (
+                <>
+                  <li><Link to="/login" className="hover:text-black transition-colors">Login</Link></li>
+                  <li><Link to="/register" className="hover:text-black transition-colors">Sign Up</Link></li>
+                </>
+              )}
             </ul>
           </div>
 

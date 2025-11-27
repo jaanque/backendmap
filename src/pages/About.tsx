@@ -1,20 +1,12 @@
 import { Link } from 'react-router-dom';
 import { Layers, Github, Twitter, ArrowRight } from 'lucide-react';
 import Footer from '../components/Footer';
+import Navbar from '../components/Navbar';
 
 export default function About() {
   return (
     <div className="min-h-screen bg-white font-sans text-zinc-900 selection:bg-black selection:text-white">
-      {/* Navbar - Reused from Home/Explore */}
-      <nav className="border-b border-zinc-100 h-16 flex items-center justify-between px-6 md:px-12 sticky top-0 bg-white/90 backdrop-blur z-50">
-        <Link to="/" className="font-bold text-xl tracking-tight flex items-center gap-2 text-zinc-900 hover:text-black transition-colors">
-          BackendMap
-        </Link>
-        <div className="flex gap-6 text-sm font-medium text-zinc-500">
-          <Link to="/explore" className="hover:text-black transition-colors">Explore Scenarios</Link>
-          <Link to="/about" className="text-black transition-colors">About</Link>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero Section */}
       <header className="py-24 px-6 md:px-12 max-w-4xl mx-auto text-center">

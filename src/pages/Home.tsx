@@ -4,6 +4,7 @@ import { getScenarios } from '../lib/api';
 import type { Scenario } from '../types';
 import { ArrowRight, Search } from 'lucide-react';
 import Footer from '../components/Footer';
+import Navbar from '../components/Navbar';
 
 export default function Home() {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
@@ -38,16 +39,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white font-sans text-zinc-900 selection:bg-black selection:text-white">
-      {/* Simple Top Bar */}
-      <nav className="border-b border-zinc-100 h-16 flex items-center justify-between px-6 md:px-12 sticky top-0 bg-white/90 backdrop-blur z-50">
-        <div className="font-bold text-xl tracking-tight flex items-center gap-2">
-          BackendMap
-        </div>
-        <div className="flex gap-6 text-sm font-medium text-zinc-500">
-          <Link to="/explore" className="hover:text-black transition-colors">Explore Scenarios</Link>
-          <Link to="/about" className="hover:text-black transition-colors">About</Link>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero */}
       <header className="py-24 px-6 md:px-12 max-w-4xl mx-auto text-center">
