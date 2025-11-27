@@ -15,20 +15,31 @@ const CustomNode = ({ data, selected }: NodeProps) => {
   const isActive = data.isActive;
 
   return (
-    <div className={`px-4 py-3 shadow-md rounded-md bg-slate-900 border-2 transition-all duration-300 min-w-[150px]
-      ${isActive ? 'border-[var(--color-primary)] shadow-[0_0_15px_rgba(34,211,238,0.5)]' : 'border-slate-700'}
-      ${selected ? 'border-white' : ''}
+    <div className={`relative px-5 py-4 min-w-[160px] rounded-2xl transition-all duration-500
+      ${isActive
+        ? 'bg-[var(--color-primary)]/10 border border-[var(--color-primary)] shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)]'
+        : 'bg-zinc-900/80 border border-zinc-800 hover:border-zinc-700 backdrop-blur-md'
+      }
+      ${selected ? 'ring-2 ring-white/20' : ''}
     `}>
-      <Handle type="target" position={Position.Left} className="w-3 h-3 !bg-slate-500" />
+      <Handle type="target" position={Position.Left} className="w-2 h-2 !bg-zinc-600 !border-none" />
 
-      <div className="flex flex-col items-center">
-        <div className={`p-2 rounded-full mb-2 ${isActive ? 'bg-[var(--color-primary)] text-black' : 'bg-slate-800 text-slate-400'}`}>
-          <Icon size={20} />
+      <div className="flex flex-col items-center gap-3">
+        <div className={`p-3 rounded-xl transition-colors duration-500 ${
+          isActive
+            ? 'bg-[var(--color-primary)] text-black shadow-lg shadow-[var(--color-primary)]/20'
+            : 'bg-zinc-800/50 text-zinc-400'
+        }`}>
+          <Icon size={24} strokeWidth={1.5} />
         </div>
-        <div className="text-sm font-bold text-slate-200">{data.label as string}</div>
+        <div className={`text-sm font-semibold tracking-wide transition-colors duration-300 ${
+          isActive ? 'text-[var(--color-primary)]' : 'text-zinc-300'
+        }`}>
+          {data.label as string}
+        </div>
       </div>
 
-      <Handle type="source" position={Position.Right} className="w-3 h-3 !bg-slate-500" />
+      <Handle type="source" position={Position.Right} className="w-2 h-2 !bg-zinc-600 !border-none" />
     </div>
   );
 };
