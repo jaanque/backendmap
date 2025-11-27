@@ -15,31 +15,31 @@ const CustomNode = ({ data, selected }: NodeProps) => {
   const isActive = data.isActive;
 
   return (
-    <div className={`relative px-5 py-4 min-w-[160px] rounded-2xl transition-all duration-500
+    <div className={`px-4 py-3 min-w-[140px] rounded-lg border-2 transition-all duration-300 bg-white
       ${isActive
-        ? 'bg-[var(--color-primary)]/10 border border-[var(--color-primary)] shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)]'
-        : 'bg-zinc-900/80 border border-zinc-800 hover:border-zinc-700 backdrop-blur-md'
+        ? 'border-[var(--color-primary)] shadow-md ring-2 ring-blue-100'
+        : 'border-slate-200 hover:border-slate-300 shadow-sm'
       }
-      ${selected ? 'ring-2 ring-white/20' : ''}
+      ${selected ? 'ring-2 ring-slate-400' : ''}
     `}>
-      <Handle type="target" position={Position.Left} className="w-2 h-2 !bg-zinc-600 !border-none" />
+      <Handle type="target" position={Position.Left} className="w-2.5 h-2.5 !bg-slate-400 !border-2 !border-white" />
 
-      <div className="flex flex-col items-center gap-3">
-        <div className={`p-3 rounded-xl transition-colors duration-500 ${
+      <div className="flex flex-col items-center gap-2">
+        <div className={`p-2 rounded-md ${
           isActive
-            ? 'bg-[var(--color-primary)] text-black shadow-lg shadow-[var(--color-primary)]/20'
-            : 'bg-zinc-800/50 text-zinc-400'
+            ? 'text-[var(--color-primary)] bg-blue-50'
+            : 'text-slate-600 bg-slate-100'
         }`}>
-          <Icon size={24} strokeWidth={1.5} />
+          <Icon size={20} strokeWidth={2} />
         </div>
-        <div className={`text-sm font-semibold tracking-wide transition-colors duration-300 ${
-          isActive ? 'text-[var(--color-primary)]' : 'text-zinc-300'
+        <div className={`text-sm font-bold ${
+          isActive ? 'text-[var(--color-primary)]' : 'text-slate-700'
         }`}>
           {data.label as string}
         </div>
       </div>
 
-      <Handle type="source" position={Position.Right} className="w-2 h-2 !bg-zinc-600 !border-none" />
+      <Handle type="source" position={Position.Right} className="w-2.5 h-2.5 !bg-slate-400 !border-2 !border-white" />
     </div>
   );
 };

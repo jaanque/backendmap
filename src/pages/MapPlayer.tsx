@@ -5,7 +5,7 @@ import '@xyflow/react/dist/style.css';
 import { getScenarioBySlug, getSteps } from '../lib/api';
 import type { Scenario, Step } from '../types';
 import CustomNode from '../components/CustomNode';
-import { ChevronLeft, ChevronRight, ArrowLeft, RefreshCw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowLeft, RefreshCw, Layers } from 'lucide-react';
 
 const nodeTypes = {
   custom: CustomNode,
@@ -58,8 +58,8 @@ export default function MapPlayer() {
           ...edge,
           animated: edge.id === currentStep.active_edge_id,
           style: edge.id === currentStep.active_edge_id
-            ? { stroke: 'var(--color-primary)', strokeWidth: 2, filter: 'drop-shadow(0 0 4px var(--color-primary))' }
-            : { stroke: '#3f3f46', strokeWidth: 1 }
+            ? { stroke: 'var(--color-primary)', strokeWidth: 2 }
+            : { stroke: '#cbd5e1', strokeWidth: 1 }
         }))
       );
     }
@@ -79,30 +79,30 @@ export default function MapPlayer() {
 
   if (error) {
     return (
-      <div className="flex h-screen bg-[var(--color-background)] text-white items-center justify-center">
-         <div className="glass p-8 rounded-2xl max-w-md text-center border border-red-500/20">
-          <h2 className="text-xl font-bold text-red-400 mb-2">Error</h2>
-          <p className="text-zinc-400">{error}</p>
-          <Link to="/" className="inline-block mt-6 text-[var(--color-primary)] hover:text-white transition-colors text-sm font-medium">Volver al Inicio</Link>
+      <div className="flex h-screen bg-[var(--color-background)] items-center justify-center">
+         <div className="bg-white p-8 rounded-lg border border-red-200 shadow-sm text-center max-w-md">
+          <h2 className="text-xl font-bold text-red-600 mb-2">Error</h2>
+          <p className="text-slate-600">{error}</p>
+          <Link to="/" className="inline-block mt-6 text-[var(--color-primary)] font-semibold hover:underline">Volver al Inicio</Link>
         </div>
       </div>
     );
   }
 
   if (!scenario) return (
-    <div className="flex h-screen bg-[var(--color-background)] items-center justify-center">
-      <RefreshCw className="w-6 h-6 text-[var(--color-primary)] animate-spin" />
+    <div className="flex h-screen bg-slate-50 items-center justify-center">
+      <RefreshCw className="w-8 h-8 text-[var(--color-primary)] animate-spin" />
     </div>
   );
 
   const currentStep = steps[currentStepIndex];
 
   return (
-    <div className="flex h-screen bg-[var(--color-background)] text-white overflow-hidden flex-col md:flex-row">
+    <div className="flex h-screen bg-white overflow-hidden flex-col md:flex-row font-sans">
       {/* Canvas Area */}
-      <div className="flex-grow h-[60%] md:h-full md:w-[70%] relative">
-        <div className="absolute top-6 left-6 z-10">
-          <Link to="/" className="flex items-center text-zinc-400 hover:text-white transition-colors bg-zinc-900/50 hover:bg-zinc-900 px-4 py-2 rounded-full backdrop-blur-md border border-zinc-800 hover:border-zinc-700 text-sm font-medium">
+      <div className="flex-grow h-[60%] md:h-full md:w-[70%] relative bg-slate-50">
+        <div className="absolute top-4 left-4 z-10">
+          <Link to="/" className="flex items-center text-slate-600 hover:text-[var(--color-primary)] transition-colors bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm text-sm font-semibold">
             <ArrowLeft size={16} className="mr-2" /> Volver
           </Link>
         </div>
@@ -115,34 +115,34 @@ export default function MapPlayer() {
           nodeTypes={nodeTypes}
           nodesDraggable={false}
           fitView
-          colorMode="dark"
           proOptions={{ hideAttribution: true }}
         >
-          <Background color="#27272a" gap={20} size={1} variant={BackgroundVariant.Dots} />
-          <Controls className="!bg-zinc-900 !border-zinc-800 !fill-zinc-400 [&>button]:!border-b-zinc-800 hover:[&>button]:!bg-zinc-800" />
+          <Background color="#94a3b8" gap={24} size={1} variant={BackgroundVariant.Dots} />
+          <Controls className="!bg-white !border-slate-200 !shadow-sm [&>button]:!border-b-slate-100 hover:[&>button]:!bg-slate-50 !fill-slate-600" />
         </ReactFlow>
       </div>
 
       {/* Sidebar */}
-      <div className="w-full h-[40%] md:h-full md:w-[30%] bg-[#09090b] border-t md:border-t-0 md:border-l border-zinc-800 flex flex-col shadow-2xl z-20 relative">
+      <div className="w-full h-[40%] md:h-full md:w-[30%] bg-white border-t md:border-t-0 md:border-l border-slate-200 flex flex-col shadow-xl z-20 relative">
         {/* Progress Bar */}
-        <div className="absolute top-0 left-0 w-full h-1 bg-zinc-900">
+        <div className="absolute top-0 left-0 w-full h-1.5 bg-slate-100">
            <div
-             className="h-full bg-[var(--color-primary)] transition-all duration-500 ease-out shadow-[0_0_10px_var(--color-primary)]"
+             className="h-full bg-[var(--color-primary)] transition-all duration-300 ease-in-out"
              style={{ width: `${((currentStepIndex + 1) / steps.length) * 100}%` }}
            />
         </div>
 
         <div className="p-8 flex-grow overflow-y-auto">
           <div className="mb-8">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-xs font-mono text-[var(--color-primary)] uppercase tracking-wider bg-[var(--color-primary)]/10 px-2 py-1 rounded">
-                Paso {currentStepIndex + 1} / {steps.length}
+            <div className="flex justify-between items-center mb-6">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
+                Paso {currentStepIndex + 1} de {steps.length}
               </span>
+              <Layers className="w-5 h-5 text-slate-400" />
             </div>
-            <h1 className="text-3xl font-bold mb-6 text-white leading-tight">{currentStep?.title || 'Cargando...'}</h1>
-            <div className="prose prose-invert prose-p:text-zinc-400 prose-p:leading-relaxed max-w-none">
-              <p className="whitespace-pre-line text-lg font-light">
+            <h1 className="text-2xl font-bold mb-4 text-[var(--color-text-main)] leading-snug">{currentStep?.title || 'Cargando...'}</h1>
+            <div className="prose prose-slate max-w-none">
+              <p className="whitespace-pre-line text-lg text-slate-600 leading-relaxed">
                 {currentStep?.content || 'Selecciona un paso para comenzar.'}
               </p>
             </div>
@@ -150,23 +150,23 @@ export default function MapPlayer() {
         </div>
 
         {/* Navigation Controls */}
-        <div className="p-8 border-t border-zinc-900 bg-zinc-950/50 backdrop-blur-sm">
+        <div className="p-6 border-t border-slate-100 bg-slate-50/50">
           <div className="flex gap-4">
             <button
               onClick={handlePrev}
               disabled={currentStepIndex === 0}
-              className="group flex-1 flex items-center justify-center py-4 rounded-xl border border-zinc-800 hover:border-zinc-600 hover:bg-zinc-900 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+              className="flex-1 flex items-center justify-center py-3.5 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold shadow-sm cursor-pointer"
             >
-              <ChevronLeft className="mr-2 group-hover:-translate-x-1 transition-transform" size={20} />
-              <span className="font-medium text-zinc-300">Anterior</span>
+              <ChevronLeft className="mr-2" size={20} />
+              Anterior
             </button>
             <button
               onClick={handleNext}
               disabled={currentStepIndex === steps.length - 1}
-              className="group flex-1 flex items-center justify-center py-4 rounded-xl bg-white text-black hover:bg-zinc-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer shadow-lg shadow-white/5"
+              className="flex-1 flex items-center justify-center py-3.5 rounded-lg bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold shadow-md shadow-blue-200 cursor-pointer"
             >
-              <span className="font-bold">Siguiente</span>
-              <ChevronRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
+              Siguiente
+              <ChevronRight className="ml-2" size={20} />
             </button>
           </div>
         </div>
