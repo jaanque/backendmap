@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { CheckCircle, Zap, Shield, Layers } from 'lucide-react';
-import Footer from '../components/Footer';
-import Navbar from '../components/Navbar';
+import { CheckCircle, Zap, Shield, Layers, ArrowLeft } from 'lucide-react';
 
 export default function Register() {
   const [email, setEmail] = useState('');
@@ -37,105 +35,113 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-white font-sans text-zinc-900 flex flex-col">
-      <Navbar />
+    <div className="h-screen w-full flex bg-white font-sans text-zinc-900 overflow-hidden">
 
-      <div className="flex-grow flex items-center justify-center p-6 md:p-12">
-        <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-12 bg-white rounded-2xl overflow-hidden shadow-sm border border-zinc-100">
+      {/* Left Column: Advantages */}
+      <div className="hidden md:flex w-1/2 bg-zinc-50 flex-col justify-center p-16 lg:p-24 relative border-r border-zinc-100">
+        <Link to="/" className="absolute top-8 left-8 flex items-center gap-2 font-bold text-zinc-900 hover:text-black transition-colors">
+          <div className="w-8 h-8 bg-black text-white rounded-lg flex items-center justify-center">
+            <Layers className="w-4 h-4" />
+          </div>
+          BackendMap
+        </Link>
 
-          {/* Left Column: Advantages */}
-          <div className="bg-zinc-50 p-8 md:p-12 flex flex-col justify-center border-b md:border-b-0 md:border-r border-zinc-100">
-            <div className="mb-8">
-               <div className="w-10 h-10 bg-black text-white rounded-xl flex items-center justify-center mb-4">
-                  <Layers className="w-5 h-5" />
-               </div>
-               <h2 className="text-3xl font-bold text-zinc-900 mb-3">Join BackendMap</h2>
-               <p className="text-zinc-500 text-lg">Master backend architecture with interactive visualizations.</p>
-            </div>
+        <div className="max-w-md">
+           <h2 className="text-4xl font-bold text-zinc-900 mb-6 leading-tight">Join the community of backend architects.</h2>
+           <p className="text-zinc-500 text-lg mb-12">Master modern system design with interactive visualizations and real-world scenarios.</p>
 
-            <ul className="space-y-6">
-              <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-black mt-0.5 flex-shrink-0" />
+           <ul className="space-y-8">
+              <li className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-white border border-zinc-200 flex items-center justify-center flex-shrink-0 shadow-sm">
+                   <CheckCircle className="w-5 h-5 text-black" />
+                </div>
                 <div>
-                  <h3 className="font-bold text-zinc-900">Track Your Progress</h3>
-                  <p className="text-sm text-zinc-500">Save completed scenarios and visualize your learning journey.</p>
+                  <h3 className="font-bold text-zinc-900 text-lg">Track Your Progress</h3>
+                  <p className="text-zinc-500 leading-relaxed">Save completed scenarios and visualize your learning journey over time.</p>
                 </div>
               </li>
-              <li className="flex items-start gap-3">
-                <Zap className="w-5 h-5 text-black mt-0.5 flex-shrink-0" />
+              <li className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-white border border-zinc-200 flex items-center justify-center flex-shrink-0 shadow-sm">
+                   <Zap className="w-5 h-5 text-black" />
+                </div>
                 <div>
-                  <h3 className="font-bold text-zinc-900">Exclusive Scenarios</h3>
-                  <p className="text-sm text-zinc-500">Access advanced architectural patterns and complex system designs.</p>
+                  <h3 className="font-bold text-zinc-900 text-lg">Exclusive Scenarios</h3>
+                  <p className="text-zinc-500 leading-relaxed">Access advanced architectural patterns and complex system designs.</p>
                 </div>
               </li>
-              <li className="flex items-start gap-3">
-                <Shield className="w-5 h-5 text-black mt-0.5 flex-shrink-0" />
+              <li className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-white border border-zinc-200 flex items-center justify-center flex-shrink-0 shadow-sm">
+                   <Shield className="w-5 h-5 text-black" />
+                </div>
                 <div>
-                  <h3 className="font-bold text-zinc-900">Community Access</h3>
-                  <p className="text-sm text-zinc-500">Join a community of developers and share your own insights.</p>
+                  <h3 className="font-bold text-zinc-900 text-lg">Community Access</h3>
+                  <p className="text-zinc-500 leading-relaxed">Join a community of developers and share your own insights.</p>
                 </div>
               </li>
             </ul>
-          </div>
-
-          {/* Right Column: Registration Form */}
-          <div className="p-8 md:p-12 flex flex-col justify-center">
-            <div className="mb-8">
-              <h1 className="text-2xl font-bold text-zinc-900">Create Account</h1>
-              <p className="text-zinc-500 text-sm mt-2">Get started for free. No credit card required.</p>
-            </div>
-
-            {error && (
-              <div className={`text-sm p-3 rounded-lg mb-4 text-center ${error.includes('successful') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-                {error}
-              </div>
-            )}
-
-            <form onSubmit={handleRegister} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold uppercase text-zinc-500 mb-1.5">Email</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-black focus:ring-1 focus:ring-black outline-none transition-all"
-                  placeholder="you@example.com"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold uppercase text-zinc-500 mb-1.5">Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={6}
-                  className="w-full px-4 py-3 rounded-lg border border-zinc-200 focus:border-black focus:ring-1 focus:ring-black outline-none transition-all"
-                  placeholder="Create a password"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full btn-pro btn-primary py-3.5 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Creating Account...' : 'Sign Up'}
-              </button>
-            </form>
-
-            <div className="mt-8 text-center text-sm text-zinc-500">
-              Already have an account?{' '}
-              <Link to="/login" className="font-bold text-zinc-900 hover:underline">
-                Sign in
-              </Link>
-            </div>
-          </div>
-
         </div>
       </div>
-      <Footer />
+
+      {/* Right Column: Registration Form */}
+      <div className="w-full md:w-1/2 flex flex-col justify-center p-8 md:p-16 lg:p-24 relative bg-white">
+        <Link to="/" className="absolute top-8 left-8 md:hidden flex items-center gap-2 font-bold text-zinc-900">
+           <ArrowLeft className="w-5 h-5" /> Back
+        </Link>
+
+        <div className="max-w-md w-full mx-auto">
+          <div className="mb-10">
+            <h1 className="text-3xl font-bold text-zinc-900">Create Account</h1>
+            <p className="text-zinc-500 mt-3">Get started for free. No credit card required.</p>
+          </div>
+
+          {error && (
+            <div className={`text-sm p-4 rounded-lg mb-6 text-center font-medium ${error.includes('successful') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleRegister} className="space-y-5">
+            <div>
+              <label className="block text-xs font-bold uppercase text-zinc-500 mb-2">Email Address</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full px-4 py-3.5 rounded-xl border border-zinc-200 focus:border-black focus:ring-1 focus:ring-black outline-none transition-all bg-zinc-50/30"
+                placeholder="you@example.com"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold uppercase text-zinc-500 mb-2">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                className="w-full px-4 py-3.5 rounded-xl border border-zinc-200 focus:border-black focus:ring-1 focus:ring-black outline-none transition-all bg-zinc-50/30"
+                placeholder="Create a password (min. 6 chars)"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full btn-pro btn-primary py-4 mt-4 text-base shadow-lg shadow-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+            >
+              {loading ? 'Creating Account...' : 'Sign Up'}
+            </button>
+          </form>
+
+          <div className="mt-10 text-center text-zinc-500">
+            Already have an account?{' '}
+            <Link to="/login" className="font-bold text-zinc-900 hover:underline">
+              Sign in
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
