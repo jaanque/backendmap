@@ -132,7 +132,7 @@ export default function MapPlayer() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           nodeTypes={nodeTypes}
-          nodesDraggable={false}
+          nodesDraggable={true}
           fitView
           proOptions={{ hideAttribution: true }}
         >
