@@ -88,7 +88,7 @@ export default function Home() {
                 <article className="border border-zinc-200 rounded-xl p-6 bg-white hover:border-zinc-400 hover:shadow-md transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div className="flex-grow">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-bold text-lg text-zinc-900 group-hover:text-indigo-600 transition-colors">{scenario.title}</h3>
+                      <h3 className="font-bold text-lg text-zinc-900 group-hover:text-zinc-600 transition-colors">{scenario.title}</h3>
                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${
                         scenario.difficulty === 'Beginner' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
                         scenario.difficulty === 'Intermediate' ? 'bg-amber-50 text-amber-700 border-amber-100' :
@@ -112,7 +112,7 @@ export default function Home() {
         ) : (
           <div className="text-center py-24 border border-dashed border-zinc-200 rounded-xl bg-zinc-50/30">
              <p className="text-zinc-500 font-medium">No scenarios match your search.</p>
-             <button onClick={() => setSearchQuery('')} className="mt-4 text-indigo-600 font-semibold hover:underline text-sm">Clear filter</button>
+             <button onClick={() => setSearchQuery('')} className="mt-4 text-zinc-900 font-semibold hover:underline text-sm">Clear filter</button>
           </div>
         )}
       </main>

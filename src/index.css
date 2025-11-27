@@ -13,8 +13,8 @@
   --color-primary: #18181b; /* Zinc 900 */
   --color-primary-foreground: #ffffff;
 
-  --color-accent: #4f46e5; /* Indigo 600 */
-  --color-accent-light: #e0e7ff; /* Indigo 100 */
+  --color-accent: #18181b; /* Zinc 900 */
+  --color-accent-light: #f4f4f5; /* Zinc 100 */
 
   --font-heading: "Plus Jakarta Sans", system-ui, sans-serif;
   --font-sans: "Inter", system-ui, sans-serif;

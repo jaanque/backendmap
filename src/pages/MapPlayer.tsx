@@ -59,7 +59,7 @@ export default function MapPlayer() {
           ...edge,
           animated: edge.id === currentStep.active_edge_id,
           style: edge.id === currentStep.active_edge_id
-            ? { stroke: '#4f46e5', strokeWidth: 3 }
+            ? { stroke: '#18181b', strokeWidth: 3 }
             : { stroke: '#e5e7eb', strokeWidth: 1.5 }
         }))
       );
@@ -147,7 +147,7 @@ export default function MapPlayer() {
         {/* Scenario Header */}
         <div className="px-6 py-5 border-b border-zinc-100">
            <div className="flex items-center gap-2 mb-1">
-             <span className={`w-2 h-2 rounded-full ${isCompleted ? 'bg-indigo-500' : 'bg-green-500'}`}></span>
+             <span className={`w-2 h-2 rounded-full ${isCompleted ? 'bg-zinc-900' : 'bg-green-500'}`}></span>
              <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
                {isCompleted ? 'Completed' : 'Live Simulation'}
              </span>
