@@ -80,7 +80,7 @@ export default function MapPlayer() {
   if (error) {
     return (
       <div className="flex h-screen bg-[var(--color-background)] items-center justify-center p-6">
-         <div className="bg-white border border-red-300 p-8 rounded-lg shadow-sm text-center max-w-md w-full">
+         <div className="bg-white border border-red-300 p-8 rounded-lg shadow-sm text-center max-w-md w-full animate-fade-in-up">
           <h2 className="text-xl font-bold text-red-700 mb-2">Error</h2>
           <p className="text-slate-600">{error}</p>
           <Link to="/" className="inline-block mt-6 text-[var(--color-accent)] font-bold hover:underline">Volver al Inicio</Link>
@@ -102,7 +102,7 @@ export default function MapPlayer() {
       {/* Canvas Area */}
       <div className="flex-grow h-[60%] md:h-full md:w-[70%] relative bg-slate-50 border-r border-slate-300">
         <div className="absolute top-4 left-4 z-10">
-          <Link to="/" className="flex items-center text-slate-700 hover:text-[var(--color-primary)] transition-colors bg-white px-3 py-2 rounded border border-slate-300 shadow-sm text-sm font-bold">
+          <Link to="/" className="flex items-center text-slate-700 hover:text-[var(--color-primary)] transition-colors bg-white px-3 py-2 rounded border border-slate-300 shadow-sm text-sm font-bold hover:shadow-md active:scale-95 duration-200">
             <ArrowLeft size={16} className="mr-2" /> Back
           </Link>
         </div>
@@ -161,7 +161,7 @@ export default function MapPlayer() {
             <button
               onClick={handlePrev}
               disabled={currentStepIndex === 0}
-              className="flex-1 flex items-center justify-center py-3 rounded border border-slate-300 bg-white text-slate-700 font-bold hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm active:translate-y-0.5"
+              className="flex-1 flex items-center justify-center py-3 rounded border border-slate-300 bg-white text-slate-700 font-bold hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm active:scale-95 duration-100"
             >
               <ChevronLeft className="mr-1" size={18} />
               PREV
@@ -169,7 +169,7 @@ export default function MapPlayer() {
             <button
               onClick={handleNext}
               disabled={currentStepIndex === steps.length - 1}
-              className="flex-1 flex items-center justify-center py-3 rounded bg-[var(--color-primary)] text-white font-bold hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md active:translate-y-0.5 active:shadow-none"
+              className="flex-1 flex items-center justify-center py-3 rounded bg-[var(--color-primary)] text-white font-bold hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md active:scale-95 duration-100"
             >
               NEXT
               <ChevronRight className="ml-1" size={18} />
