@@ -1,12 +1,13 @@
 import { supabase } from './supabase';
-import type { Scenario, Step } from '../types';
+import type { Scenario, Step, UserProgress } from '../types';
 
 export async function getScenarios(): Promise<Scenario[]> {
   if (!supabase) {
     throw new Error("Supabase client is not initialized. Please check your environment variables (VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY).");
   }
 
-  const { data, error } = await supabase.from('scenarios').select('*');
+  // Include step count
+  const { data, error } = await supabase.from('scenarios').select('*, steps(count)');
   if (error) throw error;
   return data || [];
 }
@@ -29,4 +30,44 @@ export async function getSteps(scenarioId: string): Promise<Step[]> {
   const { data, error } = await supabase.from('steps').select('*').eq('scenario_id', scenarioId).order('order_index', { ascending: true });
   if (error) throw error;
   return data || [];
+}
+
+export async function getUserProgress(userId: string): Promise<UserProgress[]> {
+  const { data, error } = await supabase
+    .from('user_progress')
+    .select('*')
+    .eq('user_id', userId);
+
+  if (error) throw error;
+  return data || [];
+}
+
+export async function saveUserProgress(userId: string, scenarioId: string, stepIndex: number, isCompleted: boolean) {
+  // Upsert progress
+  const { error } = await supabase
+    .from('user_progress')
+    .upsert(
+      {
+        user_id: userId,
+        scenario_id: scenarioId,
+        current_step_index: stepIndex,
+        is_completed: isCompleted,
+        updated_at: new Date().toISOString()
+      },
+      { onConflict: 'user_id,scenario_id' }
+    );
+
+  if (error) throw error;
+}
+
+export async function getSingleScenarioProgress(userId: string, scenarioId: string): Promise<UserProgress | null> {
+    const { data, error } = await supabase
+    .from('user_progress')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('scenario_id', scenarioId)
+    .single();
+
+    if (error && error.code !== 'PGRST116') return null; // PGRST116 is not found
+    return data;
 }

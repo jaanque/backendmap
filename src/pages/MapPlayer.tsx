@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ReactFlow, Background, Controls, useNodesState, useEdgesState, type Node, type Edge, BackgroundVariant } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { getScenarioBySlug, getSteps } from '../lib/api';
+import { getScenarioBySlug, getSteps, getSingleScenarioProgress, saveUserProgress } from '../lib/api';
+import { useAuth } from '../lib/auth';
 import type { Scenario, Step } from '../types';
 import CustomNode from '../components/CustomNode';
 import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle } from 'lucide-react';
@@ -13,6 +14,7 @@ const nodeTypes = {
 
 export default function MapPlayer() {
   const { slug } = useParams<{ slug: string }>();
+  const { user } = useAuth();
   const [scenario, setScenario] = useState<Scenario | null>(null);
   const [steps, setSteps] = useState<Step[]>([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -31,14 +33,27 @@ export default function MapPlayer() {
             setNodes(data.flow_data.initialNodes);
             setEdges(data.flow_data.initialEdges);
 
-            return getSteps(data.id).then(setSteps);
+            // Fetch steps and then maybe progress
+            getSteps(data.id).then((fetchedSteps) => {
+              setSteps(fetchedSteps);
+
+              if (user) {
+                // Check for progress
+                getSingleScenarioProgress(user.id, data.id).then(progress => {
+                   if (progress) {
+                     setCurrentStepIndex(progress.current_step_index);
+                     setIsCompleted(progress.is_completed);
+                   }
+                });
+              }
+            });
           } else {
             setError('Scenario not found');
           }
         })
         .catch((err) => setError(err.message));
     }
-  }, [slug, setNodes, setEdges]);
+  }, [slug, setNodes, setEdges, user]);
 
   useEffect(() => {
     if (steps.length > 0 && !isCompleted) {
@@ -66,27 +81,45 @@ export default function MapPlayer() {
     }
   }, [currentStepIndex, steps, setNodes, setEdges, isCompleted]);
 
+  const saveProgress = async (index: number, completed: boolean) => {
+    if (user && scenario) {
+       try {
+         await saveUserProgress(user.id, scenario.id, index, completed);
+       } catch (err) {
+         console.error("Failed to save progress", err);
+       }
+    }
+  };
+
   const handleNext = () => {
     if (currentStepIndex < steps.length - 1) {
-      setCurrentStepIndex(prev => prev + 1);
+      const nextIndex = currentStepIndex + 1;
+      setCurrentStepIndex(nextIndex);
+      saveProgress(nextIndex, false);
     } else {
       setIsCompleted(true);
+      saveProgress(currentStepIndex, true);
     }
   };
 
   const handlePrev = () => {
     if (isCompleted) {
       setIsCompleted(false);
+      // Don't necessarily revert progress in DB when just viewing previous steps, unless we want to "undo" completion.
+      // For now, let's keep it simple: just local state change for viewing.
       return;
     }
     if (currentStepIndex > 0) {
-      setCurrentStepIndex(prev => prev - 1);
+      const prevIndex = currentStepIndex - 1;
+      setCurrentStepIndex(prevIndex);
+      saveProgress(prevIndex, false);
     }
   };
 
   const handleReset = () => {
     setCurrentStepIndex(0);
     setIsCompleted(false);
+    saveProgress(0, false);
   }
 
   if (error) {

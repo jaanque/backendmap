@@ -11,6 +11,7 @@ export interface Scenario {
     initialEdges: Edge[];
   };
   created_at: string;
+  steps?: { count: number }[]; // For aggregated count
 }
 
 export interface Step {
@@ -21,6 +22,15 @@ export interface Step {
   content: string;
   active_node_id: string | null;
   active_edge_id: string | null;
+}
+
+export interface UserProgress {
+  id: string;
+  user_id: string;
+  scenario_id: string;
+  current_step_index: number;
+  is_completed: boolean;
+  updated_at: string;
 }
 
 export type Database = {
@@ -35,6 +45,11 @@ export type Database = {
         Row: Step;
         Insert: Omit<Step, 'id'>;
         Update: Partial<Step>;
+      };
+      user_progress: {
+        Row: UserProgress;
+        Insert: Omit<UserProgress, 'id' | 'updated_at'>;
+        Update: Partial<UserProgress>;
       };
     };
   };

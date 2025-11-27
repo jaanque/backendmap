@@ -1,23 +1,41 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { getScenarios } from '../lib/api';
-import type { Scenario } from '../types';
+import { getScenarios, getUserProgress } from '../lib/api';
+import { useAuth } from '../lib/auth';
+import type { Scenario, UserProgress } from '../types';
 import { ArrowRight, Search } from 'lucide-react';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
 
 export default function Explore() {
+  const { user } = useAuth();
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
+  const [userProgress, setUserProgress] = useState<Record<string, UserProgress>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
+    setLoading(true);
     getScenarios()
-      .then(setScenarios)
+      .then(async (data) => {
+        setScenarios(data);
+        if (user) {
+          try {
+            const progressData = await getUserProgress(user.id);
+            const progressMap = progressData.reduce((acc, curr) => ({
+              ...acc,
+              [curr.scenario_id]: curr
+            }), {});
+            setUserProgress(progressMap);
+          } catch (err) {
+            console.error('Failed to load progress:', err);
+          }
+        }
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [user]);
 
   const filteredScenarios = useMemo(() => {
     if (!searchQuery) return scenarios;
@@ -72,31 +90,55 @@ export default function Explore() {
           </div>
         ) : filteredScenarios.length > 0 ? (
           <div className="flex flex-col gap-4">
-            {filteredScenarios.map((scenario) => (
-              <Link key={scenario.id} to={`/map/${scenario.slug}`} className="block group">
-                <article className="border border-zinc-200 rounded-xl p-6 bg-white hover:border-zinc-400 hover:shadow-md transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                  <div className="flex-grow">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-bold text-lg text-zinc-900 group-hover:text-zinc-600 transition-colors">{scenario.title || 'Untitled Scenario'}</h3>
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${
-                        scenario.difficulty === 'Beginner' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                        scenario.difficulty === 'Intermediate' ? 'bg-amber-50 text-amber-700 border-amber-100' :
-                        'bg-rose-50 text-rose-700 border-rose-100'
-                      }`}>
-                        {scenario.difficulty || 'Unknown'}
-                      </span>
-                    </div>
-                    <p className="text-zinc-500 text-sm leading-relaxed max-w-2xl">{scenario.description || 'No description available.'}</p>
-                  </div>
+            {filteredScenarios.map((scenario) => {
+              const progress = userProgress[scenario.id];
+              const stepsCount = scenario.steps?.[0]?.count || 0;
+              const percent = progress && stepsCount > 0
+                ? Math.min(100, Math.round(((progress.current_step_index + (progress.is_completed ? 1 : 0)) / stepsCount) * 100))
+                : 0;
 
-                  <div className="flex-shrink-0 flex items-center">
-                    <div className="h-10 w-10 rounded-full bg-zinc-50 border border-zinc-100 flex items-center justify-center group-hover:bg-black group-hover:border-black transition-colors">
-                      <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-white" />
+              return (
+                <Link key={scenario.id} to={`/map/${scenario.slug}`} className="block group">
+                  <article className="border border-zinc-200 rounded-xl p-6 bg-white hover:border-zinc-400 hover:shadow-md transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div className="flex-grow">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="font-bold text-lg text-zinc-900 group-hover:text-zinc-600 transition-colors">{scenario.title || 'Untitled Scenario'}</h3>
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${
+                          scenario.difficulty === 'Beginner' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                          scenario.difficulty === 'Intermediate' ? 'bg-amber-50 text-amber-700 border-amber-100' :
+                          'bg-rose-50 text-rose-700 border-rose-100'
+                        }`}>
+                          {scenario.difficulty || 'Unknown'}
+                        </span>
+                      </div>
+                      <p className="text-zinc-500 text-sm leading-relaxed max-w-2xl">{scenario.description || 'No description available.'}</p>
+
+                      {/* Progress Bar */}
+                      {progress && (
+                        <div className="mt-4 max-w-xs">
+                          <div className="flex justify-between text-[10px] uppercase font-bold text-zinc-400 mb-1">
+                             <span>{progress.is_completed ? 'Completed' : 'In Progress'}</span>
+                             <span>{percent}%</span>
+                          </div>
+                          <div className="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden">
+                             <div
+                               className={`h-full rounded-full transition-all duration-500 ${progress.is_completed ? 'bg-green-500' : 'bg-zinc-900'}`}
+                               style={{ width: `${percent}%` }}
+                             />
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </article>
-              </Link>
-            ))}
+
+                    <div className="flex-shrink-0 flex items-center">
+                      <div className="h-10 w-10 rounded-full bg-zinc-50 border border-zinc-100 flex items-center justify-center group-hover:bg-black group-hover:border-black transition-colors">
+                        <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-white" />
+                      </div>
+                    </div>
+                  </article>
+                </Link>
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-24 border border-dashed border-zinc-200 rounded-xl bg-zinc-50/30">
