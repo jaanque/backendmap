@@ -1,15 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ReactFlow, Background, Controls, useNodesState, useEdgesState, type Node, type Edge, BackgroundVariant } from '@xyflow/react';
+import { ReactFlow, Background, Controls, useNodesState, useEdgesState, type Node, type Edge, BackgroundVariant, useReactFlow } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { getScenarioBySlug, getSteps, getSingleScenarioProgress, saveUserProgress, getUserFavorites, toggleFavorite } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import type { Scenario, Step } from '../types';
 import CustomNode from '../components/CustomNode';
-import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart } from 'lucide-react';
+import PacketEdge from '../components/PacketEdge';
+import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart, Play, Pause } from 'lucide-react';
 
 const nodeTypes = {
   custom: CustomNode,
+};
+
+const edgeTypes = {
+  packet: PacketEdge,
 };
 
 export default function MapPlayer() {
@@ -21,9 +26,12 @@ export default function MapPlayer() {
   const [error, setError] = useState<string | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+
+  const { fitView } = useReactFlow();
 
   useEffect(() => {
     if (slug) {
@@ -61,6 +69,39 @@ export default function MapPlayer() {
     }
   }, [slug, setNodes, setEdges, user]);
 
+  const saveProgress = async (index: number, completed: boolean) => {
+    if (user && scenario) {
+       try {
+         await saveUserProgress(user.id, scenario.id, index, completed);
+       } catch (err) {
+         console.error("Failed to save progress", err);
+       }
+    }
+  };
+
+  const handleNext = useCallback(() => {
+    if (currentStepIndex < steps.length - 1) {
+      const nextIndex = currentStepIndex + 1;
+      setCurrentStepIndex(nextIndex);
+      saveProgress(nextIndex, false);
+    } else {
+      setIsCompleted(true);
+      setIsPlaying(false);
+      saveProgress(currentStepIndex, true);
+    }
+  }, [currentStepIndex, steps.length, user, scenario]); // Added dependencies
+
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (isPlaying && !isCompleted) {
+      interval = setInterval(() => {
+        handleNext();
+      }, 3000);
+    }
+    return () => clearInterval(interval);
+  }, [isPlaying, isCompleted, handleNext]);
+
+
   useEffect(() => {
     if (steps.length > 0 && !isCompleted) {
       const currentStep = steps[currentStepIndex];
@@ -78,41 +119,36 @@ export default function MapPlayer() {
       setEdges((eds) =>
         eds.map((edge) => ({
           ...edge,
-          animated: edge.id === currentStep.active_edge_id,
+          type: 'packet',
+          data: {
+            ...edge.data,
+            isActive: edge.id === currentStep.active_edge_id
+          },
+          animated: false, // controlled by custom edge now
           style: edge.id === currentStep.active_edge_id
             ? { stroke: '#18181b', strokeWidth: 3 }
             : { stroke: '#e5e7eb', strokeWidth: 1.5 }
         }))
       );
-    }
-  }, [currentStepIndex, steps, setNodes, setEdges, isCompleted]);
 
-  const saveProgress = async (index: number, completed: boolean) => {
-    if (user && scenario) {
-       try {
-         await saveUserProgress(user.id, scenario.id, index, completed);
-       } catch (err) {
-         console.error("Failed to save progress", err);
-       }
+      // Auto-Focus logic
+      if (currentStep.active_node_id) {
+        window.requestAnimationFrame(() => {
+           fitView({
+             nodes: [{ id: currentStep.active_node_id as string }],
+             duration: 1000,
+             padding: 2, // Keep some context
+             maxZoom: 1.5
+           });
+        });
+      }
     }
-  };
+  }, [currentStepIndex, steps, setNodes, setEdges, isCompleted, fitView]);
 
-  const handleNext = () => {
-    if (currentStepIndex < steps.length - 1) {
-      const nextIndex = currentStepIndex + 1;
-      setCurrentStepIndex(nextIndex);
-      saveProgress(nextIndex, false);
-    } else {
-      setIsCompleted(true);
-      saveProgress(currentStepIndex, true);
-    }
-  };
 
   const handlePrev = () => {
     if (isCompleted) {
       setIsCompleted(false);
-      // Don't necessarily revert progress in DB when just viewing previous steps, unless we want to "undo" completion.
-      // For now, let's keep it simple: just local state change for viewing.
       return;
     }
     if (currentStepIndex > 0) {
@@ -125,7 +161,9 @@ export default function MapPlayer() {
   const handleReset = () => {
     setCurrentStepIndex(0);
     setIsCompleted(false);
+    setIsPlaying(false);
     saveProgress(0, false);
+    fitView({ duration: 1000, padding: 0.2 });
   }
 
   const handleToggleFavorite = async () => {
@@ -135,7 +173,7 @@ export default function MapPlayer() {
       setIsFavorited(newStatus); // Optimistic
 
       try {
-          await toggleFavorite(user.id, scenario.id, isFavorited); // Pass CURRENT status to toggle
+          await toggleFavorite(user.id, scenario.id, isFavorited);
       } catch (err) {
           console.error("Failed to toggle favorite", err);
           setIsFavorited(isFavorited); // Revert
@@ -185,6 +223,7 @@ export default function MapPlayer() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           nodesDraggable={true}
           fitView
           proOptions={{ hideAttribution: true }}
@@ -211,16 +250,29 @@ export default function MapPlayer() {
               </h1>
            </div>
 
-           {/* Favorite Button */}
-           {user && (
-             <button
-                onClick={handleToggleFavorite}
-                className="p-2 rounded-full hover:bg-zinc-100 transition-colors flex-shrink-0"
-                title={isFavorited ? "Remove from favorites" : "Add to favorites"}
-             >
-                <Heart className={`w-5 h-5 transition-colors ${isFavorited ? 'fill-red-500 text-red-500' : 'text-zinc-400'}`} />
-             </button>
-           )}
+           <div className="flex gap-2">
+               {/* Autoplay Toggle */}
+               {!isCompleted && (
+                 <button
+                    onClick={() => setIsPlaying(!isPlaying)}
+                    className={`p-2 rounded-full transition-colors flex-shrink-0 ${isPlaying ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-zinc-100 text-zinc-400'}`}
+                    title={isPlaying ? "Pause Autoplay" : "Start Autoplay"}
+                 >
+                    {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                 </button>
+               )}
+
+               {/* Favorite Button */}
+               {user && (
+                 <button
+                    onClick={handleToggleFavorite}
+                    className="p-2 rounded-full hover:bg-zinc-100 transition-colors flex-shrink-0"
+                    title={isFavorited ? "Remove from favorites" : "Add to favorites"}
+                 >
+                    <Heart className={`w-5 h-5 transition-colors ${isFavorited ? 'fill-red-500 text-red-500' : 'text-zinc-400'}`} />
+                 </button>
+               )}
+           </div>
         </div>
 
         {/* Step Content */}
