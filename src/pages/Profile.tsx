@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../lib/toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { User, Mail, Save, Loader2 } from 'lucide-react';
+import { User, Mail, Save, Loader2, Lock } from 'lucide-react';
 import { getProfile, updateProfile } from '../lib/api';
 
 export default function Profile() {
@@ -19,6 +19,12 @@ export default function Profile() {
   const [sex, setSex] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+
+  // Password Change State
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -67,6 +73,48 @@ export default function Profile() {
       showToast(error.message || 'Failed to update profile', { type: 'error' });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !supabase) return;
+
+    if (newPassword !== confirmPassword) {
+       showToast("New passwords do not match", { type: 'error' });
+       return;
+    }
+
+    setIsChangingPassword(true);
+
+    try {
+      // Verify current password by attempting to sign in
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user.email!,
+        password: currentPassword,
+      });
+
+      if (signInError) {
+        throw new Error("Incorrect current password");
+      }
+
+      // Update password
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (updateError) throw updateError;
+
+      showToast("Password updated successfully", { type: 'success' });
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+
+    } catch (err: any) {
+       console.error("Error changing password", err);
+       showToast(err.message || "Failed to update password", { type: 'error' });
+    } finally {
+       setIsChangingPassword(false);
     }
   };
 
@@ -187,6 +235,77 @@ export default function Profile() {
                 >
                   {isSaving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
                   {isSaving ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        {/* Security Section */}
+        <div className="mt-8 bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-zinc-100 bg-zinc-50/50">
+             <h2 className="font-semibold text-lg flex items-center gap-2">
+                <Lock size={18} className="text-indigo-600" />
+                Security
+             </h2>
+          </div>
+
+          <div className="p-6">
+            <form onSubmit={handlePasswordChange} className="space-y-6">
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                   <label htmlFor="currentPassword" className="block text-sm font-medium text-zinc-700">Current Password</label>
+                   <Link to="/forgot-password" className="text-xs text-indigo-600 hover:text-indigo-800 transition-colors">Forgot your password?</Link>
+                </div>
+                <input
+                  id="currentPassword"
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Enter current password"
+                  required
+                  className="w-full px-4 py-2.5 rounded-lg border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all text-sm"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="newPassword" className="block text-sm font-medium text-zinc-700 mb-2">New Password</label>
+                  <input
+                    id="newPassword"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Enter new password"
+                    required
+                    minLength={6}
+                    className="w-full px-4 py-2.5 rounded-lg border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-zinc-700 mb-2">Confirm New Password</label>
+                  <input
+                    id="confirmPassword"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm new password"
+                    required
+                    minLength={6}
+                    className="w-full px-4 py-2.5 rounded-lg border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-4 flex justify-end">
+                <button
+                  type="submit"
+                  disabled={isChangingPassword}
+                  className="btn-pro btn-secondary flex items-center gap-2 px-6 py-2.5 disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {isChangingPassword ? <Loader2 className="animate-spin" size={16} /> : <Lock size={16} />}
+                  {isChangingPassword ? 'Updating...' : 'Update Password'}
                 </button>
               </div>
             </form>
