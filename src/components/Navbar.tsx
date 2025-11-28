@@ -55,6 +55,7 @@ export default function Navbar() {
 
       <div className="flex items-center gap-6 text-sm font-medium text-zinc-500">
         <Link to="/explore" className={isActive('/explore')}>Explore Scenarios</Link>
+        <Link to="/users" className={isActive('/users')}>Users</Link>
         <Link to="/about" className={isActive('/about')}>About</Link>
 
         <div className="h-4 w-px bg-zinc-200 mx-2"></div>

@@ -55,6 +55,21 @@ export async function updateProfile(userId: string, data: Partial<Profile>) {
   if (error) throw error;
 }
 
+export async function getPublicProfiles(): Promise<Profile[]> {
+  if (!supabase) {
+    throw new Error("Supabase client is not initialized.");
+  }
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('is_public', true)
+    .order('first_name', { ascending: true });
+
+  if (error) throw error;
+  return data || [];
+}
+
 export async function getScenarios(): Promise<Scenario[]> {
   if (!supabase) {
     throw new Error("Supabase client is not initialized. Please check your environment variables (VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY).");
