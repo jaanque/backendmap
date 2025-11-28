@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
+import { getProfile } from '../lib/api';
 import { LogOut, User, ChevronDown, Settings, CreditCard, Heart } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
@@ -8,6 +9,7 @@ export default function Navbar() {
   const location = useLocation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [displayName, setDisplayName] = useState<string | null>(null);
 
   // Highlight active link
   const isActive = (path: string) => location.pathname === path ? 'text-black font-semibold' : 'hover:text-black transition-colors';
@@ -24,6 +26,26 @@ export default function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      // Try to get name from metadata first (faster)
+      const metaName = user.user_metadata?.full_name;
+      if (metaName) {
+        setDisplayName(metaName);
+      } else {
+        setDisplayName(user.email || null);
+      }
+
+      // Also fetch from profile to be sure/updated
+      getProfile(user.id).then(profile => {
+        if (profile && (profile.first_name || profile.last_name)) {
+          const name = [profile.first_name, profile.last_name].filter(Boolean).join(' ');
+          if (name) setDisplayName(name);
+        }
+      });
+    }
+  }, [user]);
 
   return (
     <nav className="border-b border-zinc-100 h-16 flex items-center justify-between px-6 md:px-12 sticky top-0 bg-white/90 backdrop-blur z-50">
@@ -46,7 +68,7 @@ export default function Navbar() {
                <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center border border-zinc-200 text-zinc-600 group-hover:border-zinc-300 transition-colors">
                   <User size={16} />
                </div>
-               <span className="hidden md:inline-block text-xs text-zinc-600 font-medium max-w-[150px] truncate group-hover:text-zinc-900">{user.email}</span>
+               <span className="hidden md:inline-block text-xs text-zinc-600 font-medium max-w-[150px] truncate group-hover:text-zinc-900">{displayName || user.email}</span>
                <ChevronDown size={14} className={`text-zinc-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180 text-zinc-600' : 'group-hover:text-zinc-600'}`} />
             </button>
 
