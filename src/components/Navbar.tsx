@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
-import { LogOut, User, ChevronDown, Settings, CreditCard } from 'lucide-react';
+import { LogOut, User, ChevronDown, Settings, CreditCard, Heart } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
 export default function Navbar() {
@@ -62,6 +62,14 @@ export default function Navbar() {
 
                 {/* Menu Items */}
                 <div className="py-1">
+                  <Link
+                    to="/favorites"
+                    className="w-full text-left px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 flex items-center gap-3 transition-colors"
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    <Heart size={16} className="text-zinc-400" />
+                    Favorites
+                  </Link>
                   <button className="w-full text-left px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 flex items-center gap-3 transition-colors cursor-not-allowed opacity-50">
                     <Settings size={16} className="text-zinc-400" />
                     Account Settings

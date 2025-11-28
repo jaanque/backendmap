@@ -33,6 +33,10 @@ export async function getSteps(scenarioId: string): Promise<Step[]> {
 }
 
 export async function getUserProgress(userId: string): Promise<UserProgress[]> {
+  if (!supabase) {
+    throw new Error("Supabase client is not initialized. Please check your environment variables (VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY).");
+  }
+
   const { data, error } = await supabase
     .from('user_progress')
     .select('*')
@@ -43,6 +47,10 @@ export async function getUserProgress(userId: string): Promise<UserProgress[]> {
 }
 
 export async function saveUserProgress(userId: string, scenarioId: string, stepIndex: number, isCompleted: boolean) {
+  if (!supabase) {
+    throw new Error("Supabase client is not initialized. Please check your environment variables (VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY).");
+  }
+
   // Upsert progress
   const { error } = await supabase
     .from('user_progress')
@@ -52,8 +60,7 @@ export async function saveUserProgress(userId: string, scenarioId: string, stepI
         scenario_id: scenarioId,
         current_step_index: stepIndex,
         is_completed: isCompleted,
-        updated_at: new Date().toISOString()
-      },
+      } as any, // Cast to any because TS inference for upsert seems tricky here
       { onConflict: 'user_id,scenario_id' }
     );
 
@@ -61,7 +68,11 @@ export async function saveUserProgress(userId: string, scenarioId: string, stepI
 }
 
 export async function getSingleScenarioProgress(userId: string, scenarioId: string): Promise<UserProgress | null> {
-    const { data, error } = await supabase
+  if (!supabase) {
+    throw new Error("Supabase client is not initialized. Please check your environment variables (VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY).");
+  }
+
+  const { data, error } = await supabase
     .from('user_progress')
     .select('*')
     .eq('user_id', userId)
@@ -73,16 +84,24 @@ export async function getSingleScenarioProgress(userId: string, scenarioId: stri
 }
 
 export async function getUserFavorites(userId: string): Promise<string[]> {
+  if (!supabase) {
+    throw new Error("Supabase client is not initialized. Please check your environment variables (VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY).");
+  }
+
   const { data, error } = await supabase
     .from('user_favorites')
     .select('scenario_id')
     .eq('user_id', userId);
 
   if (error) throw error;
-  return data.map(f => f.scenario_id);
+  return (data as any[]).map(f => f.scenario_id);
 }
 
 export async function toggleFavorite(userId: string, scenarioId: string, isFavorite: boolean) {
+  if (!supabase) {
+    throw new Error("Supabase client is not initialized. Please check your environment variables (VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY).");
+  }
+
   if (isFavorite) {
     // Remove favorite
     const { error } = await supabase
@@ -95,7 +114,7 @@ export async function toggleFavorite(userId: string, scenarioId: string, isFavor
     // Add favorite
     const { error } = await supabase
       .from('user_favorites')
-      .insert({ user_id: userId, scenario_id: scenarioId });
+      .insert({ user_id: userId, scenario_id: scenarioId } as any);
     if (error) throw error;
   }
 }

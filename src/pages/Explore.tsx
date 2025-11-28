@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { getScenarios, getUserProgress, getUserFavorites, toggleFavorite } from '../lib/api';
 import { useAuth } from '../lib/auth';
+import { useToast } from '../lib/toast';
 import type { Scenario, UserProgress } from '../types';
 import { Search } from 'lucide-react';
 import Footer from '../components/Footer';
@@ -9,6 +10,7 @@ import ScenarioCard from '../components/ScenarioCard';
 
 export default function Explore() {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [userProgress, setUserProgress] = useState<Record<string, UserProgress>>({});
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -53,12 +55,32 @@ export default function Explore() {
     else newFavs.add(scenarioId);
     setFavorites(newFavs);
 
+    // Show toast
+    showToast(isFav ? "Removed from favorites" : "Added to favorites", {
+      type: 'success',
+      onUndo: async () => {
+          // Undo: revert local state
+          const revertFavs = new Set(newFavs);
+          if (isFav) revertFavs.add(scenarioId);
+          else revertFavs.delete(scenarioId);
+          setFavorites(revertFavs);
+
+          try {
+              // Undo: toggle again
+              await toggleFavorite(user.id, scenarioId, !isFav);
+          } catch (err) {
+              console.error("Undo failed", err);
+          }
+      }
+    });
+
     try {
       await toggleFavorite(user.id, scenarioId, isFav);
     } catch (err) {
       // Revert on error
       console.error("Failed to toggle favorite", err);
       setFavorites(favorites);
+      showToast("Failed to update favorite", { type: 'error' });
     }
   };
 
