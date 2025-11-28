@@ -104,7 +104,7 @@ export default function Profile() {
      const hasOtherProviders = identities.some(id => id.provider !== 'github');
 
      if (!hasPassword && !hasOtherProviders) {
-         showToast("Cannot unlink GitHub as it is your only login method. Please set a password first.", { type: 'error' });
+         showToast("Cannot unlink GitHub as it is your only login method.", { type: 'error' });
          return;
      }
 
