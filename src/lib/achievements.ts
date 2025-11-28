@@ -35,9 +35,9 @@ export async function checkAchievements(userId: string) {
     }
 
     // 'Architect': Completed 5 scenarios.
-    if (completedScenariosCount >= 5) {
-      await award('Architect');
-    }
+    // if (completedScenariosCount >= 5) {
+    //   await award('Architect');
+    // }
 
     // 'Mastermind': Completed all beginner scenarios.
     // We need to know which are beginner. Ideally fetch scenarios but for now let's assume if they have > 0 they are on track.
