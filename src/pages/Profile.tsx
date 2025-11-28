@@ -77,8 +77,9 @@ export default function Profile() {
           return Promise.all([getAllAchievements(), getUserAchievements(user.id)]);
       })
       .then(([all, earned]) => {
-           setAchievements(all);
-           setEarnedAchievementIds(new Set(earned));
+           // Corregimos los tipos aquí
+           setAchievements(all as Achievement[]);
+           setEarnedAchievementIds(new Set(earned as string[]));
       })
       .catch(err => console.error("Error fetching achievements", err));
     }
