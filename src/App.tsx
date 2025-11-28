@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+// CAMBIO 1: Importa HashRouter en lugar de BrowserRouter
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import Explore from './pages/Explore';
 import Favorites from './pages/Favorites';
@@ -16,6 +17,7 @@ function App() {
   return (
     <AuthProvider>
       <ToastProvider>
+        {/* CAMBIO 2: Router ahora es HashRouter gracias al alias en el import */}
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
