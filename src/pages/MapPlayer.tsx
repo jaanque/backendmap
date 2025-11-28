@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ReactFlow, Background, Controls, useNodesState, useEdgesState, type Node, type Edge, BackgroundVariant, useReactFlow, ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { getScenarioBySlug, getSteps, getSingleScenarioProgress, saveUserProgress, getUserFavorites, toggleFavorite } from '../lib/api';
+import { getScenarioBySlug, getSteps, getSingleScenarioProgress, saveUserProgress, getUserFavorites, setFavorite } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import type { Scenario, Step } from '../types';
 import CustomNode from '../components/CustomNode';
@@ -28,6 +28,7 @@ function MapPlayerInner() {
   const [error, setError] = useState<string | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
+  const [isFavLoading, setIsFavLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
@@ -169,16 +170,19 @@ function MapPlayerInner() {
   }
 
   const handleToggleFavorite = async () => {
-      if (!user || !scenario) return;
+      if (!user || !scenario || isFavLoading) return;
 
       const newStatus = !isFavorited;
-      setIsFavorited(newStatus); // Optimistic
+      setIsFavorited(newStatus); // Optimistic update
+      setIsFavLoading(true);
 
       try {
-          await toggleFavorite(user.id, scenario.id, newStatus); // Fixed passing newStatus
+          await setFavorite(user.id, scenario.id, newStatus);
       } catch (err) {
           console.error("Failed to toggle favorite", err);
-          setIsFavorited(!newStatus); // Revert
+          setIsFavorited(!newStatus); // Revert on failure
+      } finally {
+          setIsFavLoading(false);
       }
   }
 
@@ -269,7 +273,8 @@ function MapPlayerInner() {
                {user && (
                  <button
                     onClick={handleToggleFavorite}
-                    className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90"
+                    disabled={isFavLoading}
+                    className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
                     title={isFavorited ? "Remove from favorites" : "Add to favorites"}
                  >
                     <Heart

@@ -97,24 +97,26 @@ export async function getUserFavorites(userId: string): Promise<string[]> {
   return (data as any[]).map(f => f.scenario_id);
 }
 
-export async function toggleFavorite(userId: string, scenarioId: string, isFavorite: boolean) {
+export async function setFavorite(userId: string, scenarioId: string, shouldBeFavorite: boolean) {
   if (!supabase) {
     throw new Error("Supabase client is not initialized. Please check your environment variables (VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY).");
   }
 
-  if (isFavorite) {
+  if (shouldBeFavorite) {
+    // Add favorite
+    const { error } = await supabase
+      .from('user_favorites')
+      .insert({ user_id: userId, scenario_id: scenarioId } as any);
+
+    // Ignore duplicate key error (already exists)
+    if (error && error.code !== '23505') throw error;
+  } else {
     // Remove favorite
     const { error } = await supabase
       .from('user_favorites')
       .delete()
       .eq('user_id', userId)
       .eq('scenario_id', scenarioId);
-    if (error) throw error;
-  } else {
-    // Add favorite
-    const { error } = await supabase
-      .from('user_favorites')
-      .insert({ user_id: userId, scenario_id: scenarioId } as any);
     if (error) throw error;
   }
 }
