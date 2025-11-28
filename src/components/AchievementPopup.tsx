@@ -35,7 +35,7 @@ export default function AchievementPopup({ title, description, onClose }: Achiev
               Close
             </button>
             <Link
-              to="/profile"
+              to="/achievements"
               className="flex-1 btn-pro btn-primary py-2.5 text-sm text-center"
             >
               View Achievements
