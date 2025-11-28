@@ -7,6 +7,7 @@ import { useAuth } from '../lib/auth';
 import type { Scenario, Step } from '../types';
 import CustomNode from '../components/CustomNode';
 import PacketEdge from '../components/PacketEdge';
+import MapLegend from '../components/MapLegend';
 import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart, Play, Pause, Terminal } from 'lucide-react';
 import { getSimulationOutput } from '../lib/simulation';
 
@@ -232,6 +233,7 @@ function MapPlayerInner() {
           <Background color="#e5e5e5" gap={24} size={1} variant={BackgroundVariant.Dots} />
           <Controls className="!bg-white !border-zinc-200 !shadow-sm !rounded-lg [&>button]:!border-b-zinc-100 hover:[&>button]:!bg-zinc-50 !fill-zinc-700" />
         </ReactFlow>
+        <MapLegend />
       </div>
 
       {/* Sidebar - Pro Tool Panel */}
