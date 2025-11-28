@@ -25,6 +25,40 @@ export async function getUserAchievements(userId: string): Promise<string[]> {
   return (data as any[]).map(ua => ua.achievement_id);
 }
 
+export async function getUserAchievementsWithDetails(userId: string): Promise<Achievement[]> {
+  if (!supabase) {
+    throw new Error("Supabase client is not initialized.");
+  }
+
+  // Supabase join syntax: user_achievements ( achievements (...) )
+  // But strictly, foreign key is on user_achievements.achievement_id -> achievements.id
+  const { data, error } = await supabase
+    .from('user_achievements')
+    .select('achievements(*)')
+    .eq('user_id', userId);
+
+  if (error) throw error;
+
+  // Flatten the result
+  return (data as any[]).map(item => item.achievements) as Achievement[];
+}
+
+export async function getScenariosByAuthor(authorId: string): Promise<Scenario[]> {
+  if (!supabase) {
+    throw new Error("Supabase client is not initialized.");
+  }
+
+  // Include step count
+  const { data, error } = await supabase
+    .from('scenarios')
+    .select('*, steps(count)')
+    .eq('author_id', authorId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+}
+
 export async function getProfile(userId: string): Promise<Profile | null> {
   if (!supabase) {
     throw new Error("Supabase client is not initialized.");
