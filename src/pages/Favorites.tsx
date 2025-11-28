@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { getScenarios, getUserProgress, getUserFavorites, toggleFavorite } from '../lib/api';
+import { getScenarios, getUserProgress, getUserFavorites, setFavorite } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { useToast } from '../lib/toast';
 import type { Scenario, UserProgress } from '../types';
@@ -50,31 +50,28 @@ export default function Favorites() {
   const handleToggleFavorite = async (scenarioId: string) => {
     if (!user) return;
 
-    const isFav = favorites.has(scenarioId);
+    const isCurrentlyFav = favorites.has(scenarioId);
+    const newFavState = !isCurrentlyFav;
+
     // Optimistic update
     const newFavs = new Set(favorites);
-    if (isFav) newFavs.delete(scenarioId);
-    else newFavs.add(scenarioId);
+    if (newFavState) newFavs.add(scenarioId);
+    else newFavs.delete(scenarioId);
     setFavorites(newFavs);
 
     // Show toast
-    showToast(isFav ? "Removed from favorites" : "Added to favorites", {
+    showToast(newFavState ? "Added to favorites" : "Removed from favorites", {
         type: 'success',
         onUndo: async () => {
              // Revert
              const revertFavs = new Set(newFavs);
-             if (isFav) revertFavs.add(scenarioId); // It was removed, so add it back
-             else revertFavs.delete(scenarioId); // It was added, so remove it
+             if (newFavState) revertFavs.delete(scenarioId);
+             else revertFavs.add(scenarioId);
              setFavorites(revertFavs);
 
              try {
-                await toggleFavorite(user.id, scenarioId, !isFav); // !isFav is the original state (undoing the toggle means setting it back to original)
-                // Actually toggleFavorite takes the NEW state.
-                // Wait, toggleFavorite(userId, scenarioId, isFavorite) -> isFavorite is the DESIRED state?
-                // Let's check api.ts.
-                // It says: if (isFavorite) { delete } else { insert }.
-                // So the 3rd arg is "is currently favorite?".
-                // No, let's read api.ts again carefully.
+                // Restore original state
+                await setFavorite(user.id, scenarioId, isCurrentlyFav);
              } catch (err) {
                  console.error("Undo failed", err);
              }
@@ -82,7 +79,7 @@ export default function Favorites() {
     });
 
     try {
-      await toggleFavorite(user.id, scenarioId, isFav);
+      await setFavorite(user.id, scenarioId, newFavState);
     } catch (err) {
       console.error("Failed to toggle favorite", err);
       setFavorites(favorites); // Revert on error

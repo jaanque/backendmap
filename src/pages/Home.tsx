@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { getScenarios, getUserProgress, getUserFavorites, toggleFavorite } from '../lib/api';
+import { getScenarios, getUserProgress, getUserFavorites, setFavorite } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { useToast } from '../lib/toast';
 import type { Scenario, UserProgress } from '../types';
@@ -45,27 +45,28 @@ export default function Home() {
   const handleToggleFavorite = async (scenarioId: string) => {
     if (!user) return; // Or show login modal
 
-    const isFav = favorites.has(scenarioId);
+    const isCurrentlyFav = favorites.has(scenarioId);
+    const newFavState = !isCurrentlyFav;
 
     // Optimistic update
     const newFavs = new Set(favorites);
-    if (isFav) newFavs.delete(scenarioId);
-    else newFavs.add(scenarioId);
+    if (newFavState) newFavs.add(scenarioId);
+    else newFavs.delete(scenarioId);
     setFavorites(newFavs);
 
     // Show toast
-    showToast(isFav ? "Removed from favorites" : "Added to favorites", {
+    showToast(newFavState ? "Added to favorites" : "Removed from favorites", {
       type: 'success',
       onUndo: async () => {
           // Undo: revert local state
           const revertFavs = new Set(newFavs);
-          if (isFav) revertFavs.add(scenarioId);
-          else revertFavs.delete(scenarioId);
+          if (newFavState) revertFavs.delete(scenarioId);
+          else revertFavs.add(scenarioId);
           setFavorites(revertFavs);
 
           try {
-              // Undo: toggle again
-              await toggleFavorite(user.id, scenarioId, !isFav);
+              // Undo: set back to original state
+              await setFavorite(user.id, scenarioId, isCurrentlyFav);
           } catch (err) {
               console.error("Undo failed", err);
               // If undo failed, we might want to revert UI again, but let's keep it simple
@@ -74,7 +75,7 @@ export default function Home() {
     });
 
     try {
-      await toggleFavorite(user.id, scenarioId, isFav);
+      await setFavorite(user.id, scenarioId, newFavState);
     } catch (err) {
       // Revert on error
       console.error("Failed to toggle favorite", err);
