@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
-import { getPublicProfiles } from '../lib/api';
+import { getPublicProfiles, getFollowersCount, getFollowingCount } from '../lib/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Loader2, User } from 'lucide-react';
+import { Loader2, User, Users as UsersIcon } from 'lucide-react';
 import type { Profile } from '../types';
 import UserDetailsModal from '../components/UserDetailsModal';
 
 export default function Users() {
   const [users, setUsers] = useState<Profile[]>([]);
+  const [userStats, setUserStats] = useState<Record<string, { followers: number; following: number }>>({});
   const [loading, setLoading] = useState(true);
 
   // Selected User Modal State
@@ -15,7 +16,25 @@ export default function Users() {
 
   useEffect(() => {
     getPublicProfiles()
-      .then(data => setUsers(data))
+      .then(async (data) => {
+        setUsers(data);
+
+        // Fetch stats for all users
+        const statsMap: Record<string, { followers: number; following: number }> = {};
+        await Promise.all(data.map(async (user) => {
+            try {
+                const [followers, following] = await Promise.all([
+                    getFollowersCount(user.id),
+                    getFollowingCount(user.id)
+                ]);
+                statsMap[user.id] = { followers, following };
+            } catch (err) {
+                console.error(`Error fetching stats for user ${user.id}`, err);
+                statsMap[user.id] = { followers: 0, following: 0 };
+            }
+        }));
+        setUserStats(statsMap);
+      })
       .catch(err => console.error("Error fetching users:", err))
       .finally(() => setLoading(false));
   }, []);
@@ -52,8 +71,21 @@ export default function Users() {
                 <h3 className="font-bold text-lg text-zinc-900">
                   {user.first_name || 'Anonymous'} {user.last_name || ''}
                 </h3>
+
+                <div className="flex items-center gap-3 mt-2 mb-1">
+                    <div className="flex items-center gap-1 text-xs text-zinc-500 bg-zinc-50 px-2 py-1 rounded-md border border-zinc-100">
+                        <UsersIcon size={12} />
+                        <span className="font-semibold text-zinc-900">{userStats[user.id]?.followers || 0}</span>
+                        <span>Followers</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-zinc-500 bg-zinc-50 px-2 py-1 rounded-md border border-zinc-100">
+                        <span className="font-semibold text-zinc-900">{userStats[user.id]?.following || 0}</span>
+                        <span>Following</span>
+                    </div>
+                </div>
+
                 {(user.gender || user.sex) && (
-                  <p className="text-xs text-zinc-500 mt-1">
+                  <p className="text-[10px] text-zinc-400 mt-1">
                     {[user.gender, user.sex].filter(Boolean).join(' • ')}
                   </p>
                 )}
