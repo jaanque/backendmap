@@ -93,6 +93,54 @@ export async function getFollowingCount(userId: string): Promise<number> {
   return count || 0;
 }
 
+export async function getFollowers(userId: string): Promise<Profile[]> {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  // Fetch follower IDs
+  const { data: follows, error } = await supabase
+    .from('follows')
+    .select('follower_id')
+    .eq('following_id', userId);
+
+  if (error) throw error;
+  if (!follows.length) return [];
+
+  const ids = (follows as any[]).map(f => f.follower_id);
+
+  // Fetch profiles
+  const { data: profiles, error: profilesError } = await supabase
+    .from('profiles')
+    .select('*')
+    .in('id', ids);
+
+  if (profilesError) throw profilesError;
+  return profiles || [];
+}
+
+export async function getFollowing(userId: string): Promise<Profile[]> {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  // Fetch following IDs
+  const { data: follows, error } = await supabase
+    .from('follows')
+    .select('following_id')
+    .eq('follower_id', userId);
+
+  if (error) throw error;
+  if (!follows.length) return [];
+
+  const ids = (follows as any[]).map(f => f.following_id);
+
+  // Fetch profiles
+  const { data: profiles, error: profilesError } = await supabase
+    .from('profiles')
+    .select('*')
+    .in('id', ids);
+
+  if (profilesError) throw profilesError;
+  return profiles || [];
+}
+
 export async function getUserAchievementsWithDetails(userId: string): Promise<Achievement[]> {
   if (!supabase) {
     throw new Error("Supabase client is not initialized.");

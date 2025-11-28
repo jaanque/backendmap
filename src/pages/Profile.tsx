@@ -8,6 +8,7 @@ import Footer from '../components/Footer';
 import { User, Mail, Save, Loader2, Lock, Github, Link as LinkIcon, Trophy, Award, Footprints, DraftingCompass, Brain, Sun, Bug } from 'lucide-react';
 import { getProfile, updateProfile, getAllAchievements, getUserAchievements, getFollowersCount, getFollowingCount } from '../lib/api';
 import { checkAchievements } from '../lib/achievements';
+import UserListModal from '../components/UserListModal';
 import type { Achievement } from '../types';
 
 // Helper to resolve icon string to component
@@ -44,6 +45,7 @@ export default function Profile() {
   // Follow Stats
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
+  const [activeFollowsModal, setActiveFollowsModal] = useState<'followers' | 'following' | null>(null);
 
   // Achievements
   const [achievements, setAchievements] = useState<Achievement[]>([]);
@@ -247,8 +249,18 @@ export default function Profile() {
                 Profile Information
              </h2>
              <div className="flex gap-4 text-xs font-medium text-zinc-500">
-                <span><strong className="text-zinc-900">{followersCount}</strong> Followers</span>
-                <span><strong className="text-zinc-900">{followingCount}</strong> Following</span>
+                <button
+                  onClick={() => setActiveFollowsModal('followers')}
+                  className="hover:text-zinc-800 transition-colors"
+                >
+                  <strong className="text-zinc-900">{followersCount}</strong> Followers
+                </button>
+                <button
+                  onClick={() => setActiveFollowsModal('following')}
+                  className="hover:text-zinc-800 transition-colors"
+                >
+                  <strong className="text-zinc-900">{followingCount}</strong> Following
+                </button>
              </div>
           </div>
 
@@ -544,6 +556,15 @@ export default function Profile() {
       </main>
 
       <Footer />
+
+      {activeFollowsModal && user && (
+        <UserListModal
+          isOpen={!!activeFollowsModal}
+          onClose={() => setActiveFollowsModal(null)}
+          userId={user.id}
+          type={activeFollowsModal}
+        />
+      )}
     </div>
   );
 }
