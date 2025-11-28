@@ -26,6 +26,7 @@ export default function Profile() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [isGithubConnected, setIsGithubConnected] = useState(false);
+  const [hasPassword, setHasPassword] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -36,6 +37,15 @@ export default function Profile() {
       // Check for GitHub identity
       const githubIdentity = user.identities?.find(id => id.provider === 'github');
       setIsGithubConnected(!!githubIdentity);
+
+      // Check if user has password login enabled
+      // The presence of 'email' provider in app_metadata usually indicates email/password or magic link
+      // For this app, we assume it means password is set if they signed up via form.
+      // However, linkIdentity might add 'email' provider too? No, linkIdentity adds to identities.
+      // A more robust check might be difficult purely client side without try/catch on update,
+      // but checking providers list is a good heuristic.
+      const providers = user.app_metadata?.providers || [];
+      setHasPassword(providers.includes('email'));
 
       getProfile(user.id)
         .then(profile => {
@@ -140,14 +150,16 @@ export default function Profile() {
     setIsChangingPassword(true);
 
     try {
-      // Verify current password by attempting to sign in
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: user.email!,
-        password: currentPassword,
-      });
+      if (hasPassword) {
+        // Verify current password only if they supposedly have one
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: user.email!,
+          password: currentPassword,
+        });
 
-      if (signInError) {
-        throw new Error("Incorrect current password");
+        if (signInError) {
+          throw new Error("Incorrect current password");
+        }
       }
 
       // Update password
@@ -157,7 +169,9 @@ export default function Profile() {
 
       if (updateError) throw updateError;
 
-      showToast("Password updated successfully", { type: 'success' });
+      showToast("Password set successfully", { type: 'success' });
+      // If they didn't have a password before, they do now.
+      setHasPassword(true);
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
@@ -345,32 +359,42 @@ export default function Profile() {
           </div>
 
           <div className="p-6">
+            {!hasPassword && (
+               <div className="mb-6 bg-amber-50 border border-amber-200 rounded-lg p-4 text-amber-800 text-sm">
+                  <strong>Set a password.</strong> You currently login with a third-party provider. Set a password to enable email login and secure your account.
+               </div>
+            )}
+
             <form onSubmit={handlePasswordChange} className="space-y-6">
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                   <label htmlFor="currentPassword" className="block text-sm font-medium text-zinc-700">Current Password</label>
-                   <Link to="/forgot-password" className="text-xs text-indigo-600 hover:text-indigo-800 transition-colors">Forgot your password?</Link>
+              {hasPassword && (
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                     <label htmlFor="currentPassword" className="block text-sm font-medium text-zinc-700">Current Password</label>
+                     <Link to="/forgot-password" className="text-xs text-indigo-600 hover:text-indigo-800 transition-colors">Forgot your password?</Link>
+                  </div>
+                  <input
+                    id="currentPassword"
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder="Enter current password"
+                    required
+                    className="w-full px-4 py-2.5 rounded-lg border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all text-sm"
+                  />
                 </div>
-                <input
-                  id="currentPassword"
-                  type="password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="Enter current password"
-                  required
-                  className="w-full px-4 py-2.5 rounded-lg border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all text-sm"
-                />
-              </div>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="newPassword" className="block text-sm font-medium text-zinc-700 mb-2">New Password</label>
+                  <label htmlFor="newPassword" className="block text-sm font-medium text-zinc-700 mb-2">
+                    {hasPassword ? 'New Password' : 'Set Password'}
+                  </label>
                   <input
                     id="newPassword"
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Enter new password"
+                    placeholder={hasPassword ? "Enter new password" : "Create a password"}
                     required
                     minLength={6}
                     className="w-full px-4 py-2.5 rounded-lg border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all text-sm"
@@ -378,13 +402,15 @@ export default function Profile() {
                 </div>
 
                 <div>
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-zinc-700 mb-2">Confirm New Password</label>
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-zinc-700 mb-2">
+                    {hasPassword ? 'Confirm New Password' : 'Confirm Password'}
+                  </label>
                   <input
                     id="confirmPassword"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm new password"
+                    placeholder={hasPassword ? "Confirm new password" : "Confirm password"}
                     required
                     minLength={6}
                     className="w-full px-4 py-2.5 rounded-lg border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all text-sm"
@@ -399,7 +425,7 @@ export default function Profile() {
                   className="btn-pro btn-secondary flex items-center gap-2 px-6 py-2.5 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   {isChangingPassword ? <Loader2 className="animate-spin" size={16} /> : <Lock size={16} />}
-                  {isChangingPassword ? 'Updating...' : 'Update Password'}
+                  {isChangingPassword ? 'Updating...' : (hasPassword ? 'Update Password' : 'Set Password')}
                 </button>
               </div>
             </form>
