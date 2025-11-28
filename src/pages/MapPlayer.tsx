@@ -2,15 +2,16 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ReactFlow, Background, Controls, useNodesState, useEdgesState, type Node, type Edge, BackgroundVariant, useReactFlow, ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { getScenarioBySlug, getSteps, getSingleScenarioProgress, saveUserProgress, getUserFavorites, setFavorite } from '../lib/api';
+import { getScenarioBySlug, getSteps, getSingleScenarioProgress, saveUserProgress, getUserFavorites, setFavorite, getProfile } from '../lib/api';
 import { useAuth } from '../lib/auth';
-import type { Scenario, Step } from '../types';
+import type { Scenario, Step, Profile } from '../types';
 import CustomNode from '../components/CustomNode';
 import PacketEdge from '../components/PacketEdge';
 import MapLegend from '../components/MapLegend';
-import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart, Play, Pause } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart, Play, Pause, User } from 'lucide-react';
 import { checkAchievements } from '../lib/achievements';
 import AchievementPopup from '../components/AchievementPopup';
+import UserDetailsModal from '../components/UserDetailsModal';
 import type { Achievement } from '../types';
 
 const nodeTypes = {
@@ -33,6 +34,8 @@ function MapPlayerInner() {
   const [isFavLoading, setIsFavLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [unlockedAchievements, setUnlockedAchievements] = useState<Achievement[]>([]);
+  const [authorProfile, setAuthorProfile] = useState<Profile | null>(null);
+  const [isAuthorModalOpen, setIsAuthorModalOpen] = useState(false);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -47,6 +50,11 @@ function MapPlayerInner() {
             setScenario(data);
             setNodes(data.flow_data.initialNodes);
             setEdges(data.flow_data.initialEdges);
+
+            // Fetch Author if exists
+            if (data.author_id) {
+                getProfile(data.author_id).then(setAuthorProfile).catch(console.error);
+            }
 
             // Fetch steps and then maybe progress
             getSteps(data.id).then((fetchedSteps) => {
@@ -219,6 +227,12 @@ function MapPlayerInner() {
 
   return (
     <div className="flex h-screen bg-white overflow-hidden flex-col md:flex-row font-sans relative">
+      <UserDetailsModal
+        isOpen={isAuthorModalOpen}
+        onClose={() => setIsAuthorModalOpen(false)}
+        user={authorProfile}
+      />
+
       {/* Achievement Popup */}
       {unlockedAchievements.length > 0 && (
         <AchievementPopup
@@ -275,6 +289,19 @@ function MapPlayerInner() {
               <h1 className="text-lg font-bold text-zinc-900 leading-tight">
                 {scenario.title}
               </h1>
+              {authorProfile && (
+                <button
+                    onClick={() => setIsAuthorModalOpen(true)}
+                    className="flex items-center gap-1.5 mt-1.5 group cursor-pointer"
+                >
+                    <div className="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-500 border border-zinc-200">
+                        <User size={10} />
+                    </div>
+                    <span className="text-xs text-zinc-500 group-hover:text-indigo-600 transition-colors">
+                        Created by <span className="font-medium">{authorProfile.first_name || 'Anonymous'}</span>
+                    </span>
+                </button>
+              )}
            </div>
 
            <div className="flex gap-2">
