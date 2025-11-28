@@ -5,7 +5,7 @@ import { useToast } from '../lib/toast';
 import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { User, Mail, Save, Loader2, Lock } from 'lucide-react';
+import { User, Mail, Save, Loader2, Lock, Github, Link as LinkIcon } from 'lucide-react';
 import { getProfile, updateProfile } from '../lib/api';
 
 export default function Profile() {
@@ -25,6 +25,7 @@ export default function Profile() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [isGithubConnected, setIsGithubConnected] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -32,6 +33,10 @@ export default function Profile() {
     }
 
     if (user) {
+      // Check for GitHub identity
+      const githubIdentity = user.identities?.find(id => id.provider === 'github');
+      setIsGithubConnected(!!githubIdentity);
+
       getProfile(user.id)
         .then(profile => {
           if (profile) {
@@ -45,6 +50,16 @@ export default function Profile() {
         .finally(() => setIsLoadingProfile(false));
     }
   }, [user, loading, navigate]);
+
+  const handleConnectGithub = async () => {
+     if (!supabase) return;
+     const { error } = await supabase.auth.linkIdentity({ provider: 'github' });
+     if (error) {
+         console.error("Error linking GitHub", error);
+         showToast(error.message || "Failed to link GitHub account", { type: 'error' });
+     }
+     // Redirect will happen automatically if successful initiation
+  }
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -238,6 +253,45 @@ export default function Profile() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+
+        {/* Connected Accounts Section */}
+        <div className="mt-8 bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-zinc-100 bg-zinc-50/50">
+             <h2 className="font-semibold text-lg flex items-center gap-2">
+                <LinkIcon size={18} className="text-indigo-600" />
+                Connected Accounts
+             </h2>
+          </div>
+
+          <div className="p-6">
+             <div className="flex items-center justify-between p-4 border border-zinc-100 rounded-lg bg-zinc-50/50">
+                <div className="flex items-center gap-4">
+                   <div className="w-10 h-10 bg-white border border-zinc-200 rounded-full flex items-center justify-center text-zinc-800">
+                      <Github size={20} />
+                   </div>
+                   <div>
+                      <p className="font-semibold text-zinc-900 text-sm">GitHub</p>
+                      <p className="text-xs text-zinc-500">
+                        {isGithubConnected ? "Connected" : "Not connected"}
+                      </p>
+                   </div>
+                </div>
+
+                {isGithubConnected ? (
+                  <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full border border-green-200">
+                    Connected
+                  </span>
+                ) : (
+                  <button
+                    onClick={handleConnectGithub}
+                    className="text-sm font-medium text-zinc-900 hover:text-black hover:underline"
+                  >
+                    Connect
+                  </button>
+                )}
+             </div>
           </div>
         </div>
 
