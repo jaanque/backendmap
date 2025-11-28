@@ -9,6 +9,9 @@ import CustomNode from '../components/CustomNode';
 import PacketEdge from '../components/PacketEdge';
 import MapLegend from '../components/MapLegend';
 import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart, Play, Pause } from 'lucide-react';
+import { checkAchievements } from '../lib/achievements';
+import AchievementPopup from '../components/AchievementPopup';
+import type { Achievement } from '../types';
 
 const nodeTypes = {
   custom: CustomNode,
@@ -29,6 +32,7 @@ function MapPlayerInner() {
   const [isFavorited, setIsFavorited] = useState(false);
   const [isFavLoading, setIsFavLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [unlockedAchievements, setUnlockedAchievements] = useState<Achievement[]>([]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -81,7 +85,7 @@ function MapPlayerInner() {
     }
   };
 
-  const handleNext = useCallback(() => {
+  const handleNext = useCallback(async () => {
     if (currentStepIndex < steps.length - 1) {
       const nextIndex = currentStepIndex + 1;
       setCurrentStepIndex(nextIndex);
@@ -89,7 +93,15 @@ function MapPlayerInner() {
     } else {
       setIsCompleted(true);
       setIsPlaying(false);
-      saveProgress(currentStepIndex, true);
+      await saveProgress(currentStepIndex, true);
+
+      // Check achievements on completion
+      if (user) {
+        const newAchievements = await checkAchievements(user.id);
+        if (newAchievements.length > 0) {
+          setUnlockedAchievements(prev => [...prev, ...newAchievements]);
+        }
+      }
     }
   }, [currentStepIndex, steps.length, user, scenario]); // Added dependencies
 
@@ -206,7 +218,16 @@ function MapPlayerInner() {
   const currentStep = steps[currentStepIndex];
 
   return (
-    <div className="flex h-screen bg-white overflow-hidden flex-col md:flex-row font-sans">
+    <div className="flex h-screen bg-white overflow-hidden flex-col md:flex-row font-sans relative">
+      {/* Achievement Popup */}
+      {unlockedAchievements.length > 0 && (
+        <AchievementPopup
+          title={unlockedAchievements[0].title}
+          description={unlockedAchievements[0].description}
+          onClose={() => setUnlockedAchievements(prev => prev.slice(1))}
+        />
+      )}
+
       {/* Header (Mobile only) */}
       <div className="md:hidden h-14 border-b border-zinc-200 flex items-center px-4 justify-between bg-white z-20">
          <Link to="/" className="text-zinc-500"><ArrowLeft size={20} /></Link>

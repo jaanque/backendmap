@@ -1,8 +1,9 @@
 import { supabase } from './supabase';
 import { getUserProgress, getAllAchievements, getUserAchievements } from './api';
+import type { Achievement } from '../types';
 
-export async function checkAchievements(userId: string) {
-  if (!supabase) return;
+export async function checkAchievements(userId: string): Promise<Achievement[]> {
+  if (!supabase) return [];
 
   try {
     const [progress, allAchievements, earnedIds] = await Promise.all([
@@ -12,7 +13,7 @@ export async function checkAchievements(userId: string) {
     ]);
 
     const earnedSet = new Set(earnedIds);
-    const newEarned: string[] = [];
+    const newEarned: Achievement[] = [];
 
     // Helper to award achievement
     const award = async (title: string) => {
@@ -22,7 +23,12 @@ export async function checkAchievements(userId: string) {
           user_id: userId,
           achievement_id: achievement.id
         } as any);
-        if (!error) newEarned.push(achievement.id);
+
+        if (error) {
+            console.error(`Failed to award achievement '${title}':`, error);
+        } else {
+            newEarned.push(achievement);
+        }
       }
     };
 
@@ -48,9 +54,9 @@ export async function checkAchievements(userId: string) {
 
     // Future expansion: 'Mastermind', 'Early Bird', 'Bug Hunter' would require more context/data.
 
-    return newEarned.length > 0; // Return true if any new achievement was unlocked
+    return newEarned;
   } catch (err) {
     console.error("Error checking achievements:", err);
-    return false;
+    return [];
   }
 }
