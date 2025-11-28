@@ -58,9 +58,9 @@ export default function Achievements() {
     <div className="min-h-screen bg-white font-sans text-zinc-900 flex flex-col">
       <Navbar />
 
-      <main className="flex-grow px-6 md:px-12 py-12 max-w-5xl mx-auto w-full">
+      <main className="flex-grow px-6 md:px-12 py-12 max-w-5xl mx-auto w-full animate-fade-in-up">
         <div className="mb-10">
-          <Link to="/profile" className="text-sm font-medium text-zinc-500 hover:text-zinc-900 flex items-center gap-1 mb-4 transition-colors">
+          <Link to="/profile" className="text-sm font-medium text-zinc-500 hover:text-zinc-900 flex items-center gap-1 mb-4 transition-colors hover:-translate-x-1">
             <ArrowLeft size={14} /> Back to Profile
           </Link>
           <h1 className="text-3xl font-bold tracking-tight text-zinc-900 flex items-center gap-3">
@@ -71,7 +71,7 @@ export default function Achievements() {
         </div>
 
         {/* Progress Summary */}
-        <div className="mb-12 p-6 bg-zinc-50 rounded-2xl border border-zinc-100 flex items-center justify-between flex-wrap gap-6">
+        <div className="mb-12 p-6 bg-zinc-50 rounded-2xl border border-zinc-100 flex items-center justify-between flex-wrap gap-6 transition-all duration-300 hover:shadow-sm">
            <div className="flex flex-col">
               <span className="text-sm font-medium text-zinc-500 uppercase tracking-wider">Total Earned</span>
               <span className="text-4xl font-bold text-zinc-900">{unlockedAchievements.length} <span className="text-lg text-zinc-400 font-normal">/ {achievements.length}</span></span>
@@ -102,7 +102,7 @@ export default function Achievements() {
                   return (
                     <div
                       key={achievement.id}
-                      className="p-5 rounded-xl border flex items-start gap-4 transition-all bg-indigo-50/30 border-indigo-100 shadow-sm hover:shadow-md"
+                      className="p-5 rounded-xl border flex items-start gap-4 transition-all bg-indigo-50/30 border-indigo-100 shadow-sm hover:shadow-md hover:scale-[1.02]"
                     >
                        <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 bg-indigo-100 text-indigo-600 shadow-sm">
                           <IconComponent size={24} />
@@ -135,7 +135,7 @@ export default function Achievements() {
                   return (
                     <div
                       key={achievement.id}
-                      className="p-5 rounded-xl border flex items-start gap-4 transition-all bg-white border-zinc-100 opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-zinc-300"
+                      className="p-5 rounded-xl border flex items-start gap-4 transition-all bg-white border-zinc-100 opacity-70 grayscale hover:grayscale-0 hover:opacity-100 hover:border-zinc-300 hover:scale-[1.02] hover:shadow-sm"
                     >
                        <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 bg-zinc-100 text-zinc-400">
                           <IconComponent size={24} />

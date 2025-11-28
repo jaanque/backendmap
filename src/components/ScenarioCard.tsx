@@ -17,8 +17,8 @@ export default function ScenarioCard({ scenario, progress, isFavorited, onToggle
     : 0;
 
   return (
-    <div className="block group relative">
-      <article className="border border-zinc-200 rounded-xl p-6 bg-white hover:border-zinc-400 hover:shadow-md transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-6 relative">
+    <div className="block group relative transition-transform active:scale-[0.99] duration-150">
+      <article className="border border-zinc-200 rounded-xl p-6 bg-white hover:border-zinc-400 hover:shadow-md hover:-translate-y-1 transition-all duration-300 ease-out flex flex-col md:flex-row md:items-center justify-between gap-6 relative">
         <div className="flex-grow">
           <div className="flex items-center gap-3 mb-2">
             <h3 className="font-bold text-lg text-zinc-900 group-hover:text-zinc-600 transition-colors">{scenario.title || 'Untitled Scenario'}</h3>

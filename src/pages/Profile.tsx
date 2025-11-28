@@ -104,7 +104,7 @@ export default function Profile() {
      const hasOtherProviders = identities.some(id => id.provider !== 'github');
 
      if (!hasPassword && !hasOtherProviders) {
-         showToast("Cannot unlink GitHub as it is your only login method.", { type: 'error' });
+         showToast("Cannot unlink GitHub as it is your only login method. Please set a password first.", { type: 'error' });
          return;
      }
 
@@ -217,13 +217,13 @@ export default function Profile() {
     <div className="min-h-screen bg-white font-sans text-zinc-900 flex flex-col">
       <Navbar />
 
-      <main className="flex-grow px-6 md:px-12 py-12 max-w-3xl mx-auto w-full">
+      <main className="flex-grow px-6 md:px-12 py-12 max-w-3xl mx-auto w-full animate-fade-in-up">
         <div className="mb-10">
           <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Account Settings</h1>
           <p className="text-zinc-500 mt-2">Manage your profile and account preferences.</p>
         </div>
 
-        <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
           <div className="p-6 border-b border-zinc-100 bg-zinc-50/50">
              <h2 className="font-semibold text-lg flex items-center gap-2">
                 <User size={18} className="text-indigo-600" />
@@ -327,7 +327,7 @@ export default function Profile() {
         </div>
 
         {/* Achievements Section */}
-        <div className="mt-8 bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
+        <div className="mt-8 bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
           <div className="p-6 border-b border-zinc-100 bg-zinc-50/50">
              <h2 className="font-semibold text-lg flex items-center gap-2">
                 <Trophy size={18} className="text-indigo-600" />
@@ -351,7 +351,7 @@ export default function Profile() {
                      return (
                        <div
                          key={achievement.id}
-                         className="p-4 rounded-xl border flex items-start gap-4 transition-all bg-indigo-50/50 border-indigo-100"
+                         className="p-4 rounded-xl border flex items-start gap-4 transition-all bg-indigo-50/50 border-indigo-100 hover:scale-[1.02] hover:shadow-sm"
                        >
                           <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-indigo-100 text-indigo-600">
                              <IconComponent size={20} />
@@ -383,7 +383,7 @@ export default function Profile() {
         </div>
 
         {/* Connected Accounts Section */}
-        <div className="mt-8 bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
+        <div className="mt-8 bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
           <div className="p-6 border-b border-zinc-100 bg-zinc-50/50">
              <h2 className="font-semibold text-lg flex items-center gap-2">
                 <LinkIcon size={18} className="text-indigo-600" />
@@ -425,7 +425,7 @@ export default function Profile() {
         </div>
 
         {/* Security Section */}
-        <div className="mt-8 bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
+        <div className="mt-8 bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
           <div className="p-6 border-b border-zinc-100 bg-zinc-50/50">
              <h2 className="font-semibold text-lg flex items-center gap-2">
                 <Lock size={18} className="text-indigo-600" />

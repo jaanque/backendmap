@@ -135,7 +135,7 @@ export default function Home() {
       </header>
 
       {/* Content - Technical List */}
-      <main className="px-6 md:px-12 pb-32 max-w-5xl mx-auto">
+      <main className="px-6 md:px-12 pb-32 max-w-5xl mx-auto animate-fade-in-up">
         <div className="mb-6 flex items-end justify-between border-b border-zinc-100 pb-4">
           <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-900">Catalog</h2>
           <span className="text-xs font-mono text-zinc-400 bg-zinc-100 px-2 py-1 rounded">{filteredScenarios.length} ITEMS</span>

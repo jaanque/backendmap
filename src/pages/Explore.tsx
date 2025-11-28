@@ -126,7 +126,7 @@ export default function Explore() {
       </div>
 
       {/* Content - Technical List */}
-      <main className="px-6 md:px-12 pb-32 max-w-5xl mx-auto">
+      <main className="px-6 md:px-12 pb-32 max-w-5xl mx-auto animate-fade-in-up">
         <div className="mb-6 flex items-end justify-between border-b border-zinc-100 pb-4">
           <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-900">All Scenarios</h2>
           <span className="text-xs font-mono text-zinc-400 bg-zinc-100 px-2 py-1 rounded">{filteredScenarios.length} ITEMS</span>
@@ -137,7 +137,7 @@ export default function Explore() {
              <div className="w-8 h-8 border-2 border-zinc-200 border-t-zinc-800 rounded-full animate-spin"></div>
           </div>
         ) : filteredScenarios.length > 0 ? (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 animate-fade-in-up">
             {filteredScenarios.map((scenario) => (
               <ScenarioCard
                 key={scenario.id}
