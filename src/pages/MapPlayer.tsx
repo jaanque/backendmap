@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ReactFlow, Background, Controls, useNodesState, useEdgesState, type Node, type Edge, BackgroundVariant, useReactFlow } from '@xyflow/react';
+import { ReactFlow, Background, Controls, useNodesState, useEdgesState, type Node, type Edge, BackgroundVariant, useReactFlow, ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { getScenarioBySlug, getSteps, getSingleScenarioProgress, saveUserProgress, getUserFavorites, toggleFavorite } from '../lib/api';
 import { useAuth } from '../lib/auth';
@@ -17,7 +17,7 @@ const edgeTypes = {
   packet: PacketEdge,
 };
 
-export default function MapPlayer() {
+function MapPlayerInner() {
   const { slug } = useParams<{ slug: string }>();
   const { user } = useAuth();
   const [scenario, setScenario] = useState<Scenario | null>(null);
@@ -343,5 +343,13 @@ export default function MapPlayer() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function MapPlayer() {
+  return (
+    <ReactFlowProvider>
+      <MapPlayerInner />
+    </ReactFlowProvider>
   );
 }
