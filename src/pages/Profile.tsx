@@ -61,6 +61,43 @@ export default function Profile() {
      // Redirect will happen automatically if successful initiation
   }
 
+  const handleUnlinkGithub = async () => {
+     if (!supabase || !user) return;
+
+     // Safety check: ensure user has another way to login (password or another provider)
+     // Identities contains all linked providers.
+     const identities = user.identities || [];
+     const hasPassword = identities.some(id => id.provider === 'email'); // 'email' provider usually implies password or magic link.
+     const hasOtherProviders = identities.some(id => id.provider !== 'github');
+
+     if (!hasPassword && !hasOtherProviders) {
+         showToast("Cannot unlink GitHub as it is your only login method. Please set a password first.", { type: 'error' });
+         return;
+     }
+
+     // Use window.confirm for simplicity as requested, but a modal would be better UI.
+     if (window.confirm("Are you sure you want to disconnect your GitHub account? This will remove your ability to sign in with GitHub.")) {
+        try {
+            const githubIdentity = identities.find(id => id.provider === 'github');
+            if (!githubIdentity) return;
+
+            // In older versions of supabase-js unlinkIdentity takes UserIdentity
+            // In newer versions it might take just the ID string, but TypeScript types suggest UserIdentity object in some versions.
+            // Based on the error "Argument of type 'string' is not assignable to parameter of type 'UserIdentity'",
+            // it seems the installed version expects the whole object.
+
+            const { error } = await supabase.auth.unlinkIdentity(githubIdentity);
+            if (error) throw error;
+
+            setIsGithubConnected(false);
+            showToast("GitHub account disconnected successfully", { type: 'success' });
+        } catch (err: any) {
+            console.error("Error unlinking GitHub", err);
+            showToast(err.message || "Failed to disconnect GitHub account", { type: 'error' });
+        }
+     }
+  }
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !supabase) return;
@@ -280,9 +317,12 @@ export default function Profile() {
                 </div>
 
                 {isGithubConnected ? (
-                  <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full border border-green-200">
-                    Connected
-                  </span>
+                  <button
+                    onClick={handleUnlinkGithub}
+                    className="px-3 py-1 bg-red-50 text-red-600 text-xs font-medium rounded-full border border-red-100 hover:bg-red-100 transition-colors"
+                  >
+                    Disconnect
+                  </button>
                 ) : (
                   <button
                     onClick={handleConnectGithub}
