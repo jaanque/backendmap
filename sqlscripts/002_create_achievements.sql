@@ -27,6 +27,9 @@ create policy "Achievements are viewable by everyone" on achievements
 create policy "User achievements viewable by owner" on user_achievements
   for select using (auth.uid() = user_id);
 
+create policy "Users can insert their own achievements" on user_achievements
+  for insert with check (auth.uid() = user_id);
+
 -- Seed data
 insert into achievements (title, description, icon_name) values
   ('First Steps', 'Completed your first scenario.', 'Footprints'),
