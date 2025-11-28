@@ -91,6 +91,36 @@ export async function getScenarioBySlug(slug: string): Promise<Scenario | null> 
   return data;
 }
 
+export async function checkSlugAvailability(slug: string): Promise<boolean> {
+  if (!supabase) {
+    throw new Error("Supabase client is not initialized.");
+  }
+
+  const { count, error } = await supabase
+    .from('scenarios')
+    .select('id', { count: 'exact', head: true })
+    .eq('slug', slug);
+
+  if (error) throw error;
+  return count === 0;
+}
+
+export async function createScenario(scenario: Omit<Scenario, 'id' | 'created_at'>): Promise<Scenario> {
+  if (!supabase) {
+    throw new Error("Supabase client is not initialized.");
+  }
+
+  // Note: RLS should handle user validation, but we assume the caller provides author_id if needed
+  const { data, error } = await supabase
+    .from('scenarios')
+    .insert(scenario as any)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function getSteps(scenarioId: string): Promise<Step[]> {
   if (!supabase) {
     throw new Error("Supabase client is not initialized. Please check your environment variables (VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY).");

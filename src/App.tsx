@@ -11,6 +11,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import Profile from './pages/Profile';
 import Achievements from './pages/Achievements';
 import Users from './pages/Users';
+import CreateScenario from './pages/CreateScenario';
 import { AuthProvider } from './lib/auth';
 import { ToastProvider } from './lib/toast';
 
@@ -31,6 +32,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/achievements" element={<Achievements />} />
             <Route path="/users" element={<Users />} />
+            <Route path="/create" element={<CreateScenario />} />
             <Route path="/map/:slug" element={<MapPlayer />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

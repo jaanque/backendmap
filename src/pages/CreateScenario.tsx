@@ -1,0 +1,333 @@
+import { useState, useCallback, useRef } from 'react';
+import { ReactFlow, ReactFlowProvider, addEdge, useNodesState, useEdgesState, Controls, Background, useReactFlow, type Node, type Edge, type Connection, BackgroundVariant } from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
+import CustomNode from '../components/CustomNode';
+import PacketEdge from '../components/PacketEdge';
+import Navbar from '../components/Navbar';
+import { useAuth } from '../lib/auth';
+import { checkSlugAvailability, createScenario } from '../lib/api';
+import { useNavigate } from 'react-router-dom';
+import { Monitor, Server, Cpu, Database, Cloud, Save, X, Loader2, GripVertical } from 'lucide-react';
+
+const nodeTypes = {
+  custom: CustomNode,
+};
+
+const edgeTypes = {
+  packet: PacketEdge,
+};
+
+const initialNodes: Node[] = [
+  {
+    id: '1',
+    type: 'custom',
+    position: { x: 250, y: 150 },
+    data: { label: 'Start Here', icon: 'server' },
+  },
+];
+
+let id = 1;
+const getId = () => `dndnode_${id++}`;
+
+function CreateScenario() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const reactFlowWrapper = useRef<HTMLDivElement>(null);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+  const { screenToFlowPosition } = useReactFlow();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Form State
+  const [title, setTitle] = useState('');
+  const [slug, setSlug] = useState('');
+  const [difficulty, setDifficulty] = useState('Beginner');
+  const [description, setDescription] = useState('');
+  const [slugError, setSlugError] = useState<string | null>(null);
+  const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
+  const [checkingSlug, setCheckingSlug] = useState(false);
+
+  const onConnect = useCallback(
+    (params: Connection) => setEdges((eds) => addEdge({ ...params, type: 'packet', animated: false }, eds)),
+    [setEdges],
+  );
+
+  const onDragStart = (event: React.DragEvent, nodeType: string, icon: string) => {
+    event.dataTransfer.setData('application/reactflow/type', nodeType);
+    event.dataTransfer.setData('application/reactflow/icon', icon);
+    event.dataTransfer.effectAllowed = 'move';
+  };
+
+  const onDragOver = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  }, []);
+
+  const onDrop = useCallback(
+    (event: React.DragEvent) => {
+      event.preventDefault();
+
+      const type = event.dataTransfer.getData('application/reactflow/type');
+      const icon = event.dataTransfer.getData('application/reactflow/icon');
+
+      if (typeof type === 'undefined' || !type) {
+        return;
+      }
+
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+
+      const newNode: Node = {
+        id: getId(),
+        type,
+        position,
+        data: { label: `${icon.charAt(0).toUpperCase() + icon.slice(1)} Node`, icon },
+      };
+
+      setNodes((nds) => nds.concat(newNode));
+    },
+    [screenToFlowPosition, setNodes],
+  );
+
+  const handleSlugChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+    setSlug(val);
+    setSlugError(null);
+    setSlugAvailable(null);
+
+    if (val.length > 2) {
+      setCheckingSlug(true);
+      try {
+        const isAvailable = await checkSlugAvailability(val);
+        setSlugAvailable(isAvailable);
+        if (!isAvailable) {
+          setSlugError('This slug is already taken.');
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setCheckingSlug(false);
+      }
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    if (!slugAvailable) {
+        setSlugError('Please choose a unique slug.');
+        return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await createScenario({
+        title,
+        slug,
+        description,
+        difficulty,
+        flow_data: {
+            initialNodes: nodes,
+            initialEdges: edges
+        },
+        tags: ['Community'],
+        author_id: user.id
+      });
+
+      setIsModalOpen(false);
+      navigate(`/map/${slug}`);
+    } catch (err: any) {
+      console.error(err);
+      alert('Failed to create scenario: ' + err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const sidebarItems = [
+    { type: 'custom', icon: 'server', label: 'Server', Icon: Server },
+    { type: 'custom', icon: 'database', label: 'Database', Icon: Database },
+    { type: 'custom', icon: 'monitor', label: 'Client', Icon: Monitor },
+    { type: 'custom', icon: 'cloud', label: 'Cloud', Icon: Cloud },
+    { type: 'custom', icon: 'cpu', label: 'Compute', Icon: Cpu },
+  ];
+
+  return (
+    <div className="h-screen flex flex-col bg-white">
+      <Navbar />
+
+      <div className="flex-grow flex overflow-hidden">
+        {/* Sidebar */}
+        <aside className="w-64 bg-white border-r border-zinc-200 flex flex-col z-10 shadow-[4px_0_24px_-4px_rgba(0,0,0,0.05)]">
+            <div className="p-4 border-b border-zinc-100">
+                <h2 className="font-semibold text-sm text-zinc-900">Components</h2>
+                <p className="text-xs text-zinc-500 mt-1">Drag and drop to canvas</p>
+            </div>
+
+            <div className="p-4 space-y-3 overflow-y-auto flex-grow">
+                {sidebarItems.map((item) => (
+                    <div
+                        key={item.icon}
+                        className="flex items-center gap-3 p-3 rounded-lg border border-zinc-200 bg-zinc-50 hover:border-indigo-300 hover:bg-indigo-50/50 hover:text-indigo-600 transition-all cursor-grab active:cursor-grabbing group"
+                        onDragStart={(event) => onDragStart(event, item.type, item.icon)}
+                        draggable
+                    >
+                        <GripVertical size={16} className="text-zinc-300 group-hover:text-indigo-300" />
+                        <div className="p-1.5 bg-white rounded-md border border-zinc-200 shadow-sm text-zinc-500 group-hover:text-indigo-600 group-hover:border-indigo-100">
+                            <item.Icon size={16} />
+                        </div>
+                        <span className="text-sm font-medium">{item.label}</span>
+                    </div>
+                ))}
+            </div>
+
+            <div className="p-4 border-t border-zinc-100 bg-zinc-50/50">
+                <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="w-full btn-pro btn-primary py-2.5 flex items-center justify-center gap-2"
+                >
+                    <Save size={16} />
+                    Publish Scenario
+                </button>
+            </div>
+        </aside>
+
+        {/* Canvas */}
+        <div className="flex-grow h-full relative bg-[#fafafa]" ref={reactFlowWrapper}>
+             <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                onConnect={onConnect}
+                onDrop={onDrop}
+                onDragOver={onDragOver}
+                nodeTypes={nodeTypes}
+                edgeTypes={edgeTypes}
+                fitView
+            >
+                <Background color="#e5e5e5" gap={24} size={1} variant={BackgroundVariant.Dots} />
+                <Controls className="!bg-white !border-zinc-200 !shadow-sm !rounded-lg [&>button]:!border-b-zinc-100 hover:[&>button]:!bg-zinc-50 !fill-zinc-700" />
+            </ReactFlow>
+        </div>
+      </div>
+
+      {/* Publish Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+                <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50">
+                    <h3 className="font-bold text-lg text-zinc-900">Publish Scenario</h3>
+                    <button onClick={() => setIsModalOpen(false)} className="text-zinc-400 hover:text-zinc-600 transition-colors">
+                        <X size={20} />
+                    </button>
+                </div>
+
+                <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                    <div>
+                        <label className="block text-sm font-medium text-zinc-700 mb-1.5">Scenario Title</label>
+                        <input
+                            type="text"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            required
+                            placeholder="e.g. Microservices Basics"
+                            className="w-full px-3 py-2 rounded-lg border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all text-sm"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-zinc-700 mb-1.5">Slug (URL)</label>
+                        <div className="relative">
+                            <input
+                                type="text"
+                                value={slug}
+                                onChange={handleSlugChange}
+                                required
+                                placeholder="microservices-basics"
+                                className={`w-full px-3 py-2 rounded-lg border outline-none transition-all text-sm ${
+                                    slugError ? 'border-red-300 focus:border-red-500 focus:ring-red-200' :
+                                    slugAvailable ? 'border-green-300 focus:border-green-500 focus:ring-green-200' :
+                                    'border-zinc-200 focus:border-indigo-500 focus:ring-indigo-200'
+                                }`}
+                            />
+                            {checkingSlug && (
+                                <div className="absolute right-3 top-2.5">
+                                    <Loader2 size={16} className="animate-spin text-zinc-400" />
+                                </div>
+                            )}
+                        </div>
+                        {slugError && <p className="text-xs text-red-500 mt-1">{slugError}</p>}
+                        {slugAvailable && !slugError && <p className="text-xs text-green-600 mt-1">Slug is available!</p>}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-zinc-700 mb-1.5">Difficulty</label>
+                            <select
+                                value={difficulty}
+                                onChange={(e) => setDifficulty(e.target.value)}
+                                className="w-full px-3 py-2 rounded-lg border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all text-sm bg-white"
+                            >
+                                <option value="Beginner">Beginner</option>
+                                <option value="Intermediate">Intermediate</option>
+                                <option value="Advanced">Advanced</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-zinc-700 mb-1.5">Tags</label>
+                            <div className="px-3 py-2 rounded-lg border border-zinc-200 bg-zinc-50 text-sm text-zinc-500 flex items-center gap-2 cursor-not-allowed">
+                                <span className="px-2 py-0.5 rounded bg-indigo-100 text-indigo-700 text-xs font-semibold">Community</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-zinc-700 mb-1.5">Description</label>
+                        <textarea
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            required
+                            rows={3}
+                            placeholder="Briefly describe what this scenario demonstrates..."
+                            className="w-full px-3 py-2 rounded-lg border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all text-sm resize-none"
+                        />
+                    </div>
+
+                    <div className="pt-2 flex justify-end gap-3">
+                        <button
+                            type="button"
+                            onClick={() => setIsModalOpen(false)}
+                            className="px-4 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={isSubmitting || !!slugError || !slugAvailable}
+                            className="btn-pro btn-primary px-6 py-2 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                        >
+                            {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                            {isSubmitting ? 'Publishing...' : 'Publish'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function CreateScenarioWrapper() {
+    return (
+        <ReactFlowProvider>
+            <CreateScenario />
+        </ReactFlowProvider>
+    )
+}

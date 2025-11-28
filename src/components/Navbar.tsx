@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { getProfile } from '../lib/api';
-import { LogOut, User, ChevronDown, Settings, CreditCard, Heart, Trophy } from 'lucide-react';
+import { LogOut, User, ChevronDown, Settings, CreditCard, Heart, Trophy, PlusSquare } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
 export default function Navbar() {
@@ -85,6 +85,14 @@ export default function Navbar() {
 
                 {/* Menu Items */}
                 <div className="py-1">
+                  <Link
+                    to="/create"
+                    className="w-full text-left px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 flex items-center gap-3 transition-colors"
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    <PlusSquare size={16} className="text-zinc-400" />
+                    Create Scenario
+                  </Link>
                   <Link
                     to="/favorites"
                     className="w-full text-left px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 flex items-center gap-3 transition-colors"

@@ -10,6 +10,8 @@ export interface Scenario {
     initialNodes: Node[];
     initialEdges: Edge[];
   };
+  tags?: string[];
+  author_id?: string;
   created_at: string;
   steps?: { count: number }[]; // For aggregated count
 }
