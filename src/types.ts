@@ -26,6 +26,8 @@ export interface Step {
   active_edge_id: string | null;
 }
 
+export type StepInput = Omit<Step, 'id' | 'scenario_id'>;
+
 export interface UserProgress {
   id: string;
   user_id: string;

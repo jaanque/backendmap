@@ -121,6 +121,18 @@ export async function createScenario(scenario: Omit<Scenario, 'id' | 'created_at
   return data;
 }
 
+export async function createSteps(steps: Omit<Step, 'id'>[]) {
+  if (!supabase) {
+    throw new Error("Supabase client is not initialized.");
+  }
+
+  const { error } = await supabase
+    .from('steps')
+    .insert(steps as any);
+
+  if (error) throw error;
+}
+
 export async function getSteps(scenarioId: string): Promise<Step[]> {
   if (!supabase) {
     throw new Error("Supabase client is not initialized. Please check your environment variables (VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY).");

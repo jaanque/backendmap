@@ -1,13 +1,14 @@
 import { useState, useCallback, useRef } from 'react';
-import { ReactFlow, ReactFlowProvider, addEdge, useNodesState, useEdgesState, Controls, Background, useReactFlow, type Node, type Edge, type Connection, BackgroundVariant } from '@xyflow/react';
+import { ReactFlow, ReactFlowProvider, addEdge, useNodesState, useEdgesState, Controls, Background, useReactFlow, type Node, type Edge, type Connection, BackgroundVariant, useOnSelectionChange } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import CustomNode from '../components/CustomNode';
 import PacketEdge from '../components/PacketEdge';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../lib/auth';
-import { checkSlugAvailability, createScenario } from '../lib/api';
+import { checkSlugAvailability, createScenario, createSteps } from '../lib/api';
 import { useNavigate } from 'react-router-dom';
-import { Monitor, Server, Cpu, Database, Cloud, Save, X, Loader2, GripVertical } from 'lucide-react';
+import { Monitor, Server, Cpu, Database, Cloud, Save, X, Loader2, GripVertical, ListOrdered, Layers, Trash2, Plus, Target } from 'lucide-react';
+import type { StepInput } from '../types';
 
 const nodeTypes = {
   custom: CustomNode,
@@ -37,8 +38,13 @@ function CreateScenario() {
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const { screenToFlowPosition } = useReactFlow();
 
+  const [activeTab, setActiveTab] = useState<'build' | 'steps'>('build');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Steps State
+  const [steps, setSteps] = useState<StepInput[]>([]);
+  const [selectedStepIndex, setSelectedStepIndex] = useState<number | null>(null);
 
   // Form State
   const [title, setTitle] = useState('');
@@ -48,6 +54,25 @@ function CreateScenario() {
   const [slugError, setSlugError] = useState<string | null>(null);
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [checkingSlug, setCheckingSlug] = useState(false);
+
+  // Helper to highlight active node/edge for selected step
+  useOnSelectionChange({
+    onChange: ({ nodes: selectedNodes, edges: selectedEdges }) => {
+      // If we are in steps mode and a step is selected, allows updating active elements
+      if (activeTab === 'steps' && selectedStepIndex !== null) {
+        const activeNode = selectedNodes[0]?.id || null;
+        const activeEdge = selectedEdges[0]?.id || null;
+
+        if (activeNode || activeEdge) {
+           setSteps(prev => prev.map((step, idx) =>
+             idx === selectedStepIndex
+               ? { ...step, active_node_id: activeNode || step.active_node_id, active_edge_id: activeEdge || step.active_edge_id }
+               : step
+           ));
+        }
+      }
+    },
+  });
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge({ ...params, type: 'packet', animated: false }, eds)),
@@ -115,6 +140,32 @@ function CreateScenario() {
     }
   };
 
+  const handleAddStep = () => {
+    const newStep: StepInput = {
+      order_index: steps.length + 1,
+      title: `Step ${steps.length + 1}`,
+      content: '',
+      active_node_id: null,
+      active_edge_id: null
+    };
+    setSteps([...steps, newStep]);
+    setSelectedStepIndex(steps.length); // Select new step
+  };
+
+  const handleUpdateStep = (index: number, field: keyof StepInput, value: any) => {
+    setSteps(prev => prev.map((step, idx) => idx === index ? { ...step, [field]: value } : step));
+  };
+
+  const handleDeleteStep = (index: number) => {
+    setSteps(prev => {
+        const newSteps = prev.filter((_, idx) => idx !== index);
+        // Re-index
+        return newSteps.map((s, i) => ({ ...s, order_index: i + 1 }));
+    });
+    if (selectedStepIndex === index) setSelectedStepIndex(null);
+    if (selectedStepIndex !== null && selectedStepIndex > index) setSelectedStepIndex(selectedStepIndex - 1);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -126,7 +177,7 @@ function CreateScenario() {
     setIsSubmitting(true);
 
     try {
-      await createScenario({
+      const createdScenario = await createScenario({
         title,
         slug,
         description,
@@ -138,6 +189,10 @@ function CreateScenario() {
         tags: ['Community'],
         author_id: user.id
       });
+
+      if (steps.length > 0) {
+        await createSteps(steps.map(s => ({ ...s, scenario_id: createdScenario.id })));
+      }
 
       setIsModalOpen(false);
       navigate(`/map/${slug}`);
@@ -163,28 +218,127 @@ function CreateScenario() {
 
       <div className="flex-grow flex overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-64 bg-white border-r border-zinc-200 flex flex-col z-10 shadow-[4px_0_24px_-4px_rgba(0,0,0,0.05)]">
-            <div className="p-4 border-b border-zinc-100">
-                <h2 className="font-semibold text-sm text-zinc-900">Components</h2>
-                <p className="text-xs text-zinc-500 mt-1">Drag and drop to canvas</p>
+        <aside className="w-80 bg-white border-r border-zinc-200 flex flex-col z-10 shadow-[4px_0_24px_-4px_rgba(0,0,0,0.05)]">
+
+            {/* Tabs */}
+            <div className="flex border-b border-zinc-200">
+                <button
+                  onClick={() => setActiveTab('build')}
+                  className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 border-b-2 transition-colors ${activeTab === 'build' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-zinc-500 hover:text-zinc-700'}`}
+                >
+                    <Layers size={16} />
+                    Components
+                </button>
+                <button
+                  onClick={() => setActiveTab('steps')}
+                  className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 border-b-2 transition-colors ${activeTab === 'steps' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-zinc-500 hover:text-zinc-700'}`}
+                >
+                    <ListOrdered size={16} />
+                    Steps ({steps.length})
+                </button>
             </div>
 
-            <div className="p-4 space-y-3 overflow-y-auto flex-grow">
-                {sidebarItems.map((item) => (
-                    <div
-                        key={item.icon}
-                        className="flex items-center gap-3 p-3 rounded-lg border border-zinc-200 bg-zinc-50 hover:border-indigo-300 hover:bg-indigo-50/50 hover:text-indigo-600 transition-all cursor-grab active:cursor-grabbing group"
-                        onDragStart={(event) => onDragStart(event, item.type, item.icon)}
-                        draggable
-                    >
-                        <GripVertical size={16} className="text-zinc-300 group-hover:text-indigo-300" />
-                        <div className="p-1.5 bg-white rounded-md border border-zinc-200 shadow-sm text-zinc-500 group-hover:text-indigo-600 group-hover:border-indigo-100">
-                            <item.Icon size={16} />
+            {/* Build Content */}
+            {activeTab === 'build' && (
+              <>
+                <div className="p-4 border-b border-zinc-100">
+                    <p className="text-xs text-zinc-500">Drag components to the canvas to build your architecture.</p>
+                </div>
+                <div className="p-4 space-y-3 overflow-y-auto flex-grow">
+                    {sidebarItems.map((item) => (
+                        <div
+                            key={item.icon}
+                            className="flex items-center gap-3 p-3 rounded-lg border border-zinc-200 bg-zinc-50 hover:border-indigo-300 hover:bg-indigo-50/50 hover:text-indigo-600 transition-all cursor-grab active:cursor-grabbing group"
+                            onDragStart={(event) => onDragStart(event, item.type, item.icon)}
+                            draggable
+                        >
+                            <GripVertical size={16} className="text-zinc-300 group-hover:text-indigo-300" />
+                            <div className="p-1.5 bg-white rounded-md border border-zinc-200 shadow-sm text-zinc-500 group-hover:text-indigo-600 group-hover:border-indigo-100">
+                                <item.Icon size={16} />
+                            </div>
+                            <span className="text-sm font-medium">{item.label}</span>
                         </div>
-                        <span className="text-sm font-medium">{item.label}</span>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+              </>
+            )}
+
+            {/* Steps Content */}
+            {activeTab === 'steps' && (
+              <div className="flex flex-col h-full overflow-hidden">
+                 <div className="p-4 border-b border-zinc-100 bg-zinc-50/50">
+                    <button
+                      onClick={handleAddStep}
+                      className="w-full btn-pro btn-secondary py-2 flex items-center justify-center gap-2 text-sm"
+                    >
+                      <Plus size={14} />
+                      Add New Step
+                    </button>
+                 </div>
+
+                 <div className="flex-grow overflow-y-auto p-4 space-y-4">
+                    {steps.length === 0 ? (
+                      <div className="text-center py-8 text-zinc-400">
+                        <ListOrdered size={32} className="mx-auto mb-2 opacity-50" />
+                        <p className="text-sm">No steps defined yet.</p>
+                      </div>
+                    ) : (
+                      steps.map((step, index) => (
+                        <div
+                          key={index}
+                          className={`border rounded-xl transition-all ${selectedStepIndex === index ? 'border-indigo-600 shadow-sm ring-1 ring-indigo-600 bg-white' : 'border-zinc-200 bg-zinc-50/50 hover:border-zinc-300'}`}
+                        >
+                            <div
+                              className="p-3 cursor-pointer flex items-center justify-between"
+                              onClick={() => setSelectedStepIndex(index)}
+                            >
+                                <span className="font-semibold text-sm text-zinc-900 flex items-center gap-2">
+                                  <span className="w-5 h-5 rounded-full bg-zinc-200 flex items-center justify-center text-[10px]">{index + 1}</span>
+                                  {step.title}
+                                </span>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleDeleteStep(index); }}
+                                  className="text-zinc-400 hover:text-red-500 transition-colors p-1"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                            </div>
+
+                            {selectedStepIndex === index && (
+                              <div className="p-3 border-t border-zinc-100 bg-white rounded-b-xl space-y-3 animate-fade-in-up">
+                                  <input
+                                    type="text"
+                                    value={step.title}
+                                    onChange={(e) => handleUpdateStep(index, 'title', e.target.value)}
+                                    className="w-full px-2 py-1.5 text-sm border border-zinc-200 rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200 outline-none"
+                                    placeholder="Step Title"
+                                  />
+                                  <textarea
+                                    value={step.content}
+                                    onChange={(e) => handleUpdateStep(index, 'content', e.target.value)}
+                                    rows={3}
+                                    className="w-full px-2 py-1.5 text-sm border border-zinc-200 rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200 outline-none resize-none"
+                                    placeholder="Explanation..."
+                                  />
+
+                                  <div className="flex items-center gap-2 text-xs text-zinc-500 bg-zinc-50 p-2 rounded border border-zinc-100">
+                                      <Target size={14} className={step.active_node_id || step.active_edge_id ? "text-indigo-600" : "text-zinc-400"} />
+                                      {step.active_node_id ? (
+                                        <span>Target: Node <b>{step.active_node_id}</b></span>
+                                      ) : step.active_edge_id ? (
+                                        <span>Target: Edge <b>{step.active_edge_id}</b></span>
+                                      ) : (
+                                        <span>Select a node/edge on canvas to target</span>
+                                      )}
+                                  </div>
+                              </div>
+                            )}
+                        </div>
+                      ))
+                    )}
+                 </div>
+              </div>
+            )}
 
             <div className="p-4 border-t border-zinc-100 bg-zinc-50/50">
                 <button
@@ -200,8 +354,21 @@ function CreateScenario() {
         {/* Canvas */}
         <div className="flex-grow h-full relative bg-[#fafafa]" ref={reactFlowWrapper}>
              <ReactFlow
-                nodes={nodes}
-                edges={edges}
+                nodes={nodes.map(n => ({
+                  ...n,
+                  data: {
+                    ...n.data,
+                    // Highlight node if active in selected step
+                    isActive: activeTab === 'steps' && selectedStepIndex !== null && steps[selectedStepIndex]?.active_node_id === n.id
+                  }
+                }))}
+                edges={edges.map(e => ({
+                  ...e,
+                  // Highlight edge if active in selected step
+                  style: (activeTab === 'steps' && selectedStepIndex !== null && steps[selectedStepIndex]?.active_edge_id === e.id)
+                    ? { stroke: '#4f46e5', strokeWidth: 3 }
+                    : { stroke: '#e5e7eb', strokeWidth: 1.5 }
+                }))}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
