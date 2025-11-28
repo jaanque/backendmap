@@ -7,6 +7,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { User, Mail, Save, Loader2, Lock, Github, Link as LinkIcon, Trophy, Award, Footprints, DraftingCompass, Brain, Sun, Bug } from 'lucide-react';
 import { getProfile, updateProfile, getAllAchievements, getUserAchievements } from '../lib/api';
+import { checkAchievements } from '../lib/achievements';
 import type { Achievement } from '../types';
 
 // Helper to resolve icon string to component
@@ -74,13 +75,17 @@ export default function Profile() {
         .catch(err => console.error('Error fetching profile:', err))
         .finally(() => setIsLoadingProfile(false));
 
-      // Fetch Achievements
-      Promise.all([getAllAchievements(), getUserAchievements(user.id)])
-        .then(([all, earned]) => {
+      // Fetch and Check Achievements
+      // First run the check logic to update any pending achievements
+      checkAchievements(user.id).then(() => {
+          // Then fetch the latest state
+          return Promise.all([getAllAchievements(), getUserAchievements(user.id)]);
+      })
+      .then(([all, earned]) => {
            setAchievements(all);
            setEarnedAchievementIds(new Set(earned));
-        })
-        .catch(err => console.error("Error fetching achievements", err));
+      })
+      .catch(err => console.error("Error fetching achievements", err));
     }
   }, [user, loading, navigate]);
 
