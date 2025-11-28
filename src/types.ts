@@ -12,6 +12,7 @@ export interface Scenario {
   };
   tags?: string[];
   author_id?: string;
+  favorites_count?: number;
   created_at: string;
   steps?: { count: number }[]; // For aggregated count
 }
