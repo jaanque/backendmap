@@ -29,7 +29,7 @@ export default function Register() {
       return;
     }
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
@@ -37,14 +37,16 @@ export default function Register() {
     if (error) {
       setError(error.message);
       setLoading(false);
+    } else if (data.session) {
+      navigate('/');
+    } else if (data.user) {
+      setError("Registration successful! Please check your email to confirm your account.");
+      setLoading(false);
+      setEmail('');
+      setPassword('');
     } else {
-       const { data: { session } } = await supabase.auth.getSession();
-       if (session) {
-         navigate('/');
-       } else {
-         setError("Registration successful! Please check your email to confirm your account.");
-         setLoading(false);
-       }
+      setError("Something went wrong. Please try again.");
+      setLoading(false);
     }
   };
 
