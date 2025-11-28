@@ -6,7 +6,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { User, Mail, Save, Loader2, Lock, Github, Link as LinkIcon, Trophy, Award, Footprints, DraftingCompass, Brain, Sun, Bug } from 'lucide-react';
-import { getProfile, updateProfile, getAllAchievements, getUserAchievements } from '../lib/api';
+import { getProfile, updateProfile, getAllAchievements, getUserAchievements, getFollowersCount, getFollowingCount } from '../lib/api';
 import { checkAchievements } from '../lib/achievements';
 import type { Achievement } from '../types';
 
@@ -41,6 +41,10 @@ export default function Profile() {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [isGithubConnected, setIsGithubConnected] = useState(false);
 
+  // Follow Stats
+  const [followersCount, setFollowersCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
+
   // Achievements
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [earnedAchievementIds, setEarnedAchievementIds] = useState<Set<string>>(new Set());
@@ -71,6 +75,15 @@ export default function Profile() {
         })
         .catch(err => console.error('Error fetching profile:', err))
         .finally(() => setIsLoadingProfile(false));
+
+      // Fetch Follow Stats
+      Promise.all([
+        getFollowersCount(user.id),
+        getFollowingCount(user.id)
+      ]).then(([followers, following]) => {
+        setFollowersCount(followers);
+        setFollowingCount(following);
+      });
 
       // Fetch and Check Achievements
       // First run the check logic to update any pending achievements
@@ -228,11 +241,15 @@ export default function Profile() {
         </div>
 
         <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
-          <div className="p-6 border-b border-zinc-100 bg-zinc-50/50">
+          <div className="p-6 border-b border-zinc-100 bg-zinc-50/50 flex justify-between items-center">
              <h2 className="font-semibold text-lg flex items-center gap-2">
                 <User size={18} className="text-indigo-600" />
                 Profile Information
              </h2>
+             <div className="flex gap-4 text-xs font-medium text-zinc-500">
+                <span><strong className="text-zinc-900">{followersCount}</strong> Followers</span>
+                <span><strong className="text-zinc-900">{followingCount}</strong> Following</span>
+             </div>
           </div>
 
           <div className="p-6">

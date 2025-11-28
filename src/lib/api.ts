@@ -25,6 +25,74 @@ export async function getUserAchievements(userId: string): Promise<string[]> {
   return (data as any[]).map(ua => ua.achievement_id);
 }
 
+export async function followUser(targetUserId: string) {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Must be logged in to follow users.");
+
+  const { error } = await supabase
+    .from('follows')
+    .insert({ follower_id: user.id, following_id: targetUserId } as any);
+
+  if (error && error.code !== '23505') throw error; // Ignore duplicate
+}
+
+export async function unfollowUser(targetUserId: string) {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Must be logged in to unfollow users.");
+
+  const { error } = await supabase
+    .from('follows')
+    .delete()
+    .eq('follower_id', user.id)
+    .eq('following_id', targetUserId);
+
+  if (error) throw error;
+}
+
+export async function checkIsFollowing(targetUserId: string): Promise<boolean> {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return false;
+
+  const { count, error } = await supabase
+    .from('follows')
+    .select('*', { count: 'exact', head: true })
+    .eq('follower_id', user.id)
+    .eq('following_id', targetUserId);
+
+  if (error) throw error;
+  return (count || 0) > 0;
+}
+
+export async function getFollowersCount(userId: string): Promise<number> {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  const { count, error } = await supabase
+    .from('follows')
+    .select('*', { count: 'exact', head: true })
+    .eq('following_id', userId);
+
+  if (error) throw error;
+  return count || 0;
+}
+
+export async function getFollowingCount(userId: string): Promise<number> {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  const { count, error } = await supabase
+    .from('follows')
+    .select('*', { count: 'exact', head: true })
+    .eq('follower_id', userId);
+
+  if (error) throw error;
+  return count || 0;
+}
+
 export async function getUserAchievementsWithDetails(userId: string): Promise<Achievement[]> {
   if (!supabase) {
     throw new Error("Supabase client is not initialized.");
