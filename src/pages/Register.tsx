@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
-import { CheckCircle, Zap, Shield, Layers, ArrowLeft } from 'lucide-react';
+import { CheckCircle, Zap, Shield, Layers, ArrowLeft, Github } from 'lucide-react';
 
 export default function Register() {
   const { user } = useAuth();
@@ -47,6 +47,19 @@ export default function Register() {
     } else {
       setError("Something went wrong. Please try again.");
       setLoading(false);
+    }
+  };
+
+  const handleGithubLogin = async () => {
+    if (!supabase) return;
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: `${window.location.origin}/`,
+      },
+    });
+    if (error) {
+      setError(error.message);
     }
   };
 
@@ -149,6 +162,20 @@ export default function Register() {
               {loading ? 'Creating Account...' : 'Sign Up'}
             </button>
           </form>
+
+          <div className="my-8 flex items-center gap-4">
+             <div className="h-px bg-zinc-200 flex-1"></div>
+             <span className="text-zinc-400 text-sm font-medium">OR</span>
+             <div className="h-px bg-zinc-200 flex-1"></div>
+          </div>
+
+          <button
+            onClick={handleGithubLogin}
+            className="w-full px-4 py-3.5 rounded-xl border border-zinc-200 flex items-center justify-center gap-3 font-medium hover:bg-zinc-50 transition-colors cursor-pointer text-zinc-700"
+          >
+             <Github size={20} />
+             Sign up with GitHub
+          </button>
 
           <div className="mt-10 text-center text-zinc-500">
             Already have an account?{' '}
