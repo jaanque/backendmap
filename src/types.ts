@@ -40,9 +40,23 @@ export interface UserFavorite {
   created_at: string;
 }
 
+export interface Profile {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  gender: string | null;
+  sex: string | null;
+  updated_at: string;
+}
+
 export type Database = {
   public: {
     Tables: {
+      profiles: {
+        Row: Profile;
+        Insert: Omit<Profile, 'updated_at'>;
+        Update: Partial<Omit<Profile, 'id' | 'updated_at'>>;
+      };
       scenarios: {
         Row: Scenario;
         Insert: Omit<Scenario, 'id' | 'created_at'>;

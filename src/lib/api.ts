@@ -1,5 +1,35 @@
 import { supabase } from './supabase';
-import type { Scenario, Step, UserProgress } from '../types';
+import type { Scenario, Step, UserProgress, Profile } from '../types';
+
+export async function getProfile(userId: string): Promise<Profile | null> {
+  if (!supabase) {
+    throw new Error("Supabase client is not initialized.");
+  }
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // Not found
+    throw error;
+  }
+  return data;
+}
+
+export async function updateProfile(userId: string, data: Partial<Profile>) {
+  if (!supabase) {
+    throw new Error("Supabase client is not initialized.");
+  }
+
+  const { error } = await supabase
+    .from('profiles')
+    .upsert({ id: userId, ...data, updated_at: new Date().toISOString() } as any);
+
+  if (error) throw error;
+}
 
 export async function getScenarios(): Promise<Scenario[]> {
   if (!supabase) {
