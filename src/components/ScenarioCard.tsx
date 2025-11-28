@@ -29,6 +29,11 @@ export default function ScenarioCard({ scenario, progress, isFavorited, onToggle
             }`}>
               {scenario.difficulty || 'Unknown'}
             </span>
+            {scenario.tags?.includes('Community') && (
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border bg-indigo-50 text-indigo-700 border-indigo-100">
+                Community
+              </span>
+            )}
           </div>
           <p className="text-zinc-500 text-sm leading-relaxed max-w-2xl">{scenario.description || 'No description available.'}</p>
 
