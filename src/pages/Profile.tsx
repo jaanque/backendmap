@@ -204,6 +204,9 @@ export default function Profile() {
       setNewPassword('');
       setConfirmPassword('');
 
+      // Refresh session to update user metadata (providers list)
+      await supabase.auth.refreshSession();
+
     } catch (err: any) {
        console.error("Error changing password", err);
        showToast(err.message || "Failed to update password", { type: 'error' });

@@ -27,7 +27,8 @@ export async function checkAchievements(userId: string) {
     };
 
     // Logic for each achievement based on the seed data
-    const completedScenariosCount = progress.filter(p => p.is_completed).length;
+    // Ensure we count unique completed scenarios if there are duplicates (though DB unique constraint should prevent it)
+    const completedScenariosCount = new Set(progress.filter(p => p.is_completed).map(p => p.scenario_id)).size;
 
     // 'First Steps': Completed your first scenario.
     if (completedScenariosCount >= 1) {
