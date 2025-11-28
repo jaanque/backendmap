@@ -1,6 +1,10 @@
 import type { Step } from '../types';
 
-export function getSimulationOutput(step: Step): string {
+export function getSimulationOutput(step?: Step | null): string {
+  if (!step) {
+    return '';
+  }
+
   const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
   const title = step.title.toLowerCase();
   const content = step.content.toLowerCase();

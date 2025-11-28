@@ -112,7 +112,7 @@ function MapPlayerInner() {
           ...node,
           data: {
             ...node.data,
-            isActive: node.id === currentStep.active_node_id
+            isActive: node.id === currentStep?.active_node_id
           }
         }))
       );
@@ -123,17 +123,17 @@ function MapPlayerInner() {
           type: 'packet',
           data: {
             ...edge.data,
-            isActive: edge.id === currentStep.active_edge_id
+            isActive: edge.id === currentStep?.active_edge_id
           },
           animated: false, // controlled by custom edge now
-          style: edge.id === currentStep.active_edge_id
+          style: edge.id === currentStep?.active_edge_id
             ? { stroke: '#18181b', strokeWidth: 3 }
             : { stroke: '#e5e7eb', strokeWidth: 1.5 }
         }))
       );
 
       // Auto-Focus logic
-      if (currentStep.active_node_id) {
+      if (currentStep?.active_node_id) {
         window.requestAnimationFrame(() => {
            fitView({
              nodes: [{ id: currentStep.active_node_id as string }],
@@ -304,23 +304,33 @@ function MapPlayerInner() {
               </div>
 
               <div className="animate-fade-in-up" key={currentStepIndex}>
-                <h2 className="text-xl font-bold text-zinc-900 mb-4">{currentStep?.title}</h2>
-                <p className="text-zinc-600 leading-relaxed text-sm mb-8">
-                  {currentStep?.content}
-                </p>
+               {currentStep ? (
+                 <>
+                   <h2 className="text-xl font-bold text-zinc-900 mb-4">{currentStep.title}</h2>
+                   <p className="text-zinc-600 leading-relaxed text-sm mb-8">
+                     {currentStep.content}
+                   </p>
 
-                {/* Terminal Output */}
-                <div className="mt-6">
-                  <div className="flex items-center gap-2 mb-2 text-zinc-500">
-                    <Terminal size={14} />
-                    <span className="text-xs font-bold uppercase tracking-wider">Terminal Output</span>
-                  </div>
-                  <div className="bg-[#1e1e1e] rounded-lg p-4 font-mono text-xs text-zinc-300 overflow-x-auto shadow-inner border border-zinc-800">
-                    <pre className="whitespace-pre-wrap leading-relaxed">
-                      {getSimulationOutput(currentStep)}
-                    </pre>
-                  </div>
-                </div>
+                   {/* Terminal Output */}
+                   <div className="mt-6">
+                     <div className="flex items-center gap-2 mb-2 text-zinc-500">
+                       <Terminal size={14} />
+                       <span className="text-xs font-bold uppercase tracking-wider">Terminal Output</span>
+                     </div>
+                     <div className="bg-[#1e1e1e] rounded-lg p-4 font-mono text-xs text-zinc-300 overflow-x-auto shadow-inner border border-zinc-800">
+                       <pre className="whitespace-pre-wrap leading-relaxed">
+                         {getSimulationOutput(currentStep)}
+                       </pre>
+                     </div>
+                   </div>
+                 </>
+               ) : (
+                 <div className="flex flex-col gap-4">
+                     <div className="h-6 bg-zinc-100 rounded animate-pulse w-3/4"></div>
+                     <div className="h-4 bg-zinc-100 rounded animate-pulse w-full"></div>
+                     <div className="h-4 bg-zinc-100 rounded animate-pulse w-2/3"></div>
+                 </div>
+               )}
               </div>
             </>
           )}
