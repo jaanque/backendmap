@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ReactFlow, Background, Controls, useNodesState, useEdgesState, type Node, type Edge, BackgroundVariant } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { getScenarioBySlug, getSteps, getSingleScenarioProgress, saveUserProgress } from '../lib/api';
+import { getScenarioBySlug, getSteps, getSingleScenarioProgress, saveUserProgress, getUserFavorites, toggleFavorite } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import type { Scenario, Step } from '../types';
 import CustomNode from '../components/CustomNode';
-import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart } from 'lucide-react';
 
 const nodeTypes = {
   custom: CustomNode,
@@ -20,6 +20,7 @@ export default function MapPlayer() {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -44,6 +45,11 @@ export default function MapPlayer() {
                      setCurrentStepIndex(progress.current_step_index);
                      setIsCompleted(progress.is_completed);
                    }
+                });
+
+                // Check for favorite
+                getUserFavorites(user.id).then(favs => {
+                    setIsFavorited(favs.includes(data.id));
                 });
               }
             });
@@ -122,6 +128,20 @@ export default function MapPlayer() {
     saveProgress(0, false);
   }
 
+  const handleToggleFavorite = async () => {
+      if (!user || !scenario) return;
+
+      const newStatus = !isFavorited;
+      setIsFavorited(newStatus); // Optimistic
+
+      try {
+          await toggleFavorite(user.id, scenario.id, isFavorited); // Pass CURRENT status to toggle
+      } catch (err) {
+          console.error("Failed to toggle favorite", err);
+          setIsFavorited(isFavorited); // Revert
+      }
+  }
+
   if (error) {
     return (
       <div className="flex h-screen bg-white items-center justify-center p-6">
@@ -178,16 +198,29 @@ export default function MapPlayer() {
       <div className="w-full h-[50%] md:h-full md:w-[30%] bg-white border-t md:border-t-0 md:border-l border-zinc-200 flex flex-col z-20 shadow-[0_0_40px_-10px_rgba(0,0,0,0.05)]">
 
         {/* Scenario Header */}
-        <div className="px-6 py-5 border-b border-zinc-100">
-           <div className="flex items-center gap-2 mb-1">
-             <span className={`w-2 h-2 rounded-full ${isCompleted ? 'bg-zinc-900' : 'bg-green-500'}`}></span>
-             <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
-               {isCompleted ? 'Completed' : 'Live Simulation'}
-             </span>
+        <div className="px-6 py-5 border-b border-zinc-100 flex items-start justify-between">
+           <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className={`w-2 h-2 rounded-full ${isCompleted ? 'bg-zinc-900' : 'bg-green-500'}`}></span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                  {isCompleted ? 'Completed' : 'Live Simulation'}
+                </span>
+              </div>
+              <h1 className="text-lg font-bold text-zinc-900 leading-tight">
+                {scenario.title}
+              </h1>
            </div>
-           <h1 className="text-lg font-bold text-zinc-900 leading-tight">
-             {scenario.title}
-           </h1>
+
+           {/* Favorite Button */}
+           {user && (
+             <button
+                onClick={handleToggleFavorite}
+                className="p-2 rounded-full hover:bg-zinc-100 transition-colors flex-shrink-0"
+                title={isFavorited ? "Remove from favorites" : "Add to favorites"}
+             >
+                <Heart className={`w-5 h-5 transition-colors ${isFavorited ? 'fill-red-500 text-red-500' : 'text-zinc-400'}`} />
+             </button>
+           )}
         </div>
 
         {/* Step Content */}

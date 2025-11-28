@@ -33,6 +33,13 @@ export interface UserProgress {
   updated_at: string;
 }
 
+export interface UserFavorite {
+  id: string;
+  user_id: string;
+  scenario_id: string;
+  created_at: string;
+}
+
 export type Database = {
   public: {
     Tables: {
@@ -50,6 +57,11 @@ export type Database = {
         Row: UserProgress;
         Insert: Omit<UserProgress, 'id' | 'updated_at'>;
         Update: Partial<UserProgress>;
+      };
+      user_favorites: {
+        Row: UserFavorite;
+        Insert: Omit<UserFavorite, 'id' | 'created_at'>;
+        Update: Partial<UserFavorite>;
       };
     };
   };

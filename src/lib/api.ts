@@ -71,3 +71,31 @@ export async function getSingleScenarioProgress(userId: string, scenarioId: stri
     if (error && error.code !== 'PGRST116') return null; // PGRST116 is not found
     return data;
 }
+
+export async function getUserFavorites(userId: string): Promise<string[]> {
+  const { data, error } = await supabase
+    .from('user_favorites')
+    .select('scenario_id')
+    .eq('user_id', userId);
+
+  if (error) throw error;
+  return data.map(f => f.scenario_id);
+}
+
+export async function toggleFavorite(userId: string, scenarioId: string, isFavorite: boolean) {
+  if (isFavorite) {
+    // Remove favorite
+    const { error } = await supabase
+      .from('user_favorites')
+      .delete()
+      .eq('user_id', userId)
+      .eq('scenario_id', scenarioId);
+    if (error) throw error;
+  } else {
+    // Add favorite
+    const { error } = await supabase
+      .from('user_favorites')
+      .insert({ user_id: userId, scenario_id: scenarioId });
+    if (error) throw error;
+  }
+}
