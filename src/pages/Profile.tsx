@@ -5,8 +5,20 @@ import { useToast } from '../lib/toast';
 import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { User, Mail, Save, Loader2, Lock, Github, Link as LinkIcon } from 'lucide-react';
-import { getProfile, updateProfile } from '../lib/api';
+import { User, Mail, Save, Loader2, Lock, Github, Link as LinkIcon, Trophy, Award, Footprints, DraftingCompass, Brain, Sun, Bug } from 'lucide-react';
+import { getProfile, updateProfile, getAllAchievements, getUserAchievements } from '../lib/api';
+import type { Achievement } from '../types';
+
+// Helper to resolve icon string to component
+const IconMap: Record<string, React.ElementType> = {
+  'Trophy': Trophy,
+  'Award': Award,
+  'Footprints': Footprints,
+  'DraftingCompass': DraftingCompass,
+  'Brain': Brain,
+  'Sun': Sun,
+  'Bug': Bug
+};
 
 export default function Profile() {
   const { user, loading } = useAuth();
@@ -28,6 +40,10 @@ export default function Profile() {
   const [isGithubConnected, setIsGithubConnected] = useState(false);
   const [hasPassword, setHasPassword] = useState(false);
 
+  // Achievements
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [earnedAchievementIds, setEarnedAchievementIds] = useState<Set<string>>(new Set());
+
   useEffect(() => {
     if (!loading && !user) {
       navigate('/login');
@@ -39,14 +55,10 @@ export default function Profile() {
       setIsGithubConnected(!!githubIdentity);
 
       // Check if user has password login enabled
-      // The presence of 'email' provider in app_metadata usually indicates email/password or magic link
-      // For this app, we assume it means password is set if they signed up via form.
-      // However, linkIdentity might add 'email' provider too? No, linkIdentity adds to identities.
-      // A more robust check might be difficult purely client side without try/catch on update,
-      // but checking providers list is a good heuristic.
       const providers = user.app_metadata?.providers || [];
       setHasPassword(providers.includes('email'));
 
+      // Fetch Profile
       getProfile(user.id)
         .then(profile => {
           if (profile) {
@@ -58,6 +70,14 @@ export default function Profile() {
         })
         .catch(err => console.error('Error fetching profile:', err))
         .finally(() => setIsLoadingProfile(false));
+
+      // Fetch Achievements
+      Promise.all([getAllAchievements(), getUserAchievements(user.id)])
+        .then(([all, earned]) => {
+           setAchievements(all);
+           setEarnedAchievementIds(new Set(earned));
+        })
+        .catch(err => console.error("Error fetching achievements", err));
     }
   }, [user, loading, navigate]);
 
@@ -304,6 +324,51 @@ export default function Profile() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+
+        {/* Achievements Section */}
+        <div className="mt-8 bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-zinc-100 bg-zinc-50/50">
+             <h2 className="font-semibold text-lg flex items-center gap-2">
+                <Trophy size={18} className="text-indigo-600" />
+                Achievements
+             </h2>
+          </div>
+
+          <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+             {achievements.map(achievement => {
+               const isUnlocked = earnedAchievementIds.has(achievement.id);
+               const IconComponent = IconMap[achievement.icon_name] || Trophy;
+
+               return (
+                 <div
+                   key={achievement.id}
+                   className={`p-4 rounded-xl border flex items-start gap-4 transition-all ${isUnlocked ? 'bg-indigo-50/50 border-indigo-100' : 'bg-zinc-50 border-zinc-100 opacity-60 grayscale'}`}
+                 >
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isUnlocked ? 'bg-indigo-100 text-indigo-600' : 'bg-zinc-200 text-zinc-400'}`}>
+                       <IconComponent size={20} />
+                    </div>
+                    <div>
+                       <h3 className={`font-bold text-sm ${isUnlocked ? 'text-indigo-900' : 'text-zinc-600'}`}>
+                         {achievement.title}
+                       </h3>
+                       <p className="text-xs text-zinc-500 mt-1 leading-snug">
+                         {achievement.description}
+                       </p>
+                       {isUnlocked && (
+                         <span className="inline-block mt-2 text-[10px] uppercase font-bold tracking-wider text-indigo-400">Unlocked</span>
+                       )}
+                    </div>
+                 </div>
+               );
+             })}
+
+             {achievements.length === 0 && (
+               <div className="col-span-full text-center py-8 text-zinc-400 text-sm">
+                 No achievements available yet.
+               </div>
+             )}
           </div>
         </div>
 

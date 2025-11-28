@@ -1,5 +1,29 @@
 import { supabase } from './supabase';
-import type { Scenario, Step, UserProgress, Profile } from '../types';
+import type { Scenario, Step, UserProgress, Profile, Achievement } from '../types';
+
+export async function getAllAchievements(): Promise<Achievement[]> {
+  if (!supabase) {
+    throw new Error("Supabase client is not initialized.");
+  }
+
+  const { data, error } = await supabase.from('achievements').select('*').order('title');
+  if (error) throw error;
+  return data || [];
+}
+
+export async function getUserAchievements(userId: string): Promise<string[]> {
+  if (!supabase) {
+    throw new Error("Supabase client is not initialized.");
+  }
+
+  const { data, error } = await supabase
+    .from('user_achievements')
+    .select('achievement_id')
+    .eq('user_id', userId);
+
+  if (error) throw error;
+  return (data as any[]).map(ua => ua.achievement_id);
+}
 
 export async function getProfile(userId: string): Promise<Profile | null> {
   if (!supabase) {

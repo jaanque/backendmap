@@ -40,6 +40,21 @@ export interface UserFavorite {
   created_at: string;
 }
 
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon_name: string;
+  created_at: string;
+}
+
+export interface UserAchievement {
+  id: string;
+  user_id: string;
+  achievement_id: string;
+  earned_at: string;
+}
+
 export interface Profile {
   id: string;
   first_name: string | null;
@@ -52,6 +67,16 @@ export interface Profile {
 export type Database = {
   public: {
     Tables: {
+      achievements: {
+        Row: Achievement;
+        Insert: Omit<Achievement, 'id' | 'created_at'>;
+        Update: Partial<Achievement>;
+      };
+      user_achievements: {
+        Row: UserAchievement;
+        Insert: Omit<UserAchievement, 'id' | 'earned_at'>;
+        Update: Partial<UserAchievement>;
+      };
       profiles: {
         Row: Profile;
         Insert: Omit<Profile, 'updated_at'>;
