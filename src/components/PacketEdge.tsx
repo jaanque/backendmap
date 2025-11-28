@@ -28,7 +28,7 @@ export default function PacketEdge({
     <>
       <BaseEdge id={id} path={edgePath} style={style} markerEnd={markerEnd} />
       {isActive && (
-        <circle r="6" fill="#4f46e5">
+        <circle r="5" fill="#000000" stroke="#ffffff" strokeWidth="2">
           <animateMotion dur="1.5s" repeatCount="indefinite" path={edgePath} />
         </circle>
       )}
