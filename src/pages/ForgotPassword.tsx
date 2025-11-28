@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Layers, ArrowLeft, Mail, CheckCircle } from 'lucide-react';
+import { Layers, ArrowLeft, Mail, CheckCircle, Lock, KeyRound } from 'lucide-react';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [step, setStep] = useState<'email' | 'verify' | 'success'>('email');
 
-  const handleResetPassword = async (e: React.FormEvent) => {
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -20,16 +23,56 @@ export default function ForgotPassword() {
       return;
     }
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
 
     if (error) {
       setError(error.message);
     } else {
-      setSuccess(true);
+      setStep('verify');
     }
     setLoading(false);
+  };
+
+  const handleVerifyAndUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    if (!supabase) return;
+
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // Verify OTP
+      const { data, error: verifyError } = await supabase.auth.verifyOtp({
+        email,
+        token: otp,
+        type: 'recovery',
+      });
+
+      if (verifyError) throw verifyError;
+
+      if (!data.session) {
+        throw new Error("Failed to establish session. Please try again.");
+      }
+
+      // Update password
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (updateError) throw updateError;
+
+      setStep('success');
+    } catch (err: any) {
+      setError(err.message || "Failed to reset password");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -47,7 +90,11 @@ export default function ForgotPassword() {
                 <Layers className="w-5 h-5" />
             </div>
             <h1 className="text-3xl font-bold text-zinc-900">Reset Password</h1>
-            <p className="text-zinc-500 mt-3">Enter your email and we'll send you instructions to reset your password.</p>
+            <p className="text-zinc-500 mt-3">
+              {step === 'email' ? "Enter your email to receive a recovery code." :
+               step === 'verify' ? "Enter the code sent to your email and your new password." :
+               "Password reset successful."}
+            </p>
           </div>
 
           {error && (
@@ -56,21 +103,84 @@ export default function ForgotPassword() {
             </div>
           )}
 
-          {success ? (
+          {step === 'success' ? (
             <div className="bg-green-50 text-green-800 p-6 rounded-xl border border-green-100 flex flex-col items-center text-center">
                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600 mb-4">
                  <CheckCircle size={24} />
                </div>
-               <h3 className="font-bold text-lg mb-2">Check your email</h3>
+               <h3 className="font-bold text-lg mb-2">Password Updated</h3>
                <p className="text-sm opacity-80 mb-6">
-                 We have sent a password reset link to <strong>{email}</strong>.
+                 Your password has been successfully reset. You can now login with your new credentials.
                </p>
                <Link to="/login" className="btn-pro btn-primary py-2.5 px-6 text-sm">
-                 Return to Login
+                 Continue to Login
                </Link>
             </div>
+          ) : step === 'verify' ? (
+            <form onSubmit={handleVerifyAndUpdate} className="space-y-5">
+              <div>
+                <label className="block text-xs font-bold uppercase text-zinc-500 mb-2">Recovery Code (OTP)</label>
+                <div className="relative">
+                  <div className="absolute top-1/2 -translate-y-1/2 left-4 text-zinc-400 pointer-events-none">
+                    <KeyRound size={18} />
+                  </div>
+                  <input
+                    type="text"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    required
+                    className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-zinc-200 focus:border-black focus:ring-1 focus:ring-black outline-none transition-all bg-zinc-50/30"
+                    placeholder="123456"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase text-zinc-500 mb-2">New Password</label>
+                <div className="relative">
+                  <div className="absolute top-1/2 -translate-y-1/2 left-4 text-zinc-400 pointer-events-none">
+                    <Lock size={18} />
+                  </div>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-zinc-200 focus:border-black focus:ring-1 focus:ring-black outline-none transition-all bg-zinc-50/30"
+                    placeholder="New password"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase text-zinc-500 mb-2">Confirm Password</label>
+                <div className="relative">
+                  <div className="absolute top-1/2 -translate-y-1/2 left-4 text-zinc-400 pointer-events-none">
+                    <Lock size={18} />
+                  </div>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-zinc-200 focus:border-black focus:ring-1 focus:ring-black outline-none transition-all bg-zinc-50/30"
+                    placeholder="Confirm new password"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full btn-pro btn-primary py-4 mt-4 text-base shadow-lg shadow-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+              >
+                {loading ? 'Updating Password...' : 'Reset Password'}
+              </button>
+            </form>
           ) : (
-            <form onSubmit={handleResetPassword} className="space-y-5">
+            <form onSubmit={handleSendOtp} className="space-y-5">
               <div>
                 <label className="block text-xs font-bold uppercase text-zinc-500 mb-2">Email Address</label>
                 <div className="relative">
@@ -93,7 +203,7 @@ export default function ForgotPassword() {
                 disabled={loading}
                 className="w-full btn-pro btn-primary py-4 mt-4 text-base shadow-lg shadow-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
               >
-                {loading ? 'Send Reset Link' : 'Send Reset Link'}
+                {loading ? 'Send Recovery Code' : 'Send Recovery Code'}
               </button>
             </form>
           )}
