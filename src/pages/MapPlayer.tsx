@@ -175,10 +175,10 @@ function MapPlayerInner() {
       setIsFavorited(newStatus); // Optimistic
 
       try {
-          await toggleFavorite(user.id, scenario.id, isFavorited);
+          await toggleFavorite(user.id, scenario.id, newStatus); // Fixed passing newStatus
       } catch (err) {
           console.error("Failed to toggle favorite", err);
-          setIsFavorited(isFavorited); // Revert
+          setIsFavorited(!newStatus); // Revert
       }
   }
 
@@ -269,10 +269,12 @@ function MapPlayerInner() {
                {user && (
                  <button
                     onClick={handleToggleFavorite}
-                    className="p-2 rounded-full hover:bg-zinc-100 transition-colors flex-shrink-0"
+                    className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90"
                     title={isFavorited ? "Remove from favorites" : "Add to favorites"}
                  >
-                    <Heart className={`w-5 h-5 transition-colors ${isFavorited ? 'fill-red-500 text-red-500' : 'text-zinc-400'}`} />
+                    <Heart
+                      className={`w-5 h-5 transition-all duration-300 ease-spring ${isFavorited ? 'fill-red-500 text-red-500 scale-110' : 'text-zinc-400 scale-100 group-hover:scale-110'}`}
+                    />
                  </button>
                )}
            </div>
