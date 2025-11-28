@@ -8,8 +8,7 @@ import type { Scenario, Step } from '../types';
 import CustomNode from '../components/CustomNode';
 import PacketEdge from '../components/PacketEdge';
 import MapLegend from '../components/MapLegend';
-import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart, Play, Pause, Terminal } from 'lucide-react';
-import { getSimulationOutput } from '../lib/simulation';
+import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart, Play, Pause } from 'lucide-react';
 
 const nodeTypes = {
   custom: CustomNode,
@@ -319,19 +318,6 @@ function MapPlayerInner() {
                    <p className="text-zinc-600 leading-relaxed text-sm mb-8">
                      {currentStep.content}
                    </p>
-
-                   {/* Terminal Output */}
-                   <div className="mt-6">
-                     <div className="flex items-center gap-2 mb-2 text-zinc-500">
-                       <Terminal size={14} />
-                       <span className="text-xs font-bold uppercase tracking-wider">Terminal Output</span>
-                     </div>
-                     <div className="bg-[#1e1e1e] rounded-lg p-4 font-mono text-xs text-zinc-300 overflow-x-auto shadow-inner border border-zinc-800">
-                       <pre className="whitespace-pre-wrap leading-relaxed">
-                         {getSimulationOutput(currentStep)}
-                       </pre>
-                     </div>
-                   </div>
                  </>
                ) : (
                  <div className="flex flex-col gap-4">

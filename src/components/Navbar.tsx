@@ -41,7 +41,7 @@ export default function Navbar() {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-2 hover:text-black transition-colors focus:outline-none group"
+              className="flex items-center gap-2 hover:text-black transition-colors focus:outline-none group cursor-pointer"
             >
                <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center border border-zinc-200 text-zinc-600 group-hover:border-zinc-300 transition-colors">
                   <User size={16} />
