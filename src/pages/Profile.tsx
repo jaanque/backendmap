@@ -44,6 +44,9 @@ export default function Profile() {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [earnedAchievementIds, setEarnedAchievementIds] = useState<Set<string>>(new Set());
 
+  const unlockedAchievements = achievements.filter(a => earnedAchievementIds.has(a.id));
+  const lockedAchievements = achievements.filter(a => !earnedAchievementIds.has(a.id));
+
   useEffect(() => {
     if (!loading && !user) {
       navigate('/login');
@@ -336,37 +339,69 @@ export default function Profile() {
              </h2>
           </div>
 
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-             {achievements.map(achievement => {
-               const isUnlocked = earnedAchievementIds.has(achievement.id);
-               const IconComponent = IconMap[achievement.icon_name] || Trophy;
-
-               return (
-                 <div
-                   key={achievement.id}
-                   className={`p-4 rounded-xl border flex items-start gap-4 transition-all ${isUnlocked ? 'bg-indigo-50/50 border-indigo-100' : 'bg-zinc-50 border-zinc-100 opacity-60 grayscale'}`}
-                 >
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isUnlocked ? 'bg-indigo-100 text-indigo-600' : 'bg-zinc-200 text-zinc-400'}`}>
-                       <IconComponent size={20} />
-                    </div>
-                    <div>
-                       <h3 className={`font-bold text-sm ${isUnlocked ? 'text-indigo-900' : 'text-zinc-600'}`}>
-                         {achievement.title}
-                       </h3>
-                       <p className="text-xs text-zinc-500 mt-1 leading-snug">
-                         {achievement.description}
-                       </p>
-                       {isUnlocked && (
-                         <span className="inline-block mt-2 text-[10px] uppercase font-bold tracking-wider text-indigo-400">Unlocked</span>
-                       )}
-                    </div>
-                 </div>
-               );
-             })}
-
+          <div className="p-6">
              {achievements.length === 0 && (
-               <div className="col-span-full text-center py-8 text-zinc-400 text-sm">
+               <div className="text-center py-8 text-zinc-400 text-sm">
                  No achievements available yet.
+               </div>
+             )}
+
+             {unlockedAchievements.length > 0 && (
+               <div className="mb-8">
+                 <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-500 mb-4">Completed</h3>
+                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                   {unlockedAchievements.map(achievement => {
+                     const IconComponent = IconMap[achievement.icon_name] || Trophy;
+                     return (
+                       <div
+                         key={achievement.id}
+                         className="p-4 rounded-xl border flex items-start gap-4 transition-all bg-indigo-50/50 border-indigo-100"
+                       >
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-indigo-100 text-indigo-600">
+                             <IconComponent size={20} />
+                          </div>
+                          <div>
+                             <h3 className="font-bold text-sm text-indigo-900">
+                               {achievement.title}
+                             </h3>
+                             <p className="text-xs text-zinc-500 mt-1 leading-snug">
+                               {achievement.description}
+                             </p>
+                             <span className="inline-block mt-2 text-[10px] uppercase font-bold tracking-wider text-indigo-400">Unlocked</span>
+                          </div>
+                       </div>
+                     );
+                   })}
+                 </div>
+               </div>
+             )}
+
+             {lockedAchievements.length > 0 && (
+               <div>
+                 <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-500 mb-4">Locked</h3>
+                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                   {lockedAchievements.map(achievement => {
+                     const IconComponent = IconMap[achievement.icon_name] || Trophy;
+                     return (
+                       <div
+                         key={achievement.id}
+                         className="p-4 rounded-xl border flex items-start gap-4 transition-all bg-zinc-50 border-zinc-100 opacity-60 grayscale"
+                       >
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-zinc-200 text-zinc-400">
+                             <IconComponent size={20} />
+                          </div>
+                          <div>
+                             <h3 className="font-bold text-sm text-zinc-600">
+                               {achievement.title}
+                             </h3>
+                             <p className="text-xs text-zinc-500 mt-1 leading-snug">
+                               {achievement.description}
+                             </p>
+                          </div>
+                       </div>
+                     );
+                   })}
+                 </div>
                </div>
              )}
           </div>
