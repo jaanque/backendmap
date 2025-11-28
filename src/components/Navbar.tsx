@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
-import { LogOut, User, ChevronDown } from 'lucide-react';
+import { LogOut, User, ChevronDown, Settings, CreditCard } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
 export default function Navbar() {
@@ -41,31 +41,52 @@ export default function Navbar() {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-2 hover:text-black transition-colors focus:outline-none"
+              className="flex items-center gap-2 hover:text-black transition-colors focus:outline-none group"
             >
-               <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center border border-zinc-200 text-zinc-600">
+               <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center border border-zinc-200 text-zinc-600 group-hover:border-zinc-300 transition-colors">
                   <User size={16} />
                </div>
-               <span className="hidden md:inline-block text-xs text-zinc-600 font-medium max-w-[150px] truncate">{user.email}</span>
-               <ChevronDown size={14} className={`text-zinc-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+               <span className="hidden md:inline-block text-xs text-zinc-600 font-medium max-w-[150px] truncate group-hover:text-zinc-900">{user.email}</span>
+               <ChevronDown size={14} className={`text-zinc-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180 text-zinc-600' : 'group-hover:text-zinc-600'}`} />
             </button>
 
             {/* Dropdown Menu */}
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border border-zinc-200 rounded-lg shadow-lg py-1 z-50 animate-in fade-in zoom-in-95 duration-100 origin-top-right">
-                <div className="px-4 py-2 border-b border-zinc-100 md:hidden">
-                  <p className="text-xs font-medium text-zinc-900 truncate">{user.email}</p>
+              <div className="absolute right-0 mt-3 w-64 bg-white border border-zinc-200 rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] py-2 z-50 animate-in fade-in zoom-in-95 duration-100 origin-top-right ring-1 ring-black/5">
+
+                {/* User Info Header */}
+                <div className="px-4 py-3 border-b border-zinc-100 mb-1">
+                  <p className="text-xs font-semibold text-zinc-900">Signed in as</p>
+                  <p className="text-sm text-zinc-500 truncate mt-0.5">{user.email}</p>
                 </div>
-                <button
-                  onClick={() => {
-                    signOut();
-                    setIsDropdownOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 hover:text-red-600 flex items-center gap-2 transition-colors"
-                >
-                  <LogOut size={14} />
-                  Sign Out
-                </button>
+
+                {/* Menu Items */}
+                <div className="py-1">
+                  <button className="w-full text-left px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 flex items-center gap-3 transition-colors cursor-not-allowed opacity-50">
+                    <Settings size={16} className="text-zinc-400" />
+                    Account Settings
+                  </button>
+                  <button className="w-full text-left px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 flex items-center gap-3 transition-colors cursor-not-allowed opacity-50">
+                    <CreditCard size={16} className="text-zinc-400" />
+                    Billing & Subscription
+                  </button>
+                </div>
+
+                <div className="h-px bg-zinc-100 my-1 mx-2"></div>
+
+                {/* Sign Out */}
+                <div className="py-1">
+                  <button
+                    onClick={() => {
+                      signOut();
+                      setIsDropdownOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors"
+                  >
+                    <LogOut size={16} />
+                    Sign Out
+                  </button>
+                </div>
               </div>
             )}
           </div>
