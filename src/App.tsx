@@ -6,6 +6,7 @@ import About from './pages/About';
 import MapPlayer from './pages/MapPlayer';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Profile from './pages/Profile';
 import { AuthProvider } from './lib/auth';
 import { ToastProvider } from './lib/toast';
 
@@ -21,6 +22,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/map/:slug" element={<MapPlayer />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

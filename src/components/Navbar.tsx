@@ -70,10 +70,14 @@ export default function Navbar() {
                     <Heart size={16} className="text-zinc-400" />
                     Favorites
                   </Link>
-                  <button className="w-full text-left px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 flex items-center gap-3 transition-colors cursor-not-allowed opacity-50">
+                  <Link
+                    to="/profile"
+                    className="w-full text-left px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 flex items-center gap-3 transition-colors"
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
                     <Settings size={16} className="text-zinc-400" />
                     Account Settings
-                  </button>
+                  </Link>
                   <button className="w-full text-left px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 flex items-center gap-3 transition-colors cursor-not-allowed opacity-50">
                     <CreditCard size={16} className="text-zinc-400" />
                     Billing & Subscription
