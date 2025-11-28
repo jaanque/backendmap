@@ -30,6 +30,7 @@ export default function Profile() {
   const [lastName, setLastName] = useState('');
   const [gender, setGender] = useState('');
   const [sex, setSex] = useState('');
+  const [isPublic, setIsPublic] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
@@ -65,6 +66,7 @@ export default function Profile() {
             setLastName(profile.last_name || '');
             setGender(profile.gender || '');
             setSex(profile.sex || '');
+            setIsPublic(profile.is_public || false);
           }
         })
         .catch(err => console.error('Error fetching profile:', err))
@@ -143,7 +145,8 @@ export default function Profile() {
         first_name: firstName,
         last_name: lastName,
         gender: gender,
-        sex: sex
+        sex: sex,
+        is_public: isPublic
       });
 
       // Also update full_name in metadata for backward compatibility if needed,
@@ -234,6 +237,32 @@ export default function Profile() {
 
           <div className="p-6">
             <form onSubmit={handleSave} className="space-y-6">
+              {/* Public Profile Toggle */}
+              <div className="bg-indigo-50/50 rounded-lg p-4 border border-indigo-100 flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-semibold text-indigo-900">Public Profile</h3>
+                  <p className="text-xs text-indigo-700 mt-1">
+                    Allow others to see your profile on the Users page.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsPublic(!isPublic)}
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${
+                    isPublic ? 'bg-indigo-600' : 'bg-zinc-200'
+                  }`}
+                  role="switch"
+                  aria-checked={isPublic}
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                      isPublic ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+
               {/* Email Field (Read-only) */}
               <div>
                 <label className="block text-sm font-medium text-zinc-700 mb-2">Email Address</label>

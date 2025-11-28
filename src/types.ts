@@ -61,6 +61,7 @@ export interface Profile {
   last_name: string | null;
   gender: string | null;
   sex: string | null;
+  is_public: boolean | null;
   updated_at: string;
 }
 
