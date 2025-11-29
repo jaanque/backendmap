@@ -143,7 +143,7 @@ export default function Explore() {
       <Navbar />
 
       {/* Search Header */}
-      <div className="py-12 px-4 md:px-12 max-w-5xl mx-auto">
+      <div id="main-content" className="py-12 px-4 md:px-12 max-w-5xl mx-auto">
         <SearchFilters
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}

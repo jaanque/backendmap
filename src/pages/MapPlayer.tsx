@@ -278,7 +278,7 @@ function MapPlayerInner() {
   const currentStep = steps[currentStepIndex];
 
   return (
-    <div className="flex h-screen bg-white overflow-hidden flex-col md:flex-row font-sans relative">
+    <div id="main-content" className="flex h-screen bg-white overflow-hidden flex-col md:flex-row font-sans relative">
       <UserDetailsModal
         isOpen={isAuthorModalOpen}
         onClose={() => setIsAuthorModalOpen(false)}
@@ -454,6 +454,7 @@ function MapPlayerInner() {
                     onClick={() => setIsPlaying(!isPlaying)}
                     className={`p-2 rounded-full transition-colors flex-shrink-0 ${isPlaying ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-zinc-100 text-zinc-400'}`}
                     title={isPlaying ? "Pause Autoplay" : "Start Autoplay"}
+                    aria-label={isPlaying ? "Pause Autoplay" : "Start Autoplay"}
                  >
                     {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
                  </button>
@@ -466,6 +467,7 @@ function MapPlayerInner() {
                     disabled={isFavLoading}
                     className="flex flex-col items-center pt-2 pb-1 px-2 rounded-xl hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed min-w-[2.5rem]"
                     title={isFavorited ? "Remove from favorites" : "Add to favorites"}
+                    aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
                  >
                     <Heart
                       className={`w-5 h-5 transition-all duration-300 ease-spring ${isFavorited ? 'fill-red-500 text-red-500 scale-110' : 'text-zinc-400 scale-100 group-hover:scale-110'}`}
@@ -484,6 +486,7 @@ function MapPlayerInner() {
                     to={`/edit/${scenario.slug}`}
                     className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90"
                     title="Edit Scenario"
+                    aria-label="Edit Scenario"
                   >
                     <Edit className="w-5 h-5 text-zinc-400 group-hover:text-indigo-600" />
                   </Link>
@@ -495,6 +498,7 @@ function MapPlayerInner() {
                     onClick={handleFork}
                     className="flex flex-col items-center pt-2 pb-1 px-2 rounded-xl hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed min-w-[2.5rem]"
                     title="Fork this scenario"
+                    aria-label="Fork this scenario"
                   >
                     <GitFork className="w-5 h-5 text-zinc-400 group-hover:text-zinc-700" />
                     {(scenario.forks_count || 0) > 0 && (
@@ -511,6 +515,7 @@ function MapPlayerInner() {
                     onClick={() => setIsReportModalOpen(true)}
                     className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Report this scenario"
+                    aria-label="Report this scenario"
                   >
                     <Flag className="w-5 h-5 text-zinc-300 group-hover:text-red-500" />
                   </button>

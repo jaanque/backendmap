@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { PlayCircle, BookOpen, Share2 } from 'lucide-react';
 import { getScenarios, getDailyHighlights, getUserProgress, getUserFavorites, setFavorite } from '../lib/api';
 import { useAuth } from '../lib/auth';
@@ -149,10 +150,17 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white font-sans text-zinc-900 selection:bg-black selection:text-white">
+      <Helmet>
+        <title>BackendMap - Visualize System Architecture</title>
+        <meta name="description" content="Interactive platform to learn, design and visualize backend flows. Understand how data moves through databases, queues, and microservices." />
+        <meta property="og:title" content="BackendMap - Visualize System Architecture" />
+        <meta property="og:description" content="Interactive platform to learn, design and visualize backend flows." />
+        <meta property="og:type" content="website" />
+      </Helmet>
       <Navbar />
 
       {/* Hero */}
-      <header className="py-24 px-4 md:px-12 max-w-4xl mx-auto text-center">
+      <header id="main-content" className="py-24 px-4 md:px-12 max-w-4xl mx-auto text-center">
         <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 text-zinc-900 leading-[1.1]">
           System Architecture <br/>
           <span className="text-zinc-400">Visualized.</span>
