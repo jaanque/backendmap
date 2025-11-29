@@ -3,10 +3,10 @@ import { getScenarios, getUserProgress, getUserFavorites, setFavorite } from '..
 import { useAuth } from '../lib/auth';
 import { useToast } from '../lib/toast';
 import type { Scenario, UserProgress } from '../types';
-import { Search } from 'lucide-react';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
 import ScenarioCard from '../components/ScenarioCard';
+import SearchFilters from '../components/SearchFilters';
 
 export default function Home() {
   const { user } = useAuth();
@@ -16,6 +16,8 @@ export default function Home() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterDifficulty, setFilterDifficulty] = useState('All');
+  const [sortOrder, setSortOrder] = useState('newest');
 
   useEffect(() => {
     getScenarios()
@@ -85,13 +87,36 @@ export default function Home() {
   };
 
   const filteredScenarios = useMemo(() => {
-    if (!searchQuery) return scenarios;
-    const lowerQuery = searchQuery.toLowerCase();
-    return scenarios.filter(s =>
-      s.title.toLowerCase().includes(lowerQuery) ||
-      s.description.toLowerCase().includes(lowerQuery)
-    );
-  }, [scenarios, searchQuery]);
+    let result = [...scenarios];
+
+    // Filter by Search Query
+    if (searchQuery) {
+      const lowerQuery = searchQuery.toLowerCase();
+      result = result.filter(s =>
+        s.title.toLowerCase().includes(lowerQuery) ||
+        s.description.toLowerCase().includes(lowerQuery)
+      );
+    }
+
+    // Filter by Difficulty
+    if (filterDifficulty !== 'All') {
+      result = result.filter(s => s.difficulty === filterDifficulty);
+    }
+
+    // Sort
+    result.sort((a, b) => {
+      if (sortOrder === 'popular') {
+        return (b.favorites_count || 0) - (a.favorites_count || 0);
+      } else if (sortOrder === 'oldest') {
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      } else {
+        // newest (default)
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+    });
+
+    return result;
+  }, [scenarios, searchQuery, filterDifficulty, sortOrder]);
 
   if (error) {
     return (
@@ -120,18 +145,14 @@ export default function Home() {
         </p>
 
         {/* Command Bar Search */}
-        <div className="max-w-xl mx-auto relative group">
-          <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-zinc-400 group-focus-within:text-black transition-colors" />
-          </div>
-          <input
-            type="text"
-            placeholder="Search scenarios (e.g., API, Database, AWS)..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-4 rounded-xl border border-zinc-200 bg-zinc-50/50 shadow-sm focus:bg-white focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all text-lg font-medium placeholder:text-zinc-400"
-          />
-        </div>
+        <SearchFilters
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          filterDifficulty={filterDifficulty}
+          setFilterDifficulty={setFilterDifficulty}
+          sortOrder={sortOrder}
+          setSortOrder={setSortOrder}
+        />
       </header>
 
       {/* Content - Technical List */}
