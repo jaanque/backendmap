@@ -82,7 +82,7 @@ export default function ViewProfile() {
     <div className="min-h-screen bg-white font-sans text-zinc-900 flex flex-col">
       <Navbar />
 
-      <main className="flex-grow px-6 md:px-12 py-12 max-w-4xl mx-auto w-full animate-fade-in-up">
+      <main className="flex-grow px-6 md:px-12 py-12 max-w-7xl mx-auto w-full animate-fade-in-up">
 
         {/* Profile Header Card */}
         <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden mb-8">
