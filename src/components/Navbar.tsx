@@ -101,6 +101,14 @@ export default function Navbar() {
                 {/* Menu Items */}
                 <div className="py-1">
                   <Link
+                    to="/me"
+                    className="w-full text-left px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 flex items-center gap-3 transition-colors"
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    <User size={16} className="text-zinc-400" />
+                    My Profile
+                  </Link>
+                  <Link
                     to="/create"
                     className="w-full text-left px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 flex items-center gap-3 transition-colors"
                     onClick={() => setIsDropdownOpen(false)}
