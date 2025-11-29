@@ -284,6 +284,32 @@ export async function createScenario(scenario: Omit<Scenario, 'id' | 'created_at
   return data;
 }
 
+export async function updateScenario(id: string, updates: Partial<Scenario>): Promise<void> {
+  if (!supabase) {
+    throw new Error("Supabase client is not initialized.");
+  }
+
+  const { error } = await supabase
+    .from('scenarios')
+    .update(updates as any)
+    .eq('id', id);
+
+  if (error) throw error;
+}
+
+export async function deleteSteps(scenarioId: string): Promise<void> {
+  if (!supabase) {
+    throw new Error("Supabase client is not initialized.");
+  }
+
+  const { error } = await supabase
+    .from('steps')
+    .delete()
+    .eq('scenario_id', scenarioId);
+
+  if (error) throw error;
+}
+
 export async function getScenarioById(id: string): Promise<Scenario | null> {
   if (!supabase) throw new Error("Supabase client is not initialized.");
 

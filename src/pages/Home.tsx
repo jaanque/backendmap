@@ -228,6 +228,7 @@ export default function Home() {
                   onToggleFavorite={handleToggleFavorite}
                   showFavoriteButton={!!user}
                   isHighlight={true}
+                  currentUserId={user?.id}
                 />
               </div>
             ))}
@@ -243,6 +244,7 @@ export default function Home() {
                     isFavorited={favorites.has(scenario.id)}
                     onToggleFavorite={handleToggleFavorite}
                     showFavoriteButton={!!user}
+                    currentUserId={user?.id}
                   />
                 </div>
             ))}

@@ -167,6 +167,7 @@ export default function Explore() {
                 isFavorited={favorites.has(scenario.id)}
                 onToggleFavorite={handleToggleFavorite}
                 showFavoriteButton={!!user}
+                currentUserId={user?.id}
               />
             ))}
           </div>

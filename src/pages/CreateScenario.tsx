@@ -5,7 +5,7 @@ import CustomNode from '../components/CustomNode';
 import PacketEdge from '../components/PacketEdge';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../lib/auth';
-import { checkSlugAvailability, createScenario, createSteps, getScenarioBySlug, getSteps } from '../lib/api';
+import { checkSlugAvailability, createScenario, updateScenario, createSteps, deleteSteps, getScenarioBySlug, getSteps } from '../lib/api';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Monitor, Server, Cpu, Database, Cloud, Save, X, Loader2, GripVertical, ListOrdered, Layers, Trash2, Plus, Target, Lock, Globe } from 'lucide-react';
 import type { StepInput } from '../types';
@@ -60,6 +60,7 @@ function CreateScenario() {
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [checkingSlug, setCheckingSlug] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [editingScenarioId, setEditingScenarioId] = useState<string | null>(null);
   const [parentScenarioId, setParentScenarioId] = useState<string | null>(null);
 
   // Load Existing Scenario (Edit Mode) or Fork Source
@@ -75,6 +76,7 @@ function CreateScenario() {
                 return;
             }
             setIsEditMode(true);
+            setEditingScenarioId(data.id);
             setSlug(data.slug);
         } else {
             // Fork Mode
@@ -224,64 +226,70 @@ function CreateScenario() {
     if (!user) return;
 
     // Only check availability if slug CHANGED in edit mode or is new
+    // If edit mode and slug matches existing slug (no change), it's fine.
     if (!isEditMode && !slugAvailable) {
         setSlugError('Please choose a unique slug.');
         return;
     }
 
-    // TODO: Implement update scenario logic properly.
-    // For now, if edit mode, we just redirect or warn.
-    // Assuming this task primarily wants to OPEN the fork in editor.
-    // Saving edits requires `updateScenario` API which we might need to add or mock.
-    // The user instruction "when a fork is made, open it in editor so it can be modified" implies we need full edit capability.
-    // I will use `createScenario` logic but warn if it's edit mode as `updateScenario` is not fully implemented in API yet for this Plan.
-    // Wait, I should probably implement `updateScenario` in API if I want "modify".
-    // But strictly following instruction: "open the fork ... so it can be modified".
-    // I will assume for this turn I just enable loading. Saving updates might be a separate task or I should do it now.
-    // I'll stick to creation logic but note that saving updates isn't fully wired for EXISTING scenarios without `updateScenario`.
-    // Actually, `createScenario` does INSERT. `updateScenario` does UPDATE.
-    // Let's rely on basic creation for now as the prompt focuses on "opening" it.
-    // But if they hit "Publish" it will try to INSERT again which fails on unique slug.
-
-    // For this task scope (align image, open fork in editor), full update logic might be out of scope but let's see.
-    // I will just alert "Saving updates is not fully implemented in this demo" if edit mode to be safe, OR try to implement it if simple.
-    // Let's skip update logic implementation for now to keep diff small and focus on the request "open in editor".
-    // The user can modify state in UI, just not persist without `updateScenario`.
-    // Wait, if I can't save, it's useless.
-    // I'll add a TODO or basic mock for now.
-
-    if (isEditMode) {
-        alert("Saving edits to existing scenarios is not yet implemented in this version.");
-        return;
+    if (isEditMode && slug !== routeSlug && !slugAvailable) {
+       setSlugError('Please choose a unique slug.');
+       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const createdScenario = await createScenario({
-        title,
-        slug,
-        description,
-        difficulty,
-        is_public: isPublic,
-        flow_data: {
-            initialNodes: nodes,
-            initialEdges: edges
-        },
-        tags: ['Community'],
-        author_id: user.id,
-        parent_scenario_id: parentScenarioId
-      });
+      if (isEditMode && editingScenarioId) {
+        // Update existing scenario
+        await updateScenario(editingScenarioId, {
+          title,
+          slug,
+          description,
+          difficulty,
+          is_public: isPublic,
+          flow_data: {
+              initialNodes: nodes,
+              initialEdges: edges
+          },
+          // Don't update author_id or created_at
+        });
 
-      if (steps.length > 0) {
-        await createSteps(steps.map(s => ({ ...s, scenario_id: createdScenario.id })));
+        // Update steps: brute force delete and recreate
+        await deleteSteps(editingScenarioId);
+        if (steps.length > 0) {
+          await createSteps(steps.map(s => ({ ...s, scenario_id: editingScenarioId })));
+        }
+
+        setIsModalOpen(false);
+        navigate(`/map/${slug}`);
+      } else {
+        // Create new scenario
+        const createdScenario = await createScenario({
+          title,
+          slug,
+          description,
+          difficulty,
+          is_public: isPublic,
+          flow_data: {
+              initialNodes: nodes,
+              initialEdges: edges
+          },
+          tags: ['Community'],
+          author_id: user.id,
+          parent_scenario_id: parentScenarioId
+        });
+
+        if (steps.length > 0) {
+          await createSteps(steps.map(s => ({ ...s, scenario_id: createdScenario.id })));
+        }
+
+        setIsModalOpen(false);
+        navigate(`/map/${slug}`);
       }
-
-      setIsModalOpen(false);
-      navigate(`/map/${slug}`);
     } catch (err: any) {
       console.error(err);
-      alert('Failed to create scenario: ' + err.message);
+      alert('Failed to save scenario: ' + err.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -429,7 +437,7 @@ function CreateScenario() {
                     className="w-full btn-pro btn-primary py-2.5 flex items-center justify-center gap-2"
                 >
                     <Save size={16} />
-                    Publish Scenario
+                    {isEditMode ? 'Update Scenario' : 'Publish Scenario'}
                 </button>
             </div>
         </aside>
@@ -472,7 +480,7 @@ function CreateScenario() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
                 <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50">
-                    <h3 className="font-bold text-lg text-zinc-900">Publish Scenario</h3>
+                    <h3 className="font-bold text-lg text-zinc-900">{isEditMode ? 'Update Scenario' : 'Publish Scenario'}</h3>
                     <button onClick={() => setIsModalOpen(false)} className="text-zinc-400 hover:text-zinc-600 transition-colors">
                         <X size={20} />
                     </button>
@@ -595,11 +603,11 @@ function CreateScenario() {
                         </button>
                         <button
                             type="submit"
-                            disabled={isSubmitting || !!slugError || !slugAvailable}
+                            disabled={isSubmitting || !!slugError || (slugAvailable === false && slug !== routeSlug)}
                             className="btn-pro btn-primary px-6 py-2 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                         >
                             {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                            {isSubmitting ? 'Publishing...' : 'Publish'}
+                            {isSubmitting ? (isEditMode ? 'Updating...' : 'Publishing...') : (isEditMode ? 'Update' : 'Publish')}
                         </button>
                     </div>
                 </form>

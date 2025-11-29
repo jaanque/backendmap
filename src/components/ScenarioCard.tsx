@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Heart, BadgeCheck, Flame } from 'lucide-react';
+import { ArrowRight, Heart, BadgeCheck, Flame, Lock, Edit } from 'lucide-react';
 import { formatNumber } from '../lib/utils';
 import type { Scenario, UserProgress } from '../types';
 
@@ -10,9 +10,10 @@ interface ScenarioCardProps {
   onToggleFavorite: (id: string) => void;
   showFavoriteButton?: boolean;
   isHighlight?: boolean;
+  currentUserId?: string;
 }
 
-export default function ScenarioCard({ scenario, progress, isFavorited, onToggleFavorite, showFavoriteButton = true, isHighlight = false }: ScenarioCardProps) {
+export default function ScenarioCard({ scenario, progress, isFavorited, onToggleFavorite, showFavoriteButton = true, isHighlight = false, currentUserId }: ScenarioCardProps) {
   const stepsCount = scenario.steps?.[0]?.count || 0;
   const percent = progress && stepsCount > 0
     ? Math.min(100, Math.round(((progress.current_step_index + (progress.is_completed ? 1 : 0)) / stepsCount) * 100))
@@ -28,6 +29,12 @@ export default function ScenarioCard({ scenario, progress, isFavorited, onToggle
         <div className="flex-grow">
           <div className="flex items-center gap-3 mb-2">
             <h3 className="font-bold text-lg text-zinc-900 group-hover:text-zinc-600 transition-colors">{scenario.title || 'Untitled Scenario'}</h3>
+            {!scenario.is_public && (
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border bg-zinc-100 text-zinc-600 border-zinc-200">
+                <Lock size={10} />
+                Private
+              </span>
+            )}
             {isHighlight && (
               <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border bg-orange-100 text-orange-700 border-orange-200 shadow-sm">
                 <Flame size={12} className="fill-orange-500 text-orange-600" />
@@ -94,6 +101,16 @@ export default function ScenarioCard({ scenario, progress, isFavorited, onToggle
                 <span className="text-xs font-semibold text-zinc-500">{formatNumber(scenario.favorites_count || 0)}</span>
               )}
             </button>
+          )}
+
+          {currentUserId && scenario.author_id === currentUserId && (
+             <Link
+               to={`/edit/${scenario.slug}`}
+               className="p-2 rounded-full hover:bg-zinc-100 transition-colors pointer-events-auto"
+               title="Edit scenario"
+             >
+               <Edit className="w-5 h-5 text-zinc-400 hover:text-indigo-600" />
+             </Link>
           )}
 
           <div className="h-10 w-10 rounded-full bg-zinc-50 border border-zinc-100 flex items-center justify-center group-hover:bg-black group-hover:border-black transition-colors">
