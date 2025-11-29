@@ -58,6 +58,9 @@ export default function Explore() {
     else newFavs.delete(scenarioId);
     setFavorites(newFavs);
 
+    // Optimistic count update
+    setScenarios(prev => prev.map(s => s.id === scenarioId ? { ...s, favorites_count: (s.favorites_count || 0) + (newFavState ? 1 : -1) } : s));
+
     // Show toast
     showToast(newFavState ? "Added to favorites" : "Removed from favorites", {
       type: 'success',
@@ -67,6 +70,9 @@ export default function Explore() {
           if (newFavState) revertFavs.delete(scenarioId);
           else revertFavs.add(scenarioId);
           setFavorites(revertFavs);
+
+          // Undo count
+          setScenarios(prev => prev.map(s => s.id === scenarioId ? { ...s, favorites_count: (s.favorites_count || 0) + (newFavState ? -1 : 1) } : s));
 
           try {
               // Undo: set back to original state
@@ -83,6 +89,8 @@ export default function Explore() {
       // Revert on error
       console.error("Failed to toggle favorite", err);
       setFavorites(favorites);
+      // Revert count
+      setScenarios(prev => prev.map(s => s.id === scenarioId ? { ...s, favorites_count: (s.favorites_count || 0) + (newFavState ? -1 : 1) } : s));
       showToast("Failed to update favorite", { type: 'error' });
     }
   };
