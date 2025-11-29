@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { getProfile } from '../lib/api';
-import { LogOut, User, ChevronDown, Settings, CreditCard, Heart, Trophy, PlusSquare, ScrollText } from 'lucide-react';
+import { LogOut, User, ChevronDown, Settings, CreditCard, Heart, Trophy, PlusSquare, ScrollText, Bell } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
 export default function Navbar() {
@@ -139,6 +139,14 @@ export default function Navbar() {
                   >
                     <Trophy size={16} className="text-zinc-400" />
                     Achievements
+                  </Link>
+                  <Link
+                    to="/activity"
+                    className="w-full text-left px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 flex items-center gap-3 transition-colors"
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    <Bell size={16} className="text-zinc-400" />
+                    Activity
                   </Link>
                   <Link
                     to="/profile"

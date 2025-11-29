@@ -73,6 +73,18 @@ export interface ScenarioReaction {
   created_at: string;
 }
 
+export interface Notification {
+  id: string;
+  user_id: string;
+  actor_id: string;
+  type: 'follow' | 'fork' | 'favorite';
+  resource_id?: string;
+  is_read: boolean;
+  created_at: string;
+  actor?: Profile;
+  resource?: Scenario;
+}
+
 export interface Profile {
   id: string;
   first_name: string | null;
