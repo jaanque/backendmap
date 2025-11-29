@@ -21,10 +21,10 @@ export default function Footer() {
               Interactive visualizations for complex backend architectures. Learn by seeing.
             </p>
             <div className="flex gap-4 pt-2">
-              <a href="#" className="text-zinc-400 hover:text-black transition-colors">
+              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-black transition-colors">
                 <Github className="w-5 h-5" />
               </a>
-              <a href="#" className="text-zinc-400 hover:text-black transition-colors">
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-black transition-colors">
                 <Twitter className="w-5 h-5" />
               </a>
             </div>

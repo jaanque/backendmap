@@ -317,7 +317,7 @@ function MapPlayerInner() {
       <div className="flex-grow h-[50%] md:h-full md:w-[70%] relative bg-[#fafafa]">
         <div className="absolute top-6 left-6 z-10 hidden md:block">
           <Link to="/" className="btn-pro btn-secondary px-3 py-2 text-xs shadow-sm bg-white">
-            <ArrowLeft size={14} className="mr-2" /> Back to Dashboard
+            <ArrowLeft size={14} className="mr-2" /> Back to Home
           </Link>
         </div>
 

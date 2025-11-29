@@ -60,8 +60,8 @@ export default function Achievements() {
 
       <main className="flex-grow px-6 md:px-12 py-12 max-w-5xl mx-auto w-full animate-fade-in-up">
         <div className="mb-10">
-          <Link to="/profile" className="text-sm font-medium text-zinc-500 hover:text-zinc-900 flex items-center gap-1 mb-4 transition-colors hover:-translate-x-1">
-            <ArrowLeft size={14} /> Back to Profile
+          <Link to="/" className="text-sm font-medium text-zinc-500 hover:text-zinc-900 flex items-center gap-1 mb-4 transition-colors hover:-translate-x-1">
+            <ArrowLeft size={14} /> Back to Home
           </Link>
           <h1 className="text-3xl font-bold tracking-tight text-zinc-900 flex items-center gap-3">
             <Trophy className="text-yellow-500" />

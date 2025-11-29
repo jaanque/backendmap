@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { getScenarios, getUserProgress, getUserFavorites, setFavorite } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { useToast } from '../lib/toast';
@@ -146,12 +147,12 @@ export default function Home() {
 
         {!user && (
           <div className="flex justify-center gap-4 mb-12">
-            <a href="/register" className="px-8 py-3 bg-zinc-900 text-white rounded-full font-semibold hover:bg-black transition-all hover:shadow-lg hover:scale-105 active:scale-95">
+            <Link to="/register" className="px-8 py-3 bg-zinc-900 text-white rounded-full font-semibold hover:bg-black transition-all hover:shadow-lg hover:scale-105 active:scale-95">
               Get Started Free
-            </a>
-            <a href="/explore" className="px-8 py-3 bg-zinc-100 text-zinc-700 rounded-full font-semibold hover:bg-zinc-200 transition-all hover:shadow active:scale-95">
+            </Link>
+            <Link to="/explore" className="px-8 py-3 bg-zinc-100 text-zinc-700 rounded-full font-semibold hover:bg-zinc-200 transition-all hover:shadow active:scale-95">
               Explore Catalog
-            </a>
+            </Link>
           </div>
         )}
 
