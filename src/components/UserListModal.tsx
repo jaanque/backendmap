@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Loader2, X, User } from 'lucide-react';
+import { Loader2, X, User, BadgeCheck } from 'lucide-react';
 import type { Profile } from '../types';
 import { getFollowers, getFollowing } from '../lib/api';
 import UserDetailsModal from './UserDetailsModal';
@@ -69,7 +69,12 @@ export default function UserListModal({ isOpen, onClose, userId, type }: UserLis
                       <User size={18} />
                     </div>
                     <div>
-                      <p className="font-semibold text-sm text-zinc-900">{user.first_name} {user.last_name}</p>
+                      <p className="font-semibold text-sm text-zinc-900 flex items-center gap-1">
+                        {user.first_name} {user.last_name}
+                        {user.is_verified && (
+                          <BadgeCheck size={14} className="text-green-600" />
+                        )}
+                      </p>
                       {(user.gender || user.sex) && (
                         <p className="text-xs text-zinc-500">
                             {[user.gender, user.sex].filter(Boolean).join(' • ')}

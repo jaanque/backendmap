@@ -164,10 +164,10 @@ export async function getScenariosByAuthor(authorId: string): Promise<Scenario[]
     throw new Error("Supabase client is not initialized.");
   }
 
-  // Include step count
+  // Include step count and author details
   const { data, error } = await supabase
     .from('scenarios')
-    .select('*, steps(count)')
+    .select('*, steps(count), author:profiles(*)')
     .eq('author_id', authorId)
     .order('created_at', { ascending: false });
 
@@ -225,8 +225,8 @@ export async function getScenarios(): Promise<Scenario[]> {
     throw new Error("Supabase client is not initialized. Please check your environment variables (VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY).");
   }
 
-  // Include step count
-  const { data, error } = await supabase.from('scenarios').select('*, steps(count)');
+  // Include step count and author details
+  const { data, error } = await supabase.from('scenarios').select('*, steps(count), author:profiles(*)');
   if (error) throw error;
   return data || [];
 }
@@ -236,7 +236,7 @@ export async function getScenarioBySlug(slug: string): Promise<Scenario | null> 
     throw new Error("Supabase client is not initialized. Please check your environment variables (VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY).");
   }
 
-  const { data, error } = await supabase.from('scenarios').select('*').eq('slug', slug).single();
+  const { data, error } = await supabase.from('scenarios').select('*, author:profiles(*)').eq('slug', slug).single();
   if (error) return null;
   return data;
 }
@@ -276,7 +276,7 @@ export async function getScenarioById(id: string): Promise<Scenario | null> {
 
   const { data, error } = await supabase
     .from('scenarios')
-    .select('*')
+    .select('*, author:profiles(*)')
     .eq('id', id)
     .single();
 

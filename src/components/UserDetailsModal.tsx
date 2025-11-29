@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Loader2, User, X, Trophy, Map, Award, Footprints, DraftingCompass, Brain, Sun, Bug, UserPlus, UserCheck, Flag } from 'lucide-react';
+import { Loader2, User, X, Trophy, Map, Award, Footprints, DraftingCompass, Brain, Sun, Bug, UserPlus, UserCheck, Flag, BadgeCheck } from 'lucide-react';
 import type { Profile, Achievement, Scenario } from '../types';
 import { getUserAchievementsWithDetails, getScenariosByAuthor, followUser, unfollowUser, checkIsFollowing, getFollowersCount, getFollowingCount, reportUser } from '../lib/api';
 import ScenarioCard from './ScenarioCard';
@@ -127,6 +127,9 @@ export default function UserDetailsModal({ isOpen, onClose, user }: UserDetailsM
                     <h2 className="font-bold text-lg text-zinc-900 flex items-center gap-2">
                         <User size={18} className="text-indigo-600" />
                         {user.first_name} {user.last_name}
+                        {user.is_verified && (
+                          <BadgeCheck size={18} className="text-green-600" />
+                        )}
                     </h2>
 
                     {!isMe && currentUser && (

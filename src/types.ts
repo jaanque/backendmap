@@ -12,6 +12,7 @@ export interface Scenario {
   };
   tags?: string[];
   author_id?: string;
+  author?: Profile;
   parent_scenario_id?: string | null;
   favorites_count?: number;
   created_at: string;

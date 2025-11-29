@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Heart } from 'lucide-react';
+import { ArrowRight, Heart, BadgeCheck } from 'lucide-react';
 import type { Scenario, UserProgress } from '../types';
 
 interface ScenarioCardProps {
@@ -36,6 +36,18 @@ export default function ScenarioCard({ scenario, progress, isFavorited, onToggle
             )}
           </div>
           <p className="text-zinc-500 text-sm leading-relaxed max-w-2xl">{scenario.description || 'No description available.'}</p>
+
+          {scenario.author && (
+            <div className="mt-3 flex items-center gap-1.5">
+              <span className="text-xs text-zinc-400 font-medium">By</span>
+              <span className="text-xs font-semibold text-zinc-700 flex items-center gap-1">
+                {scenario.author.first_name} {scenario.author.last_name}
+                {scenario.author.is_verified && (
+                  <BadgeCheck size={12} className="text-green-600" />
+                )}
+              </span>
+            </div>
+          )}
 
           {/* Progress Bar */}
           {progress && (
