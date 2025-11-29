@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ReactFlow, Background, Controls, useNodesState, useEdgesState, type Node, type Edge, BackgroundVariant, useReactFlow, ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -48,6 +48,7 @@ function MapPlayerInner() {
   const [isForkModalOpen, setIsForkModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isReporting, setIsReporting] = useState(false);
+  const lastIncrementedSlugRef = useRef<string | null>(null);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -60,7 +61,10 @@ function MapPlayerInner() {
         .then((data) => {
           if (data) {
             setScenario(data);
-            incrementScenarioViews(data.id);
+            if (lastIncrementedSlugRef.current !== slug) {
+                incrementScenarioViews(data.id);
+                lastIncrementedSlugRef.current = slug;
+            }
             setFavCount(data.favorites_count || 0);
             setNodes(data.flow_data.initialNodes);
             setEdges(data.flow_data.initialEdges);
