@@ -19,11 +19,11 @@ export default function ScenarioCard({ scenario, progress, isFavorited, onToggle
     : 0;
 
   return (
-    <div className="block group relative transition-transform active:scale-[0.99] duration-150">
-      <article className={`border rounded-xl p-6 bg-white transition-all duration-300 ease-out flex flex-col md:flex-row md:items-center justify-between gap-6 relative ${
+    <div className="block group relative">
+      <article className={`border rounded-xl p-6 bg-white transition-colors duration-200 ease-in-out flex flex-col md:flex-row md:items-center justify-between gap-6 relative ${
         isHighlight
           ? 'border-orange-300 shadow-orange-100 shadow-lg hover:shadow-orange-200 ring-1 ring-orange-200 bg-orange-50/10'
-          : 'border-zinc-200 hover:border-zinc-400 hover:shadow-md hover:-translate-y-1'
+          : 'border-zinc-200 hover:border-indigo-600 hover:shadow-sm'
       }`}>
         <div className="flex-grow">
           <div className="flex items-center gap-3 mb-2">
