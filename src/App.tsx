@@ -35,6 +35,7 @@ function App() {
             <Route path="/achievements" element={<Achievements />} />
             <Route path="/users" element={<Users />} />
             <Route path="/create" element={<CreateScenario />} />
+            <Route path="/edit/:slug" element={<CreateScenario />} />
             <Route path="/map/:slug" element={<MapPlayer />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

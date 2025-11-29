@@ -381,10 +381,13 @@ function MapPlayerInner() {
 
         {/* Fork Label */}
         {parentScenario && (
-             <div className="px-6 pb-2 -mt-3">
-                 <p className="text-xs text-zinc-400 flex items-center gap-1">
-                     <GitFork size={12} />
-                     Forked from <Link to={`/map/${parentScenario.slug}`} className="text-indigo-600 hover:underline">{parentScenario.title}</Link>
+             <div className="px-6 pb-2 pt-2 border-b border-zinc-100 bg-zinc-50/50">
+                 <p className="text-xs text-zinc-500 flex items-center gap-1.5">
+                     <GitFork size={14} className="text-indigo-500" />
+                     <span>Forked from</span>
+                     <Link to={`/map/${parentScenario.slug}`} className="font-medium text-indigo-600 hover:underline hover:text-indigo-800 transition-colors">
+                        {parentScenario.title}
+                     </Link>
                  </p>
              </div>
         )}
