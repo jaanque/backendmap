@@ -493,10 +493,15 @@ function MapPlayerInner() {
                {user && (
                   <button
                     onClick={handleFork}
-                    className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex flex-col items-center pt-2 pb-1 px-2 rounded-xl hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed min-w-[2.5rem]"
                     title="Fork this scenario"
                   >
                     <GitFork className="w-5 h-5 text-zinc-400 group-hover:text-zinc-700" />
+                    {(scenario.forks_count || 0) > 0 && (
+                        <span className="text-[10px] font-bold leading-none transition-colors text-zinc-500">
+                            {formatNumber(scenario.forks_count || 0)}
+                        </span>
+                    )}
                   </button>
                )}
 
