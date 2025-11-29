@@ -48,18 +48,21 @@ export default function Navbar() {
   }, [user]);
 
   return (
-    <nav className="border-b border-zinc-100 h-16 flex items-center justify-between px-6 md:px-12 sticky top-0 bg-white/90 backdrop-blur z-50">
-      <Link to="/" className="font-bold text-xl tracking-tight flex items-center gap-2 text-zinc-900 hover:text-black transition-colors">
-        BackendMap
-      </Link>
+    <nav className="border-b border-zinc-100 h-16 flex items-center justify-between px-6 md:px-12 sticky top-0 bg-white/90 backdrop-blur z-50" aria-label="Main Navigation">
+      <div className="flex items-center gap-8">
+        <Link to="/" className="font-bold text-xl tracking-tight flex items-center gap-2 text-zinc-900 hover:text-black transition-colors" aria-label="BackendMap Home">
+          BackendMap
+        </Link>
 
-      <div className="flex items-center gap-6 text-sm font-medium text-zinc-500">
-        <Link to="/explore" className={isActive('/explore')}>Explore Scenarios</Link>
-        <Link to="/users" className={isActive('/users')}>Users</Link>
-        <Link to="/about" className={isActive('/about')}>About</Link>
+        {/* Desktop Links */}
+        <div className="hidden md:flex items-center gap-6 text-sm font-medium text-zinc-500">
+          <Link to="/explore" className={isActive('/explore')}>Explore Scenarios</Link>
+          <Link to="/users" className={isActive('/users')}>Community</Link>
+          <Link to="/about" className={isActive('/about')}>About</Link>
+        </div>
+      </div>
 
-        <div className="h-4 w-px bg-zinc-200 mx-2"></div>
-
+      <div className="flex items-center gap-4 text-sm font-medium text-zinc-500">
         {user ? (
           <div className="relative" ref={dropdownRef}>
             <button

@@ -139,10 +139,21 @@ export default function Home() {
           System Architecture <br/>
           <span className="text-zinc-400">Visualized.</span>
         </h1>
-        <p className="text-xl text-zinc-500 mb-12 max-w-2xl mx-auto leading-relaxed">
-          A collection of interactive backend flows. <br/>
-          Understand how data moves through modern software stacks.
+        <p className="text-xl text-zinc-500 mb-10 max-w-2xl mx-auto leading-relaxed">
+          The interactive platform to learn, design and visualize backend flows.<br/>
+          See exactly how data moves through databases, queues, and microservices.
         </p>
+
+        {!user && (
+          <div className="flex justify-center gap-4 mb-12">
+            <a href="/register" className="px-8 py-3 bg-zinc-900 text-white rounded-full font-semibold hover:bg-black transition-all hover:shadow-lg hover:scale-105 active:scale-95">
+              Get Started Free
+            </a>
+            <a href="/explore" className="px-8 py-3 bg-zinc-100 text-zinc-700 rounded-full font-semibold hover:bg-zinc-200 transition-all hover:shadow active:scale-95">
+              Explore Catalog
+            </a>
+          </div>
+        )}
 
         {/* Command Bar Search */}
         <SearchFilters
@@ -163,22 +174,36 @@ export default function Home() {
         </div>
 
         {filteredScenarios.length > 0 ? (
-          <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 gap-4" role="list">
             {filteredScenarios.map((scenario) => (
-              <ScenarioCard
-                key={scenario.id}
-                scenario={scenario}
-                progress={userProgress[scenario.id]}
-                isFavorited={favorites.has(scenario.id)}
-                onToggleFavorite={handleToggleFavorite}
-                showFavoriteButton={!!user}
-              />
+              <div role="listitem" key={scenario.id}>
+                <ScenarioCard
+                  scenario={scenario}
+                  progress={userProgress[scenario.id]}
+                  isFavorited={favorites.has(scenario.id)}
+                  onToggleFavorite={handleToggleFavorite}
+                  showFavoriteButton={!!user}
+                />
+              </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-24 border border-dashed border-zinc-200 rounded-xl bg-zinc-50/30">
-             <p className="text-zinc-500 font-medium">No scenarios match your search.</p>
-             <button onClick={() => setSearchQuery('')} className="mt-4 text-zinc-900 font-semibold hover:underline text-sm">Clear filter</button>
+          <div className="text-center py-24 border border-dashed border-zinc-200 rounded-xl bg-zinc-50/30 flex flex-col items-center justify-center">
+             <div className="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mb-4 text-zinc-400">
+               <span className="text-2xl" role="img" aria-label="Magnifying glass">🔍</span>
+             </div>
+             <p className="text-zinc-600 font-medium text-lg">No scenarios match your search.</p>
+             <p className="text-zinc-400 text-sm mt-1 mb-6 max-w-sm">Try adjusting your search terms or filters to find what you're looking for.</p>
+             <button
+               onClick={() => {
+                 setSearchQuery('');
+                 setFilterDifficulty('All');
+                 setSortOrder('newest');
+               }}
+               className="btn-pro btn-secondary px-6 py-2"
+             >
+               Clear all filters
+             </button>
           </div>
         )}
       </main>
