@@ -273,8 +273,8 @@ export default function Profile() {
              </h2>
              <div className="flex items-center gap-4">
                {isVerified && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                    <BadgeCheck size={14} />
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                    <BadgeCheck size={14} className="text-blue-500 fill-blue-50" strokeWidth={2.5} />
                     Verified
                   </span>
                )}

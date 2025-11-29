@@ -128,7 +128,7 @@ export default function UserDetailsModal({ isOpen, onClose, user }: UserDetailsM
                         <User size={18} className="text-indigo-600" />
                         {user.first_name} {user.last_name}
                         {user.is_verified && (
-                          <BadgeCheck size={18} className="text-green-600" />
+                          <BadgeCheck size={18} className="text-blue-500 fill-blue-50" strokeWidth={2.5} />
                         )}
                     </h2>
 

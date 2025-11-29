@@ -72,7 +72,7 @@ export default function UserListModal({ isOpen, onClose, userId, type }: UserLis
                       <p className="font-semibold text-sm text-zinc-900 flex items-center gap-1">
                         {user.first_name} {user.last_name}
                         {user.is_verified && (
-                          <BadgeCheck size={14} className="text-green-600" />
+                          <BadgeCheck size={14} className="text-blue-500 fill-blue-50" strokeWidth={2.5} />
                         )}
                       </p>
                       {(user.gender || user.sex) && (

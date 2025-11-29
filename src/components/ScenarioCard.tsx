@@ -43,7 +43,7 @@ export default function ScenarioCard({ scenario, progress, isFavorited, onToggle
               <span className="text-xs font-semibold text-zinc-700 flex items-center gap-1">
                 {scenario.author.first_name} {scenario.author.last_name}
                 {scenario.author.is_verified && (
-                  <BadgeCheck size={12} className="text-green-600" />
+                  <BadgeCheck size={14} className="text-blue-500 fill-blue-50" strokeWidth={2.5} />
                 )}
               </span>
             </div>

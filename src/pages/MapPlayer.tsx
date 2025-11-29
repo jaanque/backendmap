@@ -366,7 +366,7 @@ function MapPlayerInner() {
                         <span className="font-medium flex items-center gap-1">
                           {authorProfile.first_name || 'Anonymous'}
                           {authorProfile.is_verified && (
-                            <BadgeCheck size={12} className="text-green-600" />
+                            <BadgeCheck size={14} className="text-blue-500 fill-blue-50" strokeWidth={2.5} />
                           )}
                         </span>
                     </span>

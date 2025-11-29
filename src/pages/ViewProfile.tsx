@@ -103,7 +103,7 @@ export default function ViewProfile() {
                    <h1 className="text-2xl font-bold text-zinc-900 leading-tight flex items-center gap-2">
                      {firstName} {lastName}
                      {isVerified && (
-                       <BadgeCheck size={24} className="text-green-600" />
+                       <BadgeCheck size={24} className="text-blue-500 fill-blue-50" strokeWidth={2.5} />
                      )}
                    </h1>
                    <p className="text-zinc-500 text-sm mt-1">{user.email}</p>

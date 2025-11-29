@@ -71,7 +71,7 @@ export default function Users() {
                 <h3 className="font-bold text-lg text-zinc-900 flex items-center gap-1">
                   {user.first_name || 'Anonymous'} {user.last_name || ''}
                   {user.is_verified && (
-                    <BadgeCheck size={16} className="text-green-600" />
+                    <BadgeCheck size={18} className="text-blue-500 fill-blue-50" strokeWidth={2.5} />
                   )}
                 </h3>
 
