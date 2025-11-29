@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { PlayCircle, BookOpen, Share2 } from 'lucide-react';
 import { getScenarios, getUserProgress, getUserFavorites, setFavorite } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { useToast } from '../lib/toast';
@@ -166,6 +167,42 @@ export default function Home() {
           setSortOrder={setSortOrder}
         />
       </header>
+
+      {/* How it Works Section */}
+      <section className="px-6 md:px-12 max-w-5xl mx-auto mb-20 animate-fade-in-up">
+        <div className="bg-zinc-50 rounded-2xl p-8 md:p-12 border border-zinc-100">
+           <h2 className="text-2xl font-bold text-center mb-10 text-zinc-900">How BackendMap Works</h2>
+           <div className="grid md:grid-cols-3 gap-8">
+              <div className="flex flex-col items-center text-center">
+                 <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-zinc-200 flex items-center justify-center text-indigo-600 mb-4">
+                    <BookOpen size={24} />
+                 </div>
+                 <h3 className="font-bold text-lg mb-2">1. Choose a Scenario</h3>
+                 <p className="text-zinc-500 text-sm leading-relaxed">
+                   Browse our catalog of real-world architecture patterns, from simple APIs to complex microservices.
+                 </p>
+              </div>
+              <div className="flex flex-col items-center text-center">
+                 <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-zinc-200 flex items-center justify-center text-indigo-600 mb-4">
+                    <PlayCircle size={24} />
+                 </div>
+                 <h3 className="font-bold text-lg mb-2">2. Watch the Flow</h3>
+                 <p className="text-zinc-500 text-sm leading-relaxed">
+                   Step through the request lifecycle. See exactly how data travels between servers, queues, and databases.
+                 </p>
+              </div>
+              <div className="flex flex-col items-center text-center">
+                 <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-zinc-200 flex items-center justify-center text-indigo-600 mb-4">
+                    <Share2 size={24} />
+                 </div>
+                 <h3 className="font-bold text-lg mb-2">3. Master & Share</h3>
+                 <p className="text-zinc-500 text-sm leading-relaxed">
+                   Complete scenarios to unlock achievements, track your progress, and share your profile with the community.
+                 </p>
+              </div>
+           </div>
+        </div>
+      </section>
 
       {/* Content - Technical List */}
       <main className="px-6 md:px-12 pb-32 max-w-5xl mx-auto animate-fade-in-up">

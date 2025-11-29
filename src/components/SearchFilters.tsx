@@ -26,6 +26,7 @@ export default function SearchFilters({
         <input
           type="text"
           placeholder="Search scenarios (e.g., API, Database, AWS)..."
+          aria-label="Search scenarios"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full pl-12 pr-4 py-4 rounded-xl border border-zinc-200 bg-zinc-50/50 shadow-sm focus:bg-white focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all text-lg font-medium placeholder:text-zinc-400"
@@ -39,6 +40,7 @@ export default function SearchFilters({
                 <Filter size={14} />
             </div>
             <select
+                aria-label="Filter by difficulty"
                 value={filterDifficulty}
                 onChange={(e) => setFilterDifficulty(e.target.value)}
                 className="pl-9 pr-8 py-2 rounded-full border border-zinc-200 bg-white text-sm font-medium text-zinc-600 focus:border-zinc-400 focus:ring-2 focus:ring-zinc-100 outline-none cursor-pointer hover:bg-zinc-50 transition-all appearance-none"
@@ -55,6 +57,7 @@ export default function SearchFilters({
                 <ArrowUpDown size={14} />
             </div>
             <select
+                aria-label="Sort scenarios"
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value)}
                 className="pl-9 pr-8 py-2 rounded-full border border-zinc-200 bg-white text-sm font-medium text-zinc-600 focus:border-zinc-400 focus:ring-2 focus:ring-zinc-100 outline-none cursor-pointer hover:bg-zinc-50 transition-all appearance-none"
