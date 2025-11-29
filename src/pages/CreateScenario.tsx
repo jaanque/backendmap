@@ -7,7 +7,7 @@ import Navbar from '../components/Navbar';
 import { useAuth } from '../lib/auth';
 import { checkSlugAvailability, createScenario, createSteps, getScenarioBySlug, getSteps } from '../lib/api';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { Monitor, Server, Cpu, Database, Cloud, Save, X, Loader2, GripVertical, ListOrdered, Layers, Trash2, Plus, Target } from 'lucide-react';
+import { Monitor, Server, Cpu, Database, Cloud, Save, X, Loader2, GripVertical, ListOrdered, Layers, Trash2, Plus, Target, Lock, Globe } from 'lucide-react';
 import type { StepInput } from '../types';
 
 const nodeTypes = {
@@ -55,6 +55,7 @@ function CreateScenario() {
   const [slug, setSlug] = useState('');
   const [difficulty, setDifficulty] = useState('Beginner');
   const [description, setDescription] = useState('');
+  const [isPublic, setIsPublic] = useState(true);
   const [slugError, setSlugError] = useState<string | null>(null);
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [checkingSlug, setCheckingSlug] = useState(false);
@@ -86,6 +87,7 @@ function CreateScenario() {
         if (mode === 'edit') setTitle(data.title);
         setDescription(data.description);
         setDifficulty(data.difficulty);
+        setIsPublic(data.is_public ?? true);
         setNodes(data.flow_data.initialNodes || []);
         setEdges(data.flow_data.initialEdges || []);
 
@@ -261,6 +263,7 @@ function CreateScenario() {
         slug,
         description,
         difficulty,
+        is_public: isPublic,
         flow_data: {
             initialNodes: nodes,
             initialEdges: edges
@@ -544,6 +547,42 @@ function CreateScenario() {
                             placeholder="Briefly describe what this scenario demonstrates..."
                             className="w-full px-3 py-2 rounded-lg border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all text-sm resize-none"
                         />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-zinc-700 mb-1.5">Visibility</label>
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setIsPublic(true)}
+                                className={`p-3 rounded-lg border flex items-center gap-3 transition-all ${
+                                    isPublic
+                                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700 ring-1 ring-indigo-600'
+                                        : 'border-zinc-200 hover:border-zinc-300 text-zinc-600'
+                                }`}
+                            >
+                                <Globe size={20} />
+                                <div className="text-left">
+                                    <div className="text-sm font-bold">Public</div>
+                                    <div className="text-xs opacity-80">Visible to everyone</div>
+                                </div>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setIsPublic(false)}
+                                className={`p-3 rounded-lg border flex items-center gap-3 transition-all ${
+                                    !isPublic
+                                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700 ring-1 ring-indigo-600'
+                                        : 'border-zinc-200 hover:border-zinc-300 text-zinc-600'
+                                }`}
+                            >
+                                <Lock size={20} />
+                                <div className="text-left">
+                                    <div className="text-sm font-bold">Private</div>
+                                    <div className="text-xs opacity-80">Only you can see it</div>
+                                </div>
+                            </button>
+                        </div>
                     </div>
 
                     <div className="pt-2 flex justify-end gap-3">
