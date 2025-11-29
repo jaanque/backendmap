@@ -76,6 +76,8 @@ export interface Profile {
   gender: string | null;
   sex: string | null;
   is_public: boolean | null;
+  is_verified?: boolean;
+  verification_requested?: boolean;
   updated_at: string;
 }
 

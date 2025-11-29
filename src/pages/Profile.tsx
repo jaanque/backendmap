@@ -5,7 +5,7 @@ import { useToast } from '../lib/toast';
 import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { User, Mail, Save, Loader2, Lock, Github, Link as LinkIcon, Trophy, Award, Footprints, DraftingCompass, Brain, Sun, Bug } from 'lucide-react';
+import { User, Mail, Save, Loader2, Lock, Github, Link as LinkIcon, Trophy, Award, Footprints, DraftingCompass, Brain, Sun, Bug, BadgeCheck, ShieldAlert } from 'lucide-react';
 import { getProfile, updateProfile, getAllAchievements, getUserAchievements, getFollowersCount, getFollowingCount } from '../lib/api';
 import { checkAchievements } from '../lib/achievements';
 import UserListModal from '../components/UserListModal';
@@ -32,7 +32,10 @@ export default function Profile() {
   const [gender, setGender] = useState('');
   const [sex, setSex] = useState('');
   const [isPublic, setIsPublic] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+  const [verificationRequested, setVerificationRequested] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isRequestingVerification, setIsRequestingVerification] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
   // Password Change State
@@ -73,6 +76,8 @@ export default function Profile() {
             setGender(profile.gender || '');
             setSex(profile.sex || '');
             setIsPublic(profile.is_public || false);
+            setIsVerified(profile.is_verified || false);
+            setVerificationRequested(profile.verification_requested || false);
           }
         })
         .catch(err => console.error('Error fetching profile:', err))
@@ -180,6 +185,24 @@ export default function Profile() {
     }
   };
 
+  const handleRequestVerification = async () => {
+    if (!user || !supabase) return;
+
+    setIsRequestingVerification(true);
+    try {
+      await updateProfile(user.id, {
+        verification_requested: true
+      });
+      setVerificationRequested(true);
+      showToast('Verification requested successfully', { type: 'success' });
+    } catch (error: any) {
+      console.error('Error requesting verification:', error);
+      showToast(error.message || 'Failed to request verification', { type: 'error' });
+    } finally {
+      setIsRequestingVerification(false);
+    }
+  };
+
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !supabase) return;
@@ -248,7 +271,20 @@ export default function Profile() {
                 <User size={18} className="text-indigo-600" />
                 Profile Information
              </h2>
-             <div className="flex gap-4 text-xs font-medium text-zinc-500">
+             <div className="flex items-center gap-4">
+               {isVerified && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                    <BadgeCheck size={14} />
+                    Verified
+                  </span>
+               )}
+               {!isVerified && verificationRequested && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
+                    <ShieldAlert size={14} />
+                    Pending Verification
+                  </span>
+               )}
+               <div className="flex gap-4 text-xs font-medium text-zinc-500">
                 <button
                   onClick={() => setActiveFollowsModal('followers')}
                   className="hover:text-zinc-800 transition-colors"
@@ -261,35 +297,58 @@ export default function Profile() {
                 >
                   <strong className="text-zinc-900">{followingCount}</strong> Following
                 </button>
+               </div>
              </div>
           </div>
 
           <div className="p-6">
             <form onSubmit={handleSave} className="space-y-6">
-              {/* Public Profile Toggle */}
-              <div className="bg-indigo-50/50 rounded-lg p-4 border border-indigo-100 flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-semibold text-indigo-900">Public Profile</h3>
-                  <p className="text-xs text-indigo-700 mt-1">
-                    Allow others to see your profile on the Users page.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsPublic(!isPublic)}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${
-                    isPublic ? 'bg-indigo-600' : 'bg-zinc-200'
-                  }`}
-                  role="switch"
-                  aria-checked={isPublic}
-                >
-                  <span
-                    aria-hidden="true"
-                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                      isPublic ? 'translate-x-5' : 'translate-x-0'
-                    }`}
-                  />
-                </button>
+              <div className="grid grid-cols-1 gap-4">
+                 {/* Verification Request Banner */}
+                 {!isVerified && !verificationRequested && (
+                    <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-4 flex items-center justify-between">
+                       <div>
+                          <h3 className="text-sm font-semibold text-indigo-900">Verify your account</h3>
+                          <p className="text-xs text-indigo-700 mt-1">
+                             Get a verified badge to show authenticity.
+                          </p>
+                       </div>
+                       <button
+                         type="button"
+                         onClick={handleRequestVerification}
+                         disabled={isRequestingVerification}
+                         className="text-xs font-medium bg-white text-indigo-600 border border-indigo-200 px-3 py-1.5 rounded-md hover:bg-indigo-50 hover:text-indigo-700 transition-colors disabled:opacity-50"
+                       >
+                          {isRequestingVerification ? <Loader2 size={14} className="animate-spin" /> : 'Request Verification'}
+                       </button>
+                    </div>
+                 )}
+
+                 {/* Public Profile Toggle */}
+                 <div className="bg-indigo-50/50 rounded-lg p-4 border border-indigo-100 flex items-center justify-between">
+                   <div>
+                     <h3 className="text-sm font-semibold text-indigo-900">Public Profile</h3>
+                     <p className="text-xs text-indigo-700 mt-1">
+                       Allow others to see your profile on the Users page.
+                     </p>
+                   </div>
+                   <button
+                     type="button"
+                     onClick={() => setIsPublic(!isPublic)}
+                     className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${
+                       isPublic ? 'bg-indigo-600' : 'bg-zinc-200'
+                     }`}
+                     role="switch"
+                     aria-checked={isPublic}
+                   >
+                     <span
+                       aria-hidden="true"
+                       className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                         isPublic ? 'translate-x-5' : 'translate-x-0'
+                       }`}
+                     />
+                   </button>
+                 </div>
               </div>
 
               {/* Email Field (Read-only) */}
