@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Heart, BadgeCheck } from 'lucide-react';
+import { ArrowRight, Heart, BadgeCheck, Flame } from 'lucide-react';
 import type { Scenario, UserProgress } from '../types';
 
 interface ScenarioCardProps {
@@ -8,9 +8,10 @@ interface ScenarioCardProps {
   isFavorited: boolean;
   onToggleFavorite: (id: string) => void;
   showFavoriteButton?: boolean;
+  isHighlight?: boolean;
 }
 
-export default function ScenarioCard({ scenario, progress, isFavorited, onToggleFavorite, showFavoriteButton = true }: ScenarioCardProps) {
+export default function ScenarioCard({ scenario, progress, isFavorited, onToggleFavorite, showFavoriteButton = true, isHighlight = false }: ScenarioCardProps) {
   const stepsCount = scenario.steps?.[0]?.count || 0;
   const percent = progress && stepsCount > 0
     ? Math.min(100, Math.round(((progress.current_step_index + (progress.is_completed ? 1 : 0)) / stepsCount) * 100))
@@ -18,10 +19,17 @@ export default function ScenarioCard({ scenario, progress, isFavorited, onToggle
 
   return (
     <div className="block group relative transition-transform active:scale-[0.99] duration-150">
-      <article className="border border-zinc-200 rounded-xl p-6 bg-white hover:border-zinc-400 hover:shadow-md hover:-translate-y-1 transition-all duration-300 ease-out flex flex-col md:flex-row md:items-center justify-between gap-6 relative">
+      <article className={`border rounded-xl p-6 bg-white hover:shadow-md hover:-translate-y-1 transition-all duration-300 ease-out flex flex-col md:flex-row md:items-center justify-between gap-6 relative ${
+        isHighlight ? 'border-orange-200 shadow-sm ring-1 ring-orange-100' : 'border-zinc-200 hover:border-zinc-400'
+      }`}>
         <div className="flex-grow">
           <div className="flex items-center gap-3 mb-2">
             <h3 className="font-bold text-lg text-zinc-900 group-hover:text-zinc-600 transition-colors">{scenario.title || 'Untitled Scenario'}</h3>
+            {isHighlight && (
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border bg-orange-50 text-orange-600 border-orange-100">
+                <Flame size={10} className="fill-orange-600" /> Destacado
+              </span>
+            )}
             <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${
               scenario.difficulty === 'Beginner' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
               scenario.difficulty === 'Intermediate' ? 'bg-amber-50 text-amber-700 border-amber-100' :

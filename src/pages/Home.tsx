@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { PlayCircle, BookOpen, Share2, Flame } from 'lucide-react';
+import { PlayCircle, BookOpen, Share2 } from 'lucide-react';
 import { getScenarios, getDailyHighlights, getUserProgress, getUserFavorites, setFavorite } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { useToast } from '../lib/toast';
@@ -23,7 +23,8 @@ export default function Home() {
   const [sortOrder, setSortOrder] = useState('newest');
 
   useEffect(() => {
-    Promise.all([getScenarios(), getDailyHighlights()])
+    // Fetch 2 highlights as requested by user
+    Promise.all([getScenarios(), getDailyHighlights(2)])
       .then(async ([allScenarios, highlights]) => {
         setScenarios(allScenarios);
         setDailyHighlights(highlights);
@@ -208,21 +209,34 @@ export default function Home() {
 
       {/* Content - Technical List */}
       <main className="px-6 md:px-12 pb-32 max-w-5xl mx-auto animate-fade-in-up">
-        {/* Daily Highlights Section */}
-        {dailyHighlights.length > 0 && (
-          <div className="mb-16">
-            <div className="mb-6 flex items-center gap-2 border-b border-zinc-100 pb-4">
-              <Flame className="w-5 h-5 text-orange-500" />
-              <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-900">Destacados del día</h2>
-              <span className="text-xs font-mono text-zinc-400 bg-zinc-100 px-2 py-1 rounded">HOT</span>
-            </div>
+        <div className="mb-6 flex items-end justify-between border-b border-zinc-100 pb-4">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-900">Catalog</h2>
+          <span className="text-xs font-mono text-zinc-400 bg-zinc-100 px-2 py-1 rounded">
+            {filteredScenarios.length + (dailyHighlights.length > 0 ? dailyHighlights.length : 0)} ITEMS
+          </span>
+        </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {dailyHighlights.map((scenario) => (
-                <div key={scenario.id} className="relative">
-                  <div className="absolute -top-3 -right-3 z-10 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
-                    TOP {dailyHighlights.indexOf(scenario) + 1}
-                  </div>
+        {(filteredScenarios.length > 0 || dailyHighlights.length > 0) ? (
+          <div className="grid grid-cols-1 gap-4" role="list">
+            {/* Render Daily Highlights first */}
+            {dailyHighlights.map((scenario) => (
+              <div role="listitem" key={`highlight-${scenario.id}`}>
+                <ScenarioCard
+                  scenario={scenario}
+                  progress={userProgress[scenario.id]}
+                  isFavorited={favorites.has(scenario.id)}
+                  onToggleFavorite={handleToggleFavorite}
+                  showFavoriteButton={!!user}
+                  isHighlight={true}
+                />
+              </div>
+            ))}
+
+            {/* Render remaining filtered scenarios, excluding duplicates */}
+            {filteredScenarios
+              .filter(s => !dailyHighlights.find(h => h.id === s.id))
+              .map((scenario) => (
+                <div role="listitem" key={scenario.id}>
                   <ScenarioCard
                     scenario={scenario}
                     progress={userProgress[scenario.id]}
@@ -231,28 +245,6 @@ export default function Home() {
                     showFavoriteButton={!!user}
                   />
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="mb-6 flex items-end justify-between border-b border-zinc-100 pb-4">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-900">Catalog</h2>
-          <span className="text-xs font-mono text-zinc-400 bg-zinc-100 px-2 py-1 rounded">{filteredScenarios.length} ITEMS</span>
-        </div>
-
-        {filteredScenarios.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4" role="list">
-            {filteredScenarios.map((scenario) => (
-              <div role="listitem" key={scenario.id}>
-                <ScenarioCard
-                  scenario={scenario}
-                  progress={userProgress[scenario.id]}
-                  isFavorited={favorites.has(scenario.id)}
-                  onToggleFavorite={handleToggleFavorite}
-                  showFavoriteButton={!!user}
-                />
-              </div>
             ))}
           </div>
         ) : (
