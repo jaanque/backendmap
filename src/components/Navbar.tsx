@@ -1,8 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
-import { getProfile } from '../lib/api';
-import { LogOut, User, ChevronDown, Settings, CreditCard, Heart, Trophy, PlusSquare } from 'lucide-react';
+import { getProfile, getScenariosByAuthor } from '../lib/api';
+import { LogOut, User, ChevronDown, Settings, CreditCard, Heart, Trophy, PlusSquare, Lock, ScrollText } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import type { Scenario } from '../types';
 
 export default function Navbar() {
   const { user, signOut } = useAuth();
@@ -10,6 +11,8 @@ export default function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [displayName, setDisplayName] = useState<string | null>(null);
+  const [userScenarios, setUserScenarios] = useState<Scenario[]>([]);
+  const [scenariosLoading, setScenariosLoading] = useState(false);
 
   // Highlight active link
   const isActive = (path: string) => location.pathname === path ? 'text-black font-semibold' : 'hover:text-black transition-colors';
@@ -26,6 +29,16 @@ export default function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if (isDropdownOpen && user) {
+        setScenariosLoading(true);
+        getScenariosByAuthor(user.id)
+            .then(setUserScenarios)
+            .catch(console.error)
+            .finally(() => setScenariosLoading(false));
+    }
+  }, [isDropdownOpen, user]);
 
   useEffect(() => {
     if (user) {
@@ -98,6 +111,33 @@ export default function Navbar() {
                   <p className="text-sm text-zinc-500 truncate mt-0.5">{user.email}</p>
                 </Link>
 
+                {/* My Scenarios Section */}
+                <div className="py-1 border-b border-zinc-100">
+                    <div className="px-4 py-2 text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
+                        <ScrollText size={12} />
+                        My Scenarios
+                    </div>
+                    <div className="max-h-48 overflow-y-auto custom-scrollbar">
+                        {scenariosLoading ? (
+                            <div className="px-4 py-2 text-xs text-zinc-400 italic">Loading...</div>
+                        ) : userScenarios.length === 0 ? (
+                            <div className="px-4 py-2 text-xs text-zinc-400 italic">No scenarios yet.</div>
+                        ) : (
+                            userScenarios.map(s => (
+                                <Link
+                                    key={s.id}
+                                    to={`/map/${s.slug}`}
+                                    className="block px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 transition-colors flex items-center justify-between group"
+                                    onClick={() => setIsDropdownOpen(false)}
+                                >
+                                    <span className="truncate pr-2">{s.title}</span>
+                                    {!s.is_public && <Lock size={12} className="text-zinc-400 flex-shrink-0" />}
+                                </Link>
+                            ))
+                        )}
+                    </div>
+                </div>
+
                 {/* Menu Items */}
                 <div className="py-1">
                   <Link
@@ -147,7 +187,7 @@ export default function Navbar() {
                       signOut();
                       setIsDropdownOpen(false);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors"
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors cursor-pointer"
                   >
                     <LogOut size={16} />
                     Sign Out
