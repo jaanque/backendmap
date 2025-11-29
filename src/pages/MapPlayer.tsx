@@ -1,14 +1,14 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ReactFlow, Background, Controls, useNodesState, useEdgesState, type Node, type Edge, BackgroundVariant, useReactFlow, ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { getScenarioBySlug, getSteps, getSingleScenarioProgress, saveUserProgress, getUserFavorites, setFavorite, getProfile } from '../lib/api';
+import { getScenarioBySlug, getSteps, getSingleScenarioProgress, saveUserProgress, getUserFavorites, setFavorite, getProfile, forkScenario, getScenarioById } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import type { Scenario, Step, Profile } from '../types';
 import CustomNode from '../components/CustomNode';
 import PacketEdge from '../components/PacketEdge';
 import MapLegend from '../components/MapLegend';
-import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart, Play, Pause, User } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart, Play, Pause, User, GitFork, Loader2 } from 'lucide-react';
 import { checkAchievements } from '../lib/achievements';
 import AchievementPopup from '../components/AchievementPopup';
 import UserDetailsModal from '../components/UserDetailsModal';
@@ -26,13 +26,16 @@ const edgeTypes = {
 function MapPlayerInner() {
   const { slug } = useParams<{ slug: string }>();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [scenario, setScenario] = useState<Scenario | null>(null);
+  const [parentScenario, setParentScenario] = useState<{ title: string; slug: string } | null>(null);
   const [steps, setSteps] = useState<Step[]>([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [isFavLoading, setIsFavLoading] = useState(false);
+  const [isForking, setIsForking] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [unlockedAchievements, setUnlockedAchievements] = useState<Achievement[]>([]);
   const [authorProfile, setAuthorProfile] = useState<Profile | null>(null);
@@ -55,6 +58,17 @@ function MapPlayerInner() {
             // Fetch Author if exists
             if (data.author_id) {
                 getProfile(data.author_id).then(setAuthorProfile).catch(console.error);
+            }
+
+            // Fetch parent if exists
+            if (data.parent_scenario_id) {
+                getScenarioById(data.parent_scenario_id).then(parent => {
+                    if (parent) {
+                        setParentScenario({ title: parent.title, slug: parent.slug });
+                    }
+                });
+            } else {
+                setParentScenario(null);
             }
 
             // Fetch steps and then maybe progress
@@ -206,6 +220,26 @@ function MapPlayerInner() {
       }
   }
 
+  const handleFork = async () => {
+      if (!user || !scenario || isForking) return;
+
+      if (!confirm("Do you want to fork this scenario? This will create a copy in your account.")) return;
+
+      setIsForking(true);
+      try {
+          const newScenario = await forkScenario(scenario.id, user.id);
+          // Redirect to new scenario
+          navigate(`/map/${newScenario.slug}`);
+          // Force reload effectively as slug changes, but react-router handles it.
+          // Note: state needs full reset, which slug change in key or useEffect dependency handles.
+      } catch (err) {
+          console.error("Fork failed", err);
+          alert("Failed to fork scenario.");
+      } finally {
+          setIsForking(false);
+      }
+  }
+
   if (error) {
     return (
       <div className="flex h-screen bg-white items-center justify-center p-6">
@@ -330,8 +364,30 @@ function MapPlayerInner() {
                     />
                  </button>
                )}
+
+               {/* Fork Button */}
+               {user && (
+                  <button
+                    onClick={handleFork}
+                    disabled={isForking}
+                    className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Fork this scenario"
+                  >
+                    {isForking ? <Loader2 className="w-5 h-5 animate-spin text-zinc-400" /> : <GitFork className="w-5 h-5 text-zinc-400 group-hover:text-zinc-700" />}
+                  </button>
+               )}
            </div>
         </div>
+
+        {/* Fork Label */}
+        {parentScenario && (
+             <div className="px-6 pb-2 -mt-3">
+                 <p className="text-xs text-zinc-400 flex items-center gap-1">
+                     <GitFork size={12} />
+                     Forked from <Link to={`/map/${parentScenario.slug}`} className="text-indigo-600 hover:underline">{parentScenario.title}</Link>
+                 </p>
+             </div>
+        )}
 
         {/* Reactions Section (Discreet) */}
         <div className="px-6 pt-2">
