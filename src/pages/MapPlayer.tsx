@@ -12,6 +12,7 @@ import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart, Pl
 import { checkAchievements } from '../lib/achievements';
 import AchievementPopup from '../components/AchievementPopup';
 import UserDetailsModal from '../components/UserDetailsModal';
+import ConfirmationModal from '../components/ConfirmationModal';
 import Reactions from '../components/Reactions';
 import type { Achievement } from '../types';
 
@@ -39,6 +40,7 @@ function MapPlayerInner() {
   const [unlockedAchievements, setUnlockedAchievements] = useState<Achievement[]>([]);
   const [authorProfile, setAuthorProfile] = useState<Profile | null>(null);
   const [isAuthorModalOpen, setIsAuthorModalOpen] = useState(false);
+  const [isForkModalOpen, setIsForkModalOpen] = useState(false);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -221,9 +223,11 @@ function MapPlayerInner() {
 
   const handleFork = () => {
       if (!user || !scenario) return;
+      setIsForkModalOpen(true);
+  }
 
-      if (!confirm("Do you want to fork this scenario? This will create a copy in your account.")) return;
-
+  const confirmFork = () => {
+      if (!scenario) return;
       // Navigate to create page with fork_slug param
       navigate(`/create?fork_slug=${scenario.slug}`);
   }
@@ -254,6 +258,15 @@ function MapPlayerInner() {
         isOpen={isAuthorModalOpen}
         onClose={() => setIsAuthorModalOpen(false)}
         user={authorProfile}
+      />
+
+      <ConfirmationModal
+        isOpen={isForkModalOpen}
+        onClose={() => setIsForkModalOpen(false)}
+        onConfirm={confirmFork}
+        title="Fork Scenario"
+        message="Do you want to fork this scenario? This will open the editor with a copy of this scenario for you to modify and publish."
+        confirmText="Fork Scenario"
       />
 
       {/* Achievement Popup */}
