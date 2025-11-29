@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { SmilePlus } from 'lucide-react';
-import { getScenarioReactions, toggleReaction, getUserReactions } from '../lib/api';
+import { getScenarioReactions, toggleReaction, getUserReaction } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { useToast } from '../lib/toast';
 
@@ -14,7 +14,7 @@ export default function Reactions({ scenarioId }: ReactionsProps) {
   const { user } = useAuth();
   const { showToast } = useToast();
   const [reactions, setReactions] = useState<Record<string, number>>({});
-  const [userReactions, setUserReactions] = useState<Set<string>>(new Set());
+  const [userReaction, setUserReaction] = useState<string | null>(null);
   const [showPicker, setShowPicker] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
 
@@ -33,13 +33,13 @@ export default function Reactions({ scenarioId }: ReactionsProps) {
 
   const loadReactions = async () => {
      try {
-         const [counts, userReactionList] = await Promise.all([
+         const [counts, myReaction] = await Promise.all([
              getScenarioReactions(scenarioId),
-             user ? getUserReactions(user.id, scenarioId) : Promise.resolve([])
+             user ? getUserReaction(user.id, scenarioId) : Promise.resolve(null)
          ]);
 
          setReactions(counts);
-         setUserReactions(new Set(userReactionList));
+         setUserReaction(myReaction);
      } catch (err) {
          console.error("Error loading reactions", err);
      }
@@ -51,21 +51,27 @@ export default function Reactions({ scenarioId }: ReactionsProps) {
           return;
       }
 
-      // Optimistic update
-      const isRemoving = userReactions.has(emoji);
+      const prevReaction = userReaction;
+      const isRemoving = prevReaction === emoji;
+      const newReaction = isRemoving ? null : emoji;
 
-      setUserReactions(prev => {
-          const next = new Set(prev);
-          if (isRemoving) next.delete(emoji);
-          else next.add(emoji);
-          return next;
-      });
+      // Optimistic Update
+      setUserReaction(newReaction);
 
       setReactions(prev => {
           const next = { ...prev };
-          const currentCount = next[emoji] || 0;
-          next[emoji] = Math.max(0, currentCount + (isRemoving ? -1 : 1));
-          if (next[emoji] === 0) delete next[emoji];
+
+          // Decrement previous if it existed
+          if (prevReaction) {
+              next[prevReaction] = Math.max(0, (next[prevReaction] || 0) - 1);
+              if (next[prevReaction] === 0) delete next[prevReaction];
+          }
+
+          // Increment new if it's set
+          if (newReaction) {
+              next[newReaction] = (next[newReaction] || 0) + 1;
+          }
+
           return next;
       });
 
@@ -86,7 +92,7 @@ export default function Reactions({ scenarioId }: ReactionsProps) {
        {/* Existing Reactions */}
        <div className="flex flex-wrap gap-2">
           {Object.entries(reactions).map(([emoji, count]) => {
-              const isSelected = userReactions.has(emoji);
+              const isSelected = userReaction === emoji;
               return (
                   <button
                     key={emoji}
@@ -121,7 +127,7 @@ export default function Reactions({ scenarioId }: ReactionsProps) {
                       <button
                         key={emoji}
                         onClick={() => handleToggle(emoji)}
-                        className={`p-2 rounded hover:bg-zinc-100 transition-colors text-lg ${userReactions.has(emoji) ? 'bg-indigo-50' : ''}`}
+                        className={`p-2 rounded hover:bg-zinc-100 transition-colors text-lg ${userReaction === emoji ? 'bg-indigo-50' : ''}`}
                       >
                           {emoji}
                       </button>

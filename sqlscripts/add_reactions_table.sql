@@ -5,7 +5,7 @@ create table if not exists scenario_reactions (
   scenario_id uuid references scenarios(id) on delete cascade not null,
   emoji text not null,
   created_at timestamptz default now(),
-  unique(user_id, scenario_id, emoji)
+  unique(user_id, scenario_id)
 );
 
 -- Index for counting
