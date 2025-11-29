@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { Plus } from 'lucide-react';
 import { getScenariosByAuthor, getUserProgress, getUserFavorites, setFavorite } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { useToast } from '../lib/toast';
@@ -6,6 +8,7 @@ import type { Scenario, UserProgress } from '../types';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
 import ScenarioCard from '../components/ScenarioCard';
+import SearchFilters from '../components/SearchFilters';
 
 export default function MyScenarios() {
   const { user } = useAuth();
@@ -15,6 +18,9 @@ export default function MyScenarios() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterDifficulty, setFilterDifficulty] = useState('All');
+  const [sortOrder, setSortOrder] = useState('newest');
 
   useEffect(() => {
     if (!user) return;
@@ -81,6 +87,38 @@ export default function MyScenarios() {
     }
   };
 
+  const filteredScenarios = useMemo(() => {
+    let result = [...scenarios];
+
+    // Filter by Search Query
+    if (searchQuery) {
+      const lowerQuery = searchQuery.toLowerCase();
+      result = result.filter(s =>
+        (s.title || '').toLowerCase().includes(lowerQuery) ||
+        (s.description || '').toLowerCase().includes(lowerQuery)
+      );
+    }
+
+    // Filter by Difficulty
+    if (filterDifficulty !== 'All') {
+      result = result.filter(s => s.difficulty === filterDifficulty);
+    }
+
+    // Sort
+    result.sort((a, b) => {
+      if (sortOrder === 'popular') {
+        return (b.favorites_count || 0) - (a.favorites_count || 0);
+      } else if (sortOrder === 'oldest') {
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      } else {
+        // newest (default)
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+    });
+
+    return result;
+  }, [scenarios, searchQuery, filterDifficulty, sortOrder]);
+
   if (!user) {
       return (
         <div className="min-h-screen bg-white font-sans text-zinc-900 selection:bg-black selection:text-white">
@@ -97,9 +135,26 @@ export default function MyScenarios() {
       <Navbar />
 
       <main className="px-4 md:px-12 py-12 max-w-5xl mx-auto animate-fade-in-up">
-        <div id="main-content" className="mb-8 border-b border-zinc-100 pb-4">
-          <h1 className="text-2xl font-bold text-zinc-900 mb-2">My Scenarios</h1>
-          <p className="text-zinc-500 text-sm">Manage your public and private scenarios.</p>
+        <div id="main-content" className="mb-8 border-b border-zinc-100 pb-4 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+              <h1 className="text-2xl font-bold text-zinc-900 mb-2">My Scenarios</h1>
+              <p className="text-zinc-500 text-sm">Manage your public and private scenarios.</p>
+          </div>
+          <Link to="/create" className="btn-pro btn-primary px-4 py-2 flex items-center gap-2">
+              <Plus size={16} />
+              New Scenario
+          </Link>
+        </div>
+
+        <div className="mb-8">
+            <SearchFilters
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              filterDifficulty={filterDifficulty}
+              setFilterDifficulty={setFilterDifficulty}
+              sortOrder={sortOrder}
+              setSortOrder={setSortOrder}
+            />
         </div>
 
         {loading ? (
@@ -110,9 +165,9 @@ export default function MyScenarios() {
             <div className="bg-red-50 border border-red-200 p-6 rounded-lg text-center">
                 <p className="text-red-700 text-sm">{error}</p>
             </div>
-        ) : scenarios.length > 0 ? (
+        ) : filteredScenarios.length > 0 ? (
           <div className="flex flex-col gap-4">
-            {scenarios.map((scenario) => (
+            {filteredScenarios.map((scenario) => (
               <ScenarioCard
                 key={scenario.id}
                 scenario={scenario}
@@ -126,7 +181,17 @@ export default function MyScenarios() {
           </div>
         ) : (
           <div className="text-center py-24 border border-dashed border-zinc-200 rounded-xl bg-zinc-50/30">
-             <p className="text-zinc-500 font-medium">You haven't created any scenarios yet.</p>
+             {scenarios.length === 0 ? (
+                 <>
+                   <p className="text-zinc-500 font-medium">You haven't created any scenarios yet.</p>
+                   <Link to="/create" className="mt-4 inline-block text-indigo-600 font-semibold hover:underline text-sm">Create your first scenario</Link>
+                 </>
+             ) : (
+                 <>
+                   <p className="text-zinc-500 font-medium">No scenarios match your search.</p>
+                   <button onClick={() => setSearchQuery('')} className="mt-4 text-zinc-900 font-semibold hover:underline text-sm">Clear filter</button>
+                 </>
+             )}
           </div>
         )}
       </main>
