@@ -5,6 +5,7 @@ import '@xyflow/react/dist/style.css';
 import { getScenarioBySlug, getSteps, getSingleScenarioProgress, saveUserProgress, getUserFavorites, setFavorite, getProfile, getScenarioById, reportScenario } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { useToast } from '../lib/toast';
+import { formatNumber } from '../lib/utils';
 import type { Scenario, Step, Profile } from '../types';
 import CustomNode from '../components/CustomNode';
 import PacketEdge from '../components/PacketEdge';
@@ -403,7 +404,7 @@ function MapPlayerInner() {
                     />
                     {favCount > 0 && (
                         <span className={`text-xs font-semibold transition-colors ${isFavorited ? 'text-red-500' : 'text-zinc-500'}`}>
-                            {favCount}
+                            {formatNumber(favCount)}
                         </span>
                     )}
                  </button>
