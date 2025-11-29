@@ -17,6 +17,8 @@ export default function Explore() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterDifficulty, setFilterDifficulty] = useState('All');
+  const [sortOrder, setSortOrder] = useState('newest');
 
   useEffect(() => {
     setLoading(true);
@@ -86,13 +88,36 @@ export default function Explore() {
   };
 
   const filteredScenarios = useMemo(() => {
-    if (!searchQuery) return scenarios;
-    const lowerQuery = searchQuery.toLowerCase();
-    return scenarios.filter(s =>
-      (s.title || '').toLowerCase().includes(lowerQuery) ||
-      (s.description || '').toLowerCase().includes(lowerQuery)
-    );
-  }, [scenarios, searchQuery]);
+    let result = [...scenarios];
+
+    // Filter by Search Query
+    if (searchQuery) {
+      const lowerQuery = searchQuery.toLowerCase();
+      result = result.filter(s =>
+        (s.title || '').toLowerCase().includes(lowerQuery) ||
+        (s.description || '').toLowerCase().includes(lowerQuery)
+      );
+    }
+
+    // Filter by Difficulty
+    if (filterDifficulty !== 'All') {
+      result = result.filter(s => s.difficulty === filterDifficulty);
+    }
+
+    // Sort
+    result.sort((a, b) => {
+      if (sortOrder === 'popular') {
+        return (b.favorites_count || 0) - (a.favorites_count || 0);
+      } else if (sortOrder === 'oldest') {
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      } else {
+        // newest (default)
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+    });
+
+    return result;
+  }, [scenarios, searchQuery, filterDifficulty, sortOrder]);
 
   if (error) {
     return (
@@ -111,17 +136,43 @@ export default function Explore() {
 
       {/* Search Header */}
       <div className="py-12 px-6 md:px-12 max-w-5xl mx-auto">
-        <div className="max-w-xl mx-auto relative group">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-zinc-400 group-focus-within:text-black transition-colors" />
+        <div className="max-w-xl mx-auto space-y-4">
+            <div className="relative group">
+                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-zinc-400 group-focus-within:text-black transition-colors" />
+                </div>
+                <input
+                type="text"
+                placeholder="Search scenarios (e.g., API, Database, AWS)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-4 rounded-xl border border-zinc-200 bg-zinc-50/50 shadow-sm focus:bg-white focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all text-lg font-medium placeholder:text-zinc-400"
+                />
             </div>
-            <input
-            type="text"
-            placeholder="Search scenarios (e.g., API, Database, AWS)..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-4 rounded-xl border border-zinc-200 bg-zinc-50/50 shadow-sm focus:bg-white focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all text-lg font-medium placeholder:text-zinc-400"
-            />
+
+            {/* Filters */}
+            <div className="flex flex-wrap items-center gap-3">
+               <select
+                 value={filterDifficulty}
+                 onChange={(e) => setFilterDifficulty(e.target.value)}
+                 className="px-3 py-2 rounded-lg border border-zinc-200 bg-white text-sm font-medium text-zinc-600 focus:border-black focus:ring-1 focus:ring-black outline-none cursor-pointer hover:bg-zinc-50 transition-colors"
+               >
+                 <option value="All">All Levels</option>
+                 <option value="Beginner">Beginner</option>
+                 <option value="Intermediate">Intermediate</option>
+                 <option value="Advanced">Advanced</option>
+               </select>
+
+               <select
+                 value={sortOrder}
+                 onChange={(e) => setSortOrder(e.target.value)}
+                 className="px-3 py-2 rounded-lg border border-zinc-200 bg-white text-sm font-medium text-zinc-600 focus:border-black focus:ring-1 focus:ring-black outline-none cursor-pointer hover:bg-zinc-50 transition-colors"
+               >
+                 <option value="newest">Newest First</option>
+                 <option value="popular">Most Popular</option>
+                 <option value="oldest">Oldest First</option>
+               </select>
+            </div>
         </div>
       </div>
 
