@@ -396,7 +396,7 @@ function MapPlayerInner() {
                  <button
                     onClick={handleToggleFavorite}
                     disabled={isFavLoading}
-                    className="flex flex-col items-center justify-center gap-0.5 px-2 py-1 rounded-xl hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed min-w-[2.5rem]"
+                    className="flex flex-col items-center pt-2 pb-1 px-2 rounded-xl hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed min-w-[2.5rem]"
                     title={isFavorited ? "Remove from favorites" : "Add to favorites"}
                  >
                     <Heart
