@@ -287,59 +287,6 @@ export async function getScenarioById(id: string): Promise<Scenario | null> {
   return data;
 }
 
-export async function forkScenario(originalScenarioId: string, userId: string): Promise<Scenario> {
-  if (!supabase) throw new Error("Supabase client is not initialized.");
-
-  // 1. Fetch Original
-  const original = await getScenarioById(originalScenarioId);
-  if (!original) throw new Error("Original scenario not found");
-
-  // 2. Fetch Steps
-  const steps = await getSteps(originalScenarioId);
-
-  // 3. Create New Slug
-  // Simple strategy: original-slug-fork-randomPart
-  const randomPart = Math.random().toString(36).substring(2, 7);
-  let newSlug = `${original.slug}-fork-${randomPart}`;
-
-  // Ensure strict uniqueness loop could be here, but collision unlikely for now.
-
-  // 4. Create Scenario
-  const { data: newScenario, error: createError } = await supabase
-    .from('scenarios')
-    .insert({
-      title: `${original.title} (Fork)`,
-      description: original.description,
-      difficulty: original.difficulty,
-      flow_data: original.flow_data,
-      slug: newSlug,
-      author_id: userId,
-      parent_scenario_id: originalScenarioId,
-      tags: original.tags
-    } as any)
-    .select()
-    .single();
-
-  if (createError) throw createError;
-  const newId = (newScenario as any).id;
-
-  // 5. Create Steps
-  if (steps.length > 0) {
-    const newSteps = steps.map(s => ({
-       scenario_id: newId,
-       order_index: s.order_index,
-       title: s.title,
-       content: s.content,
-       active_node_id: s.active_node_id,
-       active_edge_id: s.active_edge_id
-    }));
-
-    await createSteps(newSteps);
-  }
-
-  return newScenario as Scenario;
-}
-
 export async function createSteps(steps: Omit<Step, 'id'>[]) {
   if (!supabase) {
     throw new Error("Supabase client is not initialized.");

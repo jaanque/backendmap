@@ -2,13 +2,13 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ReactFlow, Background, Controls, useNodesState, useEdgesState, type Node, type Edge, BackgroundVariant, useReactFlow, ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { getScenarioBySlug, getSteps, getSingleScenarioProgress, saveUserProgress, getUserFavorites, setFavorite, getProfile, forkScenario, getScenarioById } from '../lib/api';
+import { getScenarioBySlug, getSteps, getSingleScenarioProgress, saveUserProgress, getUserFavorites, setFavorite, getProfile, getScenarioById } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import type { Scenario, Step, Profile } from '../types';
 import CustomNode from '../components/CustomNode';
 import PacketEdge from '../components/PacketEdge';
 import MapLegend from '../components/MapLegend';
-import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart, Play, Pause, User, GitFork, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart, Play, Pause, User, GitFork } from 'lucide-react';
 import { checkAchievements } from '../lib/achievements';
 import AchievementPopup from '../components/AchievementPopup';
 import UserDetailsModal from '../components/UserDetailsModal';
@@ -35,7 +35,6 @@ function MapPlayerInner() {
   const [isCompleted, setIsCompleted] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [isFavLoading, setIsFavLoading] = useState(false);
-  const [isForking, setIsForking] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [unlockedAchievements, setUnlockedAchievements] = useState<Achievement[]>([]);
   const [authorProfile, setAuthorProfile] = useState<Profile | null>(null);
@@ -220,24 +219,13 @@ function MapPlayerInner() {
       }
   }
 
-  const handleFork = async () => {
-      if (!user || !scenario || isForking) return;
+  const handleFork = () => {
+      if (!user || !scenario) return;
 
       if (!confirm("Do you want to fork this scenario? This will create a copy in your account.")) return;
 
-      setIsForking(true);
-      try {
-          const newScenario = await forkScenario(scenario.id, user.id);
-          // Redirect to new scenario
-          navigate(`/map/${newScenario.slug}`);
-          // Force reload effectively as slug changes, but react-router handles it.
-          // Note: state needs full reset, which slug change in key or useEffect dependency handles.
-      } catch (err) {
-          console.error("Fork failed", err);
-          alert("Failed to fork scenario.");
-      } finally {
-          setIsForking(false);
-      }
+      // Navigate to create page with fork_slug param
+      navigate(`/create?fork_slug=${scenario.slug}`);
   }
 
   if (error) {
@@ -369,11 +357,10 @@ function MapPlayerInner() {
                {user && (
                   <button
                     onClick={handleFork}
-                    disabled={isForking}
                     className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Fork this scenario"
                   >
-                    {isForking ? <Loader2 className="w-5 h-5 animate-spin text-zinc-400" /> : <GitFork className="w-5 h-5 text-zinc-400 group-hover:text-zinc-700" />}
+                    <GitFork className="w-5 h-5 text-zinc-400 group-hover:text-zinc-700" />
                   </button>
                )}
            </div>

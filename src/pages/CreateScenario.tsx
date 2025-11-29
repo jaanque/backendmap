@@ -6,7 +6,7 @@ import PacketEdge from '../components/PacketEdge';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../lib/auth';
 import { checkSlugAvailability, createScenario, createSteps, getScenarioBySlug, getSteps } from '../lib/api';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Monitor, Server, Cpu, Database, Cloud, Save, X, Loader2, GripVertical, ListOrdered, Layers, Trash2, Plus, Target } from 'lucide-react';
 import type { StepInput } from '../types';
 
@@ -33,6 +33,9 @@ const getId = () => `dndnode_${id++}`;
 function CreateScenario() {
   const navigate = useNavigate();
   const { slug: routeSlug } = useParams<{ slug: string }>();
+  const [searchParams] = useSearchParams();
+  const forkSlug = searchParams.get('fork_slug');
+
   const { user } = useAuth();
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -56,38 +59,52 @@ function CreateScenario() {
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [checkingSlug, setCheckingSlug] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [parentScenarioId, setParentScenarioId] = useState<string | null>(null);
 
-  // Load Existing Scenario if Edit Mode
+  // Load Existing Scenario (Edit Mode) or Fork Source
   useEffect(() => {
-    if (routeSlug) {
-      getScenarioBySlug(routeSlug).then(async (data) => {
-        if (data) {
-          if (user && data.author_id !== user.id) {
-            alert("You can only edit your own scenarios.");
-            navigate(`/map/${routeSlug}`);
-            return;
-          }
+    const loadScenario = async (slugToLoad: string, mode: 'edit' | 'fork') => {
+        const data = await getScenarioBySlug(slugToLoad);
+        if (!data) return;
 
-          setIsEditMode(true);
-          setTitle(data.title);
-          setSlug(data.slug);
-          setDescription(data.description);
-          setDifficulty(data.difficulty);
-          setNodes(data.flow_data.initialNodes || []);
-          setEdges(data.flow_data.initialEdges || []);
+        if (mode === 'edit') {
+            if (user && data.author_id !== user.id) {
+                alert("You can only edit your own scenarios.");
+                navigate(`/map/${slugToLoad}`);
+                return;
+            }
+            setIsEditMode(true);
+            setSlug(data.slug);
+        } else {
+            // Fork Mode
+            setTitle(`${data.title} (Fork)`);
+            setParentScenarioId(data.id);
+            // Don't set slug, let user choose new one
+        }
 
-          const fetchedSteps = await getSteps(data.id);
-          setSteps(fetchedSteps.map(s => ({
+        // Common data population
+        if (mode === 'edit') setTitle(data.title);
+        setDescription(data.description);
+        setDifficulty(data.difficulty);
+        setNodes(data.flow_data.initialNodes || []);
+        setEdges(data.flow_data.initialEdges || []);
+
+        const fetchedSteps = await getSteps(data.id);
+        setSteps(fetchedSteps.map(s => ({
             order_index: s.order_index,
             title: s.title,
             content: s.content || '',
             active_node_id: s.active_node_id,
             active_edge_id: s.active_edge_id
-          })));
-        }
-      });
+        })));
+    };
+
+    if (routeSlug) {
+        loadScenario(routeSlug, 'edit');
+    } else if (forkSlug) {
+        loadScenario(forkSlug, 'fork');
     }
-  }, [routeSlug, user, navigate, setNodes, setEdges]);
+  }, [routeSlug, forkSlug, user, navigate, setNodes, setEdges]);
 
   // Helper to highlight active node/edge for selected step
   useOnSelectionChange({
@@ -249,7 +266,8 @@ function CreateScenario() {
             initialEdges: edges
         },
         tags: ['Community'],
-        author_id: user.id
+        author_id: user.id,
+        parent_scenario_id: parentScenarioId
       });
 
       if (steps.length > 0) {
