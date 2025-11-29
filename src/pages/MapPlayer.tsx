@@ -2,17 +2,19 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ReactFlow, Background, Controls, useNodesState, useEdgesState, type Node, type Edge, BackgroundVariant, useReactFlow, ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { getScenarioBySlug, getSteps, getSingleScenarioProgress, saveUserProgress, getUserFavorites, setFavorite, getProfile, getScenarioById } from '../lib/api';
+import { getScenarioBySlug, getSteps, getSingleScenarioProgress, saveUserProgress, getUserFavorites, setFavorite, getProfile, getScenarioById, reportScenario } from '../lib/api';
 import { useAuth } from '../lib/auth';
+import { useToast } from '../lib/toast';
 import type { Scenario, Step, Profile } from '../types';
 import CustomNode from '../components/CustomNode';
 import PacketEdge from '../components/PacketEdge';
 import MapLegend from '../components/MapLegend';
-import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart, Play, Pause, User, GitFork } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart, Play, Pause, User, GitFork, Flag } from 'lucide-react';
 import { checkAchievements } from '../lib/achievements';
 import AchievementPopup from '../components/AchievementPopup';
 import UserDetailsModal from '../components/UserDetailsModal';
 import ConfirmationModal from '../components/ConfirmationModal';
+import ReportModal from '../components/ReportModal';
 import Reactions from '../components/Reactions';
 import type { Achievement } from '../types';
 
@@ -27,6 +29,7 @@ const edgeTypes = {
 function MapPlayerInner() {
   const { slug } = useParams<{ slug: string }>();
   const { user } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [scenario, setScenario] = useState<Scenario | null>(null);
   const [parentScenario, setParentScenario] = useState<{ title: string; slug: string } | null>(null);
@@ -41,6 +44,8 @@ function MapPlayerInner() {
   const [authorProfile, setAuthorProfile] = useState<Profile | null>(null);
   const [isAuthorModalOpen, setIsAuthorModalOpen] = useState(false);
   const [isForkModalOpen, setIsForkModalOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [isReporting, setIsReporting] = useState(false);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -232,6 +237,21 @@ function MapPlayerInner() {
       navigate(`/create?fork_slug=${scenario.slug}`);
   }
 
+  const handleReport = async (reason: string, description: string) => {
+      if (!user || !scenario) return;
+      setIsReporting(true);
+      try {
+          await reportScenario(scenario.id, reason, description);
+          showToast("Report submitted successfully", { type: 'success' });
+          setIsReportModalOpen(false);
+      } catch (err) {
+          console.error("Report failed", err);
+          showToast("Failed to submit report", { type: 'error' });
+      } finally {
+          setIsReporting(false);
+      }
+  }
+
   if (error) {
     return (
       <div className="flex h-screen bg-white items-center justify-center p-6">
@@ -267,6 +287,14 @@ function MapPlayerInner() {
         title="Fork Scenario"
         message="Do you want to fork this scenario? This will open the editor with a copy of this scenario for you to modify and publish."
         confirmText="Fork Scenario"
+      />
+
+      <ReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        onSubmit={handleReport}
+        title="Report Scenario"
+        isSubmitting={isReporting}
       />
 
       {/* Achievement Popup */}
@@ -374,6 +402,17 @@ function MapPlayerInner() {
                     title="Fork this scenario"
                   >
                     <GitFork className="w-5 h-5 text-zinc-400 group-hover:text-zinc-700" />
+                  </button>
+               )}
+
+               {/* Report Button */}
+               {user && (
+                  <button
+                    onClick={() => setIsReportModalOpen(true)}
+                    className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Report this scenario"
+                  >
+                    <Flag className="w-5 h-5 text-zinc-300 group-hover:text-red-500" />
                   </button>
                )}
            </div>

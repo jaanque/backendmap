@@ -398,6 +398,42 @@ export async function setFavorite(userId: string, scenarioId: string, shouldBeFa
   }
 }
 
+export async function reportScenario(scenarioId: string, reason: string, description: string) {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Must be logged in to report.");
+
+  const { error } = await supabase
+    .from('scenario_reports')
+    .insert({
+      reporter_id: user.id,
+      scenario_id: scenarioId,
+      reason,
+      description
+    } as any);
+
+  if (error) throw error;
+}
+
+export async function reportUser(targetUserId: string, reason: string, description: string) {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Must be logged in to report.");
+
+  const { error } = await supabase
+    .from('profile_reports')
+    .insert({
+      reporter_id: user.id,
+      target_user_id: targetUserId,
+      reason,
+      description
+    } as any);
+
+  if (error) throw error;
+}
+
 export async function getScenarioReactions(scenarioId: string): Promise<Record<string, number>> {
   if (!supabase) throw new Error("Supabase client is not initialized.");
 

@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Loader2, User, X, Trophy, Map, Award, Footprints, DraftingCompass, Brain, Sun, Bug, UserPlus, UserCheck } from 'lucide-react';
+import { Loader2, User, X, Trophy, Map, Award, Footprints, DraftingCompass, Brain, Sun, Bug, UserPlus, UserCheck, Flag } from 'lucide-react';
 import type { Profile, Achievement, Scenario } from '../types';
-import { getUserAchievementsWithDetails, getScenariosByAuthor, followUser, unfollowUser, checkIsFollowing, getFollowersCount, getFollowingCount } from '../lib/api';
+import { getUserAchievementsWithDetails, getScenariosByAuthor, followUser, unfollowUser, checkIsFollowing, getFollowersCount, getFollowingCount, reportUser } from '../lib/api';
 import ScenarioCard from './ScenarioCard';
 import { useAuth } from '../lib/auth';
+import { useToast } from '../lib/toast';
+import ReportModal from './ReportModal';
 
 interface UserDetailsModalProps {
   isOpen: boolean;
@@ -24,6 +26,7 @@ const IconMap: Record<string, React.ElementType> = {
 
 export default function UserDetailsModal({ isOpen, onClose, user }: UserDetailsModalProps) {
   const { user: currentUser } = useAuth();
+  const { showToast } = useToast();
   const [userAchievements, setUserAchievements] = useState<Achievement[]>([]);
   const [userScenarios, setUserScenarios] = useState<Scenario[]>([]);
   const [loadingDetails, setLoadingDetails] = useState(false);
@@ -33,6 +36,10 @@ export default function UserDetailsModal({ isOpen, onClose, user }: UserDetailsM
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
   const [followLoading, setFollowLoading] = useState(false);
+
+  // Report State
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [isReporting, setIsReporting] = useState(false);
 
   useEffect(() => {
     if (isOpen && user) {
@@ -84,12 +91,36 @@ export default function UserDetailsModal({ isOpen, onClose, user }: UserDetailsM
     }
   };
 
+  const handleReport = async (reason: string, description: string) => {
+      if (!user || !currentUser) return;
+      setIsReporting(true);
+      try {
+          await reportUser(user.id, reason, description);
+          showToast("User reported successfully", { type: 'success' });
+          setIsReportModalOpen(false);
+      } catch (err) {
+          console.error("Report failed", err);
+          showToast("Failed to submit report", { type: 'error' });
+      } finally {
+          setIsReporting(false);
+      }
+  };
+
   if (!isOpen || !user) return null;
 
   const isMe = currentUser?.id === user.id;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+        {/* Report Modal */}
+        <ReportModal
+            isOpen={isReportModalOpen}
+            onClose={() => setIsReportModalOpen(false)}
+            onSubmit={handleReport}
+            title="Report User"
+            isSubmitting={isReporting}
+        />
+
         <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
             <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between sticky top-0 bg-white z-10">
                 <div className="flex items-center gap-4">
@@ -128,6 +159,17 @@ export default function UserDetailsModal({ isOpen, onClose, user }: UserDetailsM
                         <span><strong className="text-zinc-900">{followersCount}</strong> Followers</span>
                         <span><strong className="text-zinc-900">{followingCount}</strong> Following</span>
                     </div>
+
+                    {!isMe && currentUser && (
+                       <button
+                         onClick={() => setIsReportModalOpen(true)}
+                         className="text-zinc-300 hover:text-red-500 transition-colors rounded-full p-1 hover:bg-red-50"
+                         title="Report User"
+                       >
+                         <Flag size={16} />
+                       </button>
+                    )}
+
                     <button
                         onClick={onClose}
                         className="text-zinc-400 hover:text-zinc-600 transition-colors rounded-full p-1 hover:bg-zinc-100"
