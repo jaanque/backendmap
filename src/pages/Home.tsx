@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { PlayCircle, BookOpen, Share2 } from 'lucide-react';
-import { getScenarios, getUserProgress, getUserFavorites, setFavorite } from '../lib/api';
+import { PlayCircle, BookOpen, Share2, Flame } from 'lucide-react';
+import { getScenarios, getDailyHighlights, getUserProgress, getUserFavorites, setFavorite } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { useToast } from '../lib/toast';
 import type { Scenario, UserProgress } from '../types';
@@ -14,6 +14,7 @@ export default function Home() {
   const { user } = useAuth();
   const { showToast } = useToast();
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
+  const [dailyHighlights, setDailyHighlights] = useState<Scenario[]>([]);
   const [userProgress, setUserProgress] = useState<Record<string, UserProgress>>({});
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
@@ -22,9 +23,10 @@ export default function Home() {
   const [sortOrder, setSortOrder] = useState('newest');
 
   useEffect(() => {
-    getScenarios()
-      .then(async (data) => {
-        setScenarios(data);
+    Promise.all([getScenarios(), getDailyHighlights()])
+      .then(async ([allScenarios, highlights]) => {
+        setScenarios(allScenarios);
+        setDailyHighlights(highlights);
         if (user) {
           try {
             const [progressData, favData] = await Promise.all([
@@ -206,6 +208,34 @@ export default function Home() {
 
       {/* Content - Technical List */}
       <main className="px-6 md:px-12 pb-32 max-w-5xl mx-auto animate-fade-in-up">
+        {/* Daily Highlights Section */}
+        {dailyHighlights.length > 0 && (
+          <div className="mb-16">
+            <div className="mb-6 flex items-center gap-2 border-b border-zinc-100 pb-4">
+              <Flame className="w-5 h-5 text-orange-500" />
+              <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-900">Destacados del día</h2>
+              <span className="text-xs font-mono text-zinc-400 bg-zinc-100 px-2 py-1 rounded">HOT</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {dailyHighlights.map((scenario) => (
+                <div key={scenario.id} className="relative">
+                  <div className="absolute -top-3 -right-3 z-10 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
+                    TOP {dailyHighlights.indexOf(scenario) + 1}
+                  </div>
+                  <ScenarioCard
+                    scenario={scenario}
+                    progress={userProgress[scenario.id]}
+                    isFavorited={favorites.has(scenario.id)}
+                    onToggleFavorite={handleToggleFavorite}
+                    showFavoriteButton={!!user}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="mb-6 flex items-end justify-between border-b border-zinc-100 pb-4">
           <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-900">Catalog</h2>
           <span className="text-xs font-mono text-zinc-400 bg-zinc-100 px-2 py-1 rounded">{filteredScenarios.length} ITEMS</span>

@@ -126,5 +126,11 @@ export type Database = {
         Update: Partial<ScenarioReaction>;
       };
     };
+    Functions: {
+      get_daily_highlights: {
+        Args: { limit_count: number };
+        Returns: Scenario[];
+      };
+    };
   };
 };

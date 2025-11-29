@@ -11,6 +11,19 @@ export async function getAllAchievements(): Promise<Achievement[]> {
   return data || [];
 }
 
+export async function getDailyHighlights(limit: number = 3): Promise<Scenario[]> {
+  if (!supabase) {
+    throw new Error("Supabase client is not initialized.");
+  }
+
+  const { data, error } = await supabase
+    .rpc('get_daily_highlights', { limit_count: limit } as any)
+    .select('*, steps(count), author:profiles(*)');
+
+  if (error) throw error;
+  return data || [];
+}
+
 export async function getUserAchievements(userId: string): Promise<string[]> {
   if (!supabase) {
     throw new Error("Supabase client is not initialized.");
