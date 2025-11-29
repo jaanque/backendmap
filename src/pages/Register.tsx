@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
-import { CheckCircle, Zap, Shield, Layers, ArrowLeft, Github } from 'lucide-react';
+import { CheckCircle, Zap, Shield, Layers, ArrowLeft, Github, Eye, EyeOff, Lock, AlertCircle } from 'lucide-react';
 
 export default function Register() {
   const { user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -25,6 +27,12 @@ export default function Register() {
 
     if (!supabase) {
       setError("Supabase not initialized");
+      setLoading(false);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
       setLoading(false);
       return;
     }
@@ -143,15 +151,55 @@ export default function Register() {
             </div>
             <div>
               <label className="block text-xs font-bold uppercase text-zinc-500 mb-2">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-                className="w-full px-4 py-3.5 rounded-xl border border-zinc-200 focus:border-black focus:ring-1 focus:ring-black outline-none transition-all bg-zinc-50/30"
-                placeholder="Create a password (min. 6 chars)"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  className={`w-full px-4 py-3.5 rounded-xl border ${password.length > 0 && password.length < 6 ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-zinc-200 focus:border-black focus:ring-black'} focus:ring-1 outline-none transition-all bg-zinc-50/30`}
+                  placeholder="Create a password (min. 6 chars)"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 focus:outline-none"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              {password.length > 0 && password.length < 6 && (
+                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                  <AlertCircle size={12} /> Password must be at least 6 characters
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase text-zinc-500 mb-2">Confirm Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  className={`w-full px-4 py-3.5 rounded-xl border ${confirmPassword && password !== confirmPassword ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-zinc-200 focus:border-black focus:ring-black'} focus:ring-1 outline-none transition-all bg-zinc-50/30`}
+                  placeholder="Confirm your password"
+                />
+                 {confirmPassword && password === confirmPassword && (
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500 pointer-events-none">
+                       <CheckCircle size={18} />
+                    </div>
+                 )}
+              </div>
+               {confirmPassword && password !== confirmPassword && (
+                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                  <AlertCircle size={12} /> Passwords do not match
+                </p>
+              )}
             </div>
 
             <button
