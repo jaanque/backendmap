@@ -88,49 +88,52 @@ export default function ViewProfile() {
         <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden mb-8">
           <div className="h-32 bg-gradient-to-r from-indigo-500 to-indigo-600"></div>
           <div className="px-8 pb-8">
-            <div className="relative flex justify-between items-end -mt-12 mb-6">
-               <div className="w-24 h-24 rounded-full bg-white p-1 shadow-md">
+            <div className="relative -mt-12 mb-4">
+               <div className="w-24 h-24 rounded-full bg-white p-1 shadow-md inline-block">
                  <div className="w-full h-full rounded-full bg-zinc-100 flex items-center justify-center text-zinc-400">
                     <User size={40} />
                  </div>
                </div>
-               <Link to="/profile" className="btn-pro btn-secondary flex items-center gap-2 px-4 py-2 text-sm mb-2">
+            </div>
+
+            <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                <div className="flex-grow">
+                   <h1 className="text-2xl font-bold text-zinc-900 leading-tight">
+                     {firstName} {lastName}
+                   </h1>
+                   <p className="text-zinc-500 text-sm mt-1">{user.email}</p>
+
+                   <div className="flex items-center gap-6 mt-4">
+                      <div className="flex items-center gap-1.5 text-sm">
+                         <span className="font-bold text-zinc-900">{followersCount}</span>
+                         <span className="text-zinc-500">Followers</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-sm">
+                         <span className="font-bold text-zinc-900">{followingCount}</span>
+                         <span className="text-zinc-500">Following</span>
+                      </div>
+                   </div>
+
+                   {(gender || sex) && (
+                      <div className="mt-4 flex flex-wrap gap-2">
+                         {gender && (
+                           <span className="px-3 py-1 rounded-full bg-zinc-100 text-zinc-600 text-xs font-medium border border-zinc-200">
+                             {gender}
+                           </span>
+                         )}
+                         {sex && (
+                           <span className="px-3 py-1 rounded-full bg-zinc-100 text-zinc-600 text-xs font-medium border border-zinc-200">
+                             {sex}
+                           </span>
+                         )}
+                      </div>
+                   )}
+                </div>
+
+                <Link to="/profile" className="btn-pro btn-secondary flex items-center gap-2 px-4 py-2 text-sm shrink-0">
                   <Settings size={16} />
                   Configure Profile
                </Link>
-            </div>
-
-            <div>
-               <h1 className="text-2xl font-bold text-zinc-900">
-                 {firstName} {lastName}
-               </h1>
-               <p className="text-zinc-500 text-sm mt-1">{user.email}</p>
-
-               <div className="flex items-center gap-6 mt-4">
-                  <div className="flex items-center gap-1.5 text-sm">
-                     <span className="font-bold text-zinc-900">{followersCount}</span>
-                     <span className="text-zinc-500">Followers</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-sm">
-                     <span className="font-bold text-zinc-900">{followingCount}</span>
-                     <span className="text-zinc-500">Following</span>
-                  </div>
-               </div>
-
-               {(gender || sex) && (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                     {gender && (
-                       <span className="px-3 py-1 rounded-full bg-zinc-100 text-zinc-600 text-xs font-medium border border-zinc-200">
-                         {gender}
-                       </span>
-                     )}
-                     {sex && (
-                       <span className="px-3 py-1 rounded-full bg-zinc-100 text-zinc-600 text-xs font-medium border border-zinc-200">
-                         {sex}
-                       </span>
-                     )}
-                  </div>
-               )}
             </div>
           </div>
         </div>
@@ -138,36 +141,36 @@ export default function ViewProfile() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
            {/* Left Column: Achievements */}
            <div className="lg:col-span-1 space-y-8">
-              <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
-                <div className="p-4 border-b border-zinc-100 bg-zinc-50/50">
+              <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden h-full">
+                <div className="p-6 border-b border-zinc-100 bg-zinc-50/50">
                    <h2 className="font-semibold text-zinc-900 flex items-center gap-2">
                       <Trophy size={18} className="text-amber-500" />
                       Achievements
                    </h2>
                 </div>
-                <div className="p-4">
+                <div className="p-6">
                    {userAchievements.length === 0 ? (
                       <p className="text-zinc-500 text-sm italic text-center py-4">No achievements yet.</p>
                    ) : (
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                          {userAchievements.map(achievement => {
                             const IconComponent = IconMap[achievement.icon_name] || Trophy;
                             return (
-                               <div key={achievement.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-50 transition-colors">
-                                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-indigo-50 text-indigo-600 flex-shrink-0">
-                                     <IconComponent size={14} />
+                               <div key={achievement.id} className="flex items-center gap-4 p-2 rounded-lg hover:bg-zinc-50 transition-colors -mx-2">
+                                  <div className="w-10 h-10 rounded-full flex items-center justify-center bg-indigo-50 text-indigo-600 flex-shrink-0">
+                                     <IconComponent size={18} />
                                   </div>
                                   <div className="min-w-0">
-                                     <p className="font-medium text-sm text-zinc-900 truncate">{achievement.title}</p>
-                                     <p className="text-[10px] text-zinc-500 truncate">{achievement.description}</p>
+                                     <p className="font-bold text-sm text-zinc-900 truncate">{achievement.title}</p>
+                                     <p className="text-xs text-zinc-500 truncate leading-relaxed">{achievement.description}</p>
                                   </div>
                                </div>
                             );
                          })}
                       </div>
                    )}
-                   <div className="mt-4 pt-4 border-t border-zinc-100 text-center">
-                      <Link to="/achievements" className="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+                   <div className="mt-6 pt-4 border-t border-zinc-100 text-center">
+                      <Link to="/achievements" className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold uppercase tracking-wide">
                          View All Achievements
                       </Link>
                    </div>
@@ -194,7 +197,7 @@ export default function ViewProfile() {
                          </Link>
                       </div>
                    ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 gap-4">
                          {userScenarios.map(scenario => (
                             <ScenarioCard
                                key={scenario.id}
