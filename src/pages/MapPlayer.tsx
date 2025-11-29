@@ -396,14 +396,14 @@ function MapPlayerInner() {
                  <button
                     onClick={handleToggleFavorite}
                     disabled={isFavLoading}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex flex-col items-center justify-center gap-0.5 px-2 py-1 rounded-xl hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed min-w-[2.5rem]"
                     title={isFavorited ? "Remove from favorites" : "Add to favorites"}
                  >
                     <Heart
                       className={`w-5 h-5 transition-all duration-300 ease-spring ${isFavorited ? 'fill-red-500 text-red-500 scale-110' : 'text-zinc-400 scale-100 group-hover:scale-110'}`}
                     />
                     {favCount > 0 && (
-                        <span className={`text-xs font-semibold transition-colors ${isFavorited ? 'text-red-500' : 'text-zinc-500'}`}>
+                        <span className={`text-[10px] font-bold leading-none transition-colors ${isFavorited ? 'text-red-500' : 'text-zinc-500'}`}>
                             {formatNumber(favCount)}
                         </span>
                     )}
