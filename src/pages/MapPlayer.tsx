@@ -12,6 +12,7 @@ import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart, Pl
 import { checkAchievements } from '../lib/achievements';
 import AchievementPopup from '../components/AchievementPopup';
 import UserDetailsModal from '../components/UserDetailsModal';
+import Reactions from '../components/Reactions';
 import type { Achievement } from '../types';
 
 const nodeTypes = {
@@ -330,6 +331,11 @@ function MapPlayerInner() {
                  </button>
                )}
            </div>
+        </div>
+
+        {/* Reactions Section (Discreet) */}
+        <div className="px-6 pt-2">
+            <Reactions scenarioId={scenario.id} />
         </div>
 
         {/* Step Content */}

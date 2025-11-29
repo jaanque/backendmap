@@ -381,3 +381,72 @@ export async function setFavorite(userId: string, scenarioId: string, shouldBeFa
     if (error) throw error;
   }
 }
+
+export async function getScenarioReactions(scenarioId: string): Promise<Record<string, number>> {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  // Get count grouped by emoji
+  // Supabase postgrest doesn't support easy GROUP BY in standard client yet without RPC usually,
+  // but we can fetch all (not ideal for scale but fine for now) or use rpc.
+  // We'll fetch all IDs and emojis for this scenario.
+
+  const { data, error } = await supabase
+    .from('scenario_reactions')
+    .select('emoji')
+    .eq('scenario_id', scenarioId);
+
+  if (error) throw error;
+
+  const counts: Record<string, number> = {};
+  data.forEach((r: any) => {
+    counts[r.emoji] = (counts[r.emoji] || 0) + 1;
+  });
+
+  return counts;
+}
+
+export async function getUserReactions(userId: string, scenarioId: string): Promise<string[]> {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  const { data, error } = await supabase
+    .from('scenario_reactions')
+    .select('emoji')
+    .eq('user_id', userId)
+    .eq('scenario_id', scenarioId);
+
+  if (error) throw error;
+  return data ? data.map((r: any) => r.emoji) : [];
+}
+
+export async function toggleReaction(userId: string, scenarioId: string, emoji: string): Promise<void> {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  // Check if user already has THIS reaction
+  const { count, error: countError } = await supabase
+    .from('scenario_reactions')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('scenario_id', scenarioId)
+    .eq('emoji', emoji);
+
+  if (countError) throw countError;
+  const exists = (count || 0) > 0;
+
+  if (exists) {
+    // Remove it
+    const { error } = await supabase
+      .from('scenario_reactions')
+      .delete()
+      .eq('user_id', userId)
+      .eq('scenario_id', scenarioId)
+      .eq('emoji', emoji);
+    if (error) throw error;
+  } else {
+    // Insert it
+    const { error } = await supabase
+      .from('scenario_reactions')
+      .insert({ user_id: userId, scenario_id: scenarioId, emoji } as any);
+
+    if (error) throw error;
+  }
+}

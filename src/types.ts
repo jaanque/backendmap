@@ -60,6 +60,14 @@ export interface UserAchievement {
   earned_at: string;
 }
 
+export interface ScenarioReaction {
+  id: string;
+  user_id: string;
+  scenario_id: string;
+  emoji: string;
+  created_at: string;
+}
+
 export interface Profile {
   id: string;
   first_name: string | null;
@@ -107,6 +115,11 @@ export type Database = {
         Row: UserFavorite;
         Insert: Omit<UserFavorite, 'id' | 'created_at'>;
         Update: Partial<UserFavorite>;
+      };
+      scenario_reactions: {
+        Row: ScenarioReaction;
+        Insert: Omit<ScenarioReaction, 'id' | 'created_at'>;
+        Update: Partial<ScenarioReaction>;
       };
     };
   };
