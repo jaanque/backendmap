@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { getPublicProfiles, getFollowersCount, getFollowingCount } from '../lib/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Loader2, User, Users as UsersIcon } from 'lucide-react';
+import { Loader2, User, Users as UsersIcon, BadgeCheck } from 'lucide-react';
 import type { Profile } from '../types';
 import UserDetailsModal from '../components/UserDetailsModal';
 
@@ -68,8 +68,11 @@ export default function Users() {
                 <div className="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mb-4">
                   <User size={40} />
                 </div>
-                <h3 className="font-bold text-lg text-zinc-900">
+                <h3 className="font-bold text-lg text-zinc-900 flex items-center gap-1">
                   {user.first_name || 'Anonymous'} {user.last_name || ''}
+                  {user.is_verified && (
+                    <BadgeCheck size={16} className="text-green-600" />
+                  )}
                 </h3>
 
                 <div className="flex items-center gap-3 mt-2 mb-1">

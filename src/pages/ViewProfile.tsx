@@ -3,7 +3,7 @@ import { useAuth } from '../lib/auth';
 import { getProfile, getFollowersCount, getFollowingCount, getUserAchievementsWithDetails, getScenariosByAuthor } from '../lib/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { User, Loader2, Trophy, Map, Settings, Award, Footprints, DraftingCompass, Brain, Sun, Bug } from 'lucide-react';
+import { User, Loader2, Trophy, Map, Settings, Award, Footprints, DraftingCompass, Brain, Sun, Bug, BadgeCheck } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import type { Achievement, Scenario } from '../types';
 import ScenarioCard from '../components/ScenarioCard';
@@ -27,6 +27,7 @@ export default function ViewProfile() {
   const [lastName, setLastName] = useState('');
   const [gender, setGender] = useState('');
   const [sex, setSex] = useState('');
+  const [isVerified, setIsVerified] = useState(false);
 
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
@@ -57,6 +58,7 @@ export default function ViewProfile() {
           setLastName(profile.last_name || '');
           setGender(profile.gender || '');
           setSex(profile.sex || '');
+          setIsVerified(profile.is_verified || false);
         }
         setFollowersCount(followers);
         setFollowingCount(following);
@@ -98,8 +100,11 @@ export default function ViewProfile() {
 
             <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                 <div className="flex-grow">
-                   <h1 className="text-2xl font-bold text-zinc-900 leading-tight">
+                   <h1 className="text-2xl font-bold text-zinc-900 leading-tight flex items-center gap-2">
                      {firstName} {lastName}
+                     {isVerified && (
+                       <BadgeCheck size={24} className="text-green-600" />
+                     )}
                    </h1>
                    <p className="text-zinc-500 text-sm mt-1">{user.email}</p>
 

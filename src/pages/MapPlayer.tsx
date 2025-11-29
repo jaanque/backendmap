@@ -9,7 +9,7 @@ import type { Scenario, Step, Profile } from '../types';
 import CustomNode from '../components/CustomNode';
 import PacketEdge from '../components/PacketEdge';
 import MapLegend from '../components/MapLegend';
-import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart, Play, Pause, User, GitFork, Flag } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart, Play, Pause, User, GitFork, Flag, BadgeCheck } from 'lucide-react';
 import { checkAchievements } from '../lib/achievements';
 import AchievementPopup from '../components/AchievementPopup';
 import UserDetailsModal from '../components/UserDetailsModal';
@@ -361,8 +361,14 @@ function MapPlayerInner() {
                     <div className="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-500 border border-zinc-200">
                         <User size={10} />
                     </div>
-                    <span className="text-xs text-zinc-500 group-hover:text-indigo-600 transition-colors">
-                        Created by <span className="font-medium">{authorProfile.first_name || 'Anonymous'}</span>
+                    <span className="text-xs text-zinc-500 group-hover:text-indigo-600 transition-colors flex items-center gap-1">
+                        Created by
+                        <span className="font-medium flex items-center gap-1">
+                          {authorProfile.first_name || 'Anonymous'}
+                          {authorProfile.is_verified && (
+                            <BadgeCheck size={12} className="text-green-600" />
+                          )}
+                        </span>
                     </span>
                 </button>
               )}
