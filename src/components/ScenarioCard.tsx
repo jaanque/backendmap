@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Heart, BadgeCheck, Flame } from 'lucide-react';
+import { formatNumber } from '../lib/utils';
 import type { Scenario, UserProgress } from '../types';
 
 interface ScenarioCardProps {
@@ -90,7 +91,7 @@ export default function ScenarioCard({ scenario, progress, isFavorited, onToggle
             >
               <Heart className={`w-5 h-5 transition-colors ${isFavorited ? 'fill-red-500 text-red-500' : 'text-zinc-400'}`} />
               {(scenario.favorites_count || 0) > 0 && (
-                <span className="text-xs font-semibold text-zinc-500">{scenario.favorites_count}</span>
+                <span className="text-xs font-semibold text-zinc-500">{formatNumber(scenario.favorites_count || 0)}</span>
               )}
             </button>
           )}
