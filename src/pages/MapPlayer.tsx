@@ -379,70 +379,6 @@ function MapPlayerInner() {
               )}
            </div>
 
-           <div className="flex gap-2">
-               {/* Autoplay Toggle */}
-               {!isCompleted && (
-                 <button
-                    onClick={() => setIsPlaying(!isPlaying)}
-                    className={`p-2 rounded-full transition-colors flex-shrink-0 ${isPlaying ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-zinc-100 text-zinc-400'}`}
-                    title={isPlaying ? "Pause Autoplay" : "Start Autoplay"}
-                 >
-                    {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-                 </button>
-               )}
-
-               {/* Favorite Button */}
-               {user && (
-                 <button
-                    onClick={handleToggleFavorite}
-                    disabled={isFavLoading}
-                    className="flex flex-col items-center pt-2 pb-1 px-2 rounded-xl hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed min-w-[2.5rem]"
-                    title={isFavorited ? "Remove from favorites" : "Add to favorites"}
-                 >
-                    <Heart
-                      className={`w-5 h-5 transition-all duration-300 ease-spring ${isFavorited ? 'fill-red-500 text-red-500 scale-110' : 'text-zinc-400 scale-100 group-hover:scale-110'}`}
-                    />
-                    {favCount > 0 && (
-                        <span className={`text-[10px] font-bold leading-none transition-colors ${isFavorited ? 'text-red-500' : 'text-zinc-500'}`}>
-                            {formatNumber(favCount)}
-                        </span>
-                    )}
-                 </button>
-               )}
-
-               {/* Edit Button */}
-               {user && scenario.author_id === user.id && (
-                  <Link
-                    to={`/edit/${scenario.slug}`}
-                    className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90"
-                    title="Edit Scenario"
-                  >
-                    <Edit className="w-5 h-5 text-zinc-400 group-hover:text-indigo-600" />
-                  </Link>
-               )}
-
-               {/* Fork Button */}
-               {user && (
-                  <button
-                    onClick={handleFork}
-                    className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Fork this scenario"
-                  >
-                    <GitFork className="w-5 h-5 text-zinc-400 group-hover:text-zinc-700" />
-                  </button>
-               )}
-
-               {/* Report Button */}
-               {user && (
-                  <button
-                    onClick={() => setIsReportModalOpen(true)}
-                    className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Report this scenario"
-                  >
-                    <Flag className="w-5 h-5 text-zinc-300 group-hover:text-red-500" />
-                  </button>
-               )}
-           </div>
         </div>
 
         {/* Fork Label */}
@@ -508,6 +444,72 @@ function MapPlayerInner() {
               </div>
             </>
           )}
+        </div>
+
+        {/* Actions Bar */}
+        <div className="px-4 md:px-6 py-4 border-t border-zinc-100 flex items-center justify-center gap-4 bg-white">
+               {/* Autoplay Toggle */}
+               {!isCompleted && (
+                 <button
+                    onClick={() => setIsPlaying(!isPlaying)}
+                    className={`p-2 rounded-full transition-colors flex-shrink-0 ${isPlaying ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-zinc-100 text-zinc-400'}`}
+                    title={isPlaying ? "Pause Autoplay" : "Start Autoplay"}
+                 >
+                    {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                 </button>
+               )}
+
+               {/* Favorite Button */}
+               {user && (
+                 <button
+                    onClick={handleToggleFavorite}
+                    disabled={isFavLoading}
+                    className="flex flex-col items-center pt-2 pb-1 px-2 rounded-xl hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed min-w-[2.5rem]"
+                    title={isFavorited ? "Remove from favorites" : "Add to favorites"}
+                 >
+                    <Heart
+                      className={`w-5 h-5 transition-all duration-300 ease-spring ${isFavorited ? 'fill-red-500 text-red-500 scale-110' : 'text-zinc-400 scale-100 group-hover:scale-110'}`}
+                    />
+                    {favCount > 0 && (
+                        <span className={`text-[10px] font-bold leading-none transition-colors ${isFavorited ? 'text-red-500' : 'text-zinc-500'}`}>
+                            {formatNumber(favCount)}
+                        </span>
+                    )}
+                 </button>
+               )}
+
+               {/* Edit Button */}
+               {user && scenario.author_id === user.id && (
+                  <Link
+                    to={`/edit/${scenario.slug}`}
+                    className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90"
+                    title="Edit Scenario"
+                  >
+                    <Edit className="w-5 h-5 text-zinc-400 group-hover:text-indigo-600" />
+                  </Link>
+               )}
+
+               {/* Fork Button */}
+               {user && (
+                  <button
+                    onClick={handleFork}
+                    className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Fork this scenario"
+                  >
+                    <GitFork className="w-5 h-5 text-zinc-400 group-hover:text-zinc-700" />
+                  </button>
+               )}
+
+               {/* Report Button */}
+               {user && (
+                  <button
+                    onClick={() => setIsReportModalOpen(true)}
+                    className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Report this scenario"
+                  >
+                    <Flag className="w-5 h-5 text-zinc-300 group-hover:text-red-500" />
+                  </button>
+               )}
         </div>
 
         {/* Navigation Controls */}
