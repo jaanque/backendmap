@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ReactFlow, Background, Controls, useNodesState, useEdgesState, type Node, type Edge, BackgroundVariant, useReactFlow, ReactFlowProvider } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { getScenarioBySlug, getSteps, getSingleScenarioProgress, saveUserProgress, getUserFavorites, setFavorite, getProfile, getScenarioById, reportScenario } from '../lib/api';
+import { getScenarioBySlug, getSteps, getSingleScenarioProgress, saveUserProgress, getUserFavorites, setFavorite, getProfile, getScenarioById, reportScenario, incrementScenarioViews } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { useToast } from '../lib/toast';
 import { formatNumber } from '../lib/utils';
@@ -10,7 +10,7 @@ import type { Scenario, Step, Profile } from '../types';
 import CustomNode from '../components/CustomNode';
 import PacketEdge from '../components/PacketEdge';
 import MapLegend from '../components/MapLegend';
-import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart, Play, Pause, User, GitFork, Flag, BadgeCheck, Edit } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowLeft, RotateCcw, CheckCircle, Heart, Play, Pause, User, GitFork, Flag, BadgeCheck, Edit, Eye } from 'lucide-react';
 import { checkAchievements } from '../lib/achievements';
 import AchievementPopup from '../components/AchievementPopup';
 import UserDetailsModal from '../components/UserDetailsModal';
@@ -60,6 +60,7 @@ function MapPlayerInner() {
         .then((data) => {
           if (data) {
             setScenario(data);
+            incrementScenarioViews(data.id);
             setFavCount(data.favorites_count || 0);
             setNodes(data.flow_data.initialNodes);
             setEdges(data.flow_data.initialEdges);
@@ -459,6 +460,17 @@ function MapPlayerInner() {
                     {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
                  </button>
                )}
+
+               {/* Views Count */}
+               <div
+                 className="flex flex-col items-center pt-2 pb-1 px-2 rounded-xl min-w-[2.5rem] cursor-default group"
+                 title="Total Views"
+               >
+                    <Eye className="w-5 h-5 text-zinc-400 group-hover:text-zinc-600 transition-colors" />
+                    <span className="text-[10px] font-bold leading-none transition-colors text-zinc-500">
+                        {formatNumber((scenario.views_count || 0) + 1)}
+                    </span>
+               </div>
 
                {/* Favorite Button */}
                {user && (

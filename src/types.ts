@@ -16,6 +16,7 @@ export interface Scenario {
   parent_scenario_id?: string | null;
   favorites_count?: number;
   forks_count?: number;
+  views_count?: number;
   is_public?: boolean;
   created_at: string;
   steps?: { count: number }[]; // For aggregated count

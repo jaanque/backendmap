@@ -437,6 +437,16 @@ export async function setFavorite(userId: string, scenarioId: string, shouldBeFa
   }
 }
 
+export async function incrementScenarioViews(scenarioId: string): Promise<void> {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  const { error } = await supabase.rpc('increment_scenario_views', { scenario_id: scenarioId });
+  if (error) {
+      console.error("Failed to increment views:", error);
+      // Don't throw, just log. Views are non-critical.
+  }
+}
+
 export async function reportScenario(scenarioId: string, reason: string, description: string) {
   if (!supabase) throw new Error("Supabase client is not initialized.");
 
