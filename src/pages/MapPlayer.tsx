@@ -63,18 +63,18 @@ function MapPlayerInner() {
 
             // Fetch Author if exists
             if (data.author_id) {
-                getProfile(data.author_id).then(setAuthorProfile).catch(console.error);
+              getProfile(data.author_id).then(setAuthorProfile).catch(console.error);
             }
 
             // Fetch parent if exists
             if (data.parent_scenario_id) {
-                getScenarioById(data.parent_scenario_id).then(parent => {
-                    if (parent) {
-                        setParentScenario({ title: parent.title, slug: parent.slug });
-                    }
-                });
+              getScenarioById(data.parent_scenario_id).then(parent => {
+                if (parent) {
+                  setParentScenario({ title: parent.title, slug: parent.slug });
+                }
+              });
             } else {
-                setParentScenario(null);
+              setParentScenario(null);
             }
 
             // Fetch steps and then maybe progress
@@ -84,20 +84,20 @@ function MapPlayerInner() {
               if (user) {
                 // Check for progress
                 getSingleScenarioProgress(user.id, data.id).then(progress => {
-                   if (progress) {
-                     setCurrentStepIndex(progress.current_step_index);
-                     setIsCompleted(progress.is_completed);
-                   }
+                  if (progress) {
+                    setCurrentStepIndex(progress.current_step_index);
+                    setIsCompleted(progress.is_completed);
+                  }
                 });
 
                 // Check for favorite
                 getUserFavorites(user.id).then(favs => {
-                    setIsFavorited(favs.includes(data.id));
+                  setIsFavorited(favs.includes(data.id));
                 });
               }
             });
           } else {
-            setError('Scenario not found');
+            setError('Scenario private or not found');
           }
         })
         .catch((err) => setError(err.message));
@@ -106,11 +106,11 @@ function MapPlayerInner() {
 
   const saveProgress = async (index: number, completed: boolean) => {
     if (user && scenario) {
-       try {
-         await saveUserProgress(user.id, scenario.id, index, completed);
-       } catch (err) {
-         console.error("Failed to save progress", err);
-       }
+      try {
+        await saveUserProgress(user.id, scenario.id, index, completed);
+      } catch (err) {
+        console.error("Failed to save progress", err);
+      }
     }
   };
 
@@ -177,12 +177,12 @@ function MapPlayerInner() {
       // Auto-Focus logic
       if (currentStep?.active_node_id) {
         window.requestAnimationFrame(() => {
-           fitView({
-             nodes: [{ id: currentStep.active_node_id as string }],
-             duration: 1000,
-             padding: 2, // Keep some context
-             maxZoom: 1.5
-           });
+          fitView({
+            nodes: [{ id: currentStep.active_node_id as string }],
+            duration: 1000,
+            padding: 2, // Keep some context
+            maxZoom: 1.5
+          });
         });
       }
     }
@@ -210,52 +210,52 @@ function MapPlayerInner() {
   }
 
   const handleToggleFavorite = async () => {
-      if (!user || !scenario || isFavLoading) return;
+    if (!user || !scenario || isFavLoading) return;
 
-      const newStatus = !isFavorited;
-      setIsFavorited(newStatus); // Optimistic update
-      setIsFavLoading(true);
+    const newStatus = !isFavorited;
+    setIsFavorited(newStatus); // Optimistic update
+    setIsFavLoading(true);
 
-      try {
-          await setFavorite(user.id, scenario.id, newStatus);
-      } catch (err) {
-          console.error("Failed to toggle favorite", err);
-          setIsFavorited(!newStatus); // Revert on failure
-      } finally {
-          setIsFavLoading(false);
-      }
+    try {
+      await setFavorite(user.id, scenario.id, newStatus);
+    } catch (err) {
+      console.error("Failed to toggle favorite", err);
+      setIsFavorited(!newStatus); // Revert on failure
+    } finally {
+      setIsFavLoading(false);
+    }
   }
 
   const handleFork = () => {
-      if (!user || !scenario) return;
-      setIsForkModalOpen(true);
+    if (!user || !scenario) return;
+    setIsForkModalOpen(true);
   }
 
   const confirmFork = () => {
-      if (!scenario) return;
-      // Navigate to create page with fork_slug param
-      navigate(`/create?fork_slug=${scenario.slug}`);
+    if (!scenario) return;
+    // Navigate to create page with fork_slug param
+    navigate(`/create?fork_slug=${scenario.slug}`);
   }
 
   const handleReport = async (reason: string, description: string) => {
-      if (!user || !scenario) return;
-      setIsReporting(true);
-      try {
-          await reportScenario(scenario.id, reason, description);
-          showToast("Report submitted successfully", { type: 'success' });
-          setIsReportModalOpen(false);
-      } catch (err) {
-          console.error("Report failed", err);
-          showToast("Failed to submit report", { type: 'error' });
-      } finally {
-          setIsReporting(false);
-      }
+    if (!user || !scenario) return;
+    setIsReporting(true);
+    try {
+      await reportScenario(scenario.id, reason, description);
+      showToast("Report submitted successfully", { type: 'success' });
+      setIsReportModalOpen(false);
+    } catch (err) {
+      console.error("Report failed", err);
+      showToast("Failed to submit report", { type: 'error' });
+    } finally {
+      setIsReporting(false);
+    }
   }
 
   if (error) {
     return (
       <div className="flex h-screen bg-white items-center justify-center p-6">
-         <div className="text-center">
+        <div className="text-center">
           <h2 className="text-xl font-bold text-zinc-900 mb-2">Error Loading Scenario</h2>
           <p className="text-zinc-500 mb-6">{error}</p>
           <Link to="/" className="btn-pro btn-secondary px-4 py-2 text-sm">Return Home</Link>
@@ -308,9 +308,9 @@ function MapPlayerInner() {
 
       {/* Header (Mobile only) */}
       <div className="md:hidden h-14 border-b border-zinc-200 flex items-center px-4 justify-between bg-white z-20">
-         <Link to="/" className="text-zinc-500"><ArrowLeft size={20} /></Link>
-         <span className="font-bold text-sm">{scenario.title}</span>
-         <div />
+        <Link to="/" className="text-zinc-500"><ArrowLeft size={20} /></Link>
+        <span className="font-bold text-sm">{scenario.title}</span>
+        <div />
       </div>
 
       {/* Canvas Area */}
@@ -343,103 +343,103 @@ function MapPlayerInner() {
 
         {/* Scenario Header */}
         <div className="px-6 py-5 border-b border-zinc-100 flex items-start justify-between">
-           <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className={`w-2 h-2 rounded-full ${isCompleted ? 'bg-zinc-900' : 'bg-green-500'}`}></span>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
-                  {isCompleted ? 'Completed' : 'Live Simulation'}
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className={`w-2 h-2 rounded-full ${isCompleted ? 'bg-zinc-900' : 'bg-green-500'}`}></span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                {isCompleted ? 'Completed' : 'Live Simulation'}
+              </span>
+            </div>
+            <h1 className="text-lg font-bold text-zinc-900 leading-tight">
+              {scenario.title}
+            </h1>
+            {authorProfile && (
+              <button
+                onClick={() => setIsAuthorModalOpen(true)}
+                className="flex items-center gap-1.5 mt-1.5 group cursor-pointer"
+              >
+                <div className="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-500 border border-zinc-200">
+                  <User size={10} />
+                </div>
+                <span className="text-xs text-zinc-500 group-hover:text-indigo-600 transition-colors flex items-center gap-1">
+                  Created by
+                  <span className="font-medium flex items-center gap-1">
+                    {authorProfile.first_name || 'Anonymous'}
+                    {authorProfile.is_verified && (
+                      <BadgeCheck size={14} className="text-blue-500 fill-blue-50" strokeWidth={2.5} />
+                    )}
+                  </span>
                 </span>
-              </div>
-              <h1 className="text-lg font-bold text-zinc-900 leading-tight">
-                {scenario.title}
-              </h1>
-              {authorProfile && (
-                <button
-                    onClick={() => setIsAuthorModalOpen(true)}
-                    className="flex items-center gap-1.5 mt-1.5 group cursor-pointer"
-                >
-                    <div className="w-4 h-4 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-500 border border-zinc-200">
-                        <User size={10} />
-                    </div>
-                    <span className="text-xs text-zinc-500 group-hover:text-indigo-600 transition-colors flex items-center gap-1">
-                        Created by
-                        <span className="font-medium flex items-center gap-1">
-                          {authorProfile.first_name || 'Anonymous'}
-                          {authorProfile.is_verified && (
-                            <BadgeCheck size={14} className="text-blue-500 fill-blue-50" strokeWidth={2.5} />
-                          )}
-                        </span>
-                    </span>
-                </button>
-              )}
-           </div>
+              </button>
+            )}
+          </div>
 
-           <div className="flex gap-2">
-               {/* Autoplay Toggle */}
-               {!isCompleted && (
-                 <button
-                    onClick={() => setIsPlaying(!isPlaying)}
-                    className={`p-2 rounded-full transition-colors flex-shrink-0 ${isPlaying ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-zinc-100 text-zinc-400'}`}
-                    title={isPlaying ? "Pause Autoplay" : "Start Autoplay"}
-                 >
-                    {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-                 </button>
-               )}
+          <div className="flex gap-2">
+            {/* Autoplay Toggle */}
+            {!isCompleted && (
+              <button
+                onClick={() => setIsPlaying(!isPlaying)}
+                className={`p-2 rounded-full transition-colors flex-shrink-0 ${isPlaying ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-zinc-100 text-zinc-400'}`}
+                title={isPlaying ? "Pause Autoplay" : "Start Autoplay"}
+              >
+                {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+              </button>
+            )}
 
-               {/* Favorite Button */}
-               {user && (
-                 <button
-                    onClick={handleToggleFavorite}
-                    disabled={isFavLoading}
-                    className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                    title={isFavorited ? "Remove from favorites" : "Add to favorites"}
-                 >
-                    <Heart
-                      className={`w-5 h-5 transition-all duration-300 ease-spring ${isFavorited ? 'fill-red-500 text-red-500 scale-110' : 'text-zinc-400 scale-100 group-hover:scale-110'}`}
-                    />
-                 </button>
-               )}
+            {/* Favorite Button */}
+            {user && (
+              <button
+                onClick={handleToggleFavorite}
+                disabled={isFavLoading}
+                className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                title={isFavorited ? "Remove from favorites" : "Add to favorites"}
+              >
+                <Heart
+                  className={`w-5 h-5 transition-all duration-300 ease-spring ${isFavorited ? 'fill-red-500 text-red-500 scale-110' : 'text-zinc-400 scale-100 group-hover:scale-110'}`}
+                />
+              </button>
+            )}
 
-               {/* Fork Button */}
-               {user && (
-                  <button
-                    onClick={handleFork}
-                    className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Fork this scenario"
-                  >
-                    <GitFork className="w-5 h-5 text-zinc-400 group-hover:text-zinc-700" />
-                  </button>
-               )}
+            {/* Fork Button */}
+            {user && (
+              <button
+                onClick={handleFork}
+                className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Fork this scenario"
+              >
+                <GitFork className="w-5 h-5 text-zinc-400 group-hover:text-zinc-700" />
+              </button>
+            )}
 
-               {/* Report Button */}
-               {user && (
-                  <button
-                    onClick={() => setIsReportModalOpen(true)}
-                    className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Report this scenario"
-                  >
-                    <Flag className="w-5 h-5 text-zinc-300 group-hover:text-red-500" />
-                  </button>
-               )}
-           </div>
+            {/* Report Button */}
+            {user && (
+              <button
+                onClick={() => setIsReportModalOpen(true)}
+                className="p-2 rounded-full hover:bg-zinc-100 transition-all flex-shrink-0 group active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Report this scenario"
+              >
+                <Flag className="w-5 h-5 text-zinc-300 group-hover:text-red-500" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Fork Label */}
         {parentScenario && (
-             <div className="px-6 pb-2 pt-2 border-b border-zinc-100 bg-zinc-50/50">
-                 <p className="text-xs text-zinc-500 flex items-center gap-1.5">
-                     <GitFork size={14} className="text-indigo-500" />
-                     <span>Forked from</span>
-                     <Link to={`/map/${parentScenario.slug}`} className="font-medium text-indigo-600 hover:underline hover:text-indigo-800 transition-colors">
-                        {parentScenario.title}
-                     </Link>
-                 </p>
-             </div>
+          <div className="px-6 pb-2 pt-2 border-b border-zinc-100 bg-zinc-50/50">
+            <p className="text-xs text-zinc-500 flex items-center gap-1.5">
+              <GitFork size={14} className="text-indigo-500" />
+              <span>Forked from</span>
+              <Link to={`/map/${parentScenario.slug}`} className="font-medium text-indigo-600 hover:underline hover:text-indigo-800 transition-colors">
+                {parentScenario.title}
+              </Link>
+            </p>
+          </div>
         )}
 
         {/* Reactions Section (Discreet) */}
         <div className="px-6 pt-2">
-            <Reactions scenarioId={scenario.id} />
+          <Reactions scenarioId={scenario.id} />
         </div>
 
         {/* Step Content */}
@@ -454,36 +454,36 @@ function MapPlayerInner() {
                 You have successfully navigated through the entire architecture flow.
               </p>
               <div className="flex flex-col gap-3 w-full max-w-xs">
-                 <Link to="/explore" className="btn-pro btn-primary w-full py-2.5">Explore Other Scenarios</Link>
-                 <button onClick={handleReset} className="btn-pro btn-secondary w-full py-2.5">Replay Scenario</button>
+                <Link to="/explore" className="btn-pro btn-primary w-full py-2.5">Explore Other Scenarios</Link>
+                <button onClick={handleReset} className="btn-pro btn-secondary w-full py-2.5">Replay Scenario</button>
               </div>
             </div>
           ) : (
             <>
               <div className="flex items-center justify-between mb-6">
-                 <span className="px-2 py-1 bg-zinc-100 text-zinc-600 rounded text-xs font-mono font-medium">
-                   Step {currentStepIndex + 1}/{steps.length}
-                 </span>
-                 <button onClick={handleReset} className="text-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer" title="Reset">
-                   <RotateCcw size={14} />
-                 </button>
+                <span className="px-2 py-1 bg-zinc-100 text-zinc-600 rounded text-xs font-mono font-medium">
+                  Step {currentStepIndex + 1}/{steps.length}
+                </span>
+                <button onClick={handleReset} className="text-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer" title="Reset">
+                  <RotateCcw size={14} />
+                </button>
               </div>
 
               <div className="animate-fade-in-up" key={currentStepIndex}>
-               {currentStep ? (
-                 <>
-                   <h2 className="text-xl font-bold text-zinc-900 mb-4">{currentStep.title}</h2>
-                   <p className="text-zinc-600 leading-relaxed text-sm mb-8">
-                     {currentStep.content}
-                   </p>
-                 </>
-               ) : (
-                 <div className="flex flex-col gap-4">
-                     <div className="h-6 bg-zinc-100 rounded animate-pulse w-3/4"></div>
-                     <div className="h-4 bg-zinc-100 rounded animate-pulse w-full"></div>
-                     <div className="h-4 bg-zinc-100 rounded animate-pulse w-2/3"></div>
-                 </div>
-               )}
+                {currentStep ? (
+                  <>
+                    <h2 className="text-xl font-bold text-zinc-900 mb-4">{currentStep.title}</h2>
+                    <p className="text-zinc-600 leading-relaxed text-sm mb-8">
+                      {currentStep.content}
+                    </p>
+                  </>
+                ) : (
+                  <div className="flex flex-col gap-4">
+                    <div className="h-6 bg-zinc-100 rounded animate-pulse w-3/4"></div>
+                    <div className="h-4 bg-zinc-100 rounded animate-pulse w-full"></div>
+                    <div className="h-4 bg-zinc-100 rounded animate-pulse w-2/3"></div>
+                  </div>
+                )}
               </div>
             </>
           )}
@@ -511,10 +511,10 @@ function MapPlayerInner() {
             </div>
 
             <div className="mt-4 h-1 w-full bg-zinc-200 rounded-full overflow-hidden">
-               <div
-                 className="h-full bg-zinc-900 transition-all duration-300 ease-out"
-                 style={{ width: `${((currentStepIndex + 1) / steps.length) * 100}%` }}
-               />
+              <div
+                className="h-full bg-zinc-900 transition-all duration-300 ease-out"
+                style={{ width: `${((currentStepIndex + 1) / steps.length) * 100}%` }}
+              />
             </div>
           </div>
         )}
