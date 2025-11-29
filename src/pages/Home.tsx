@@ -139,7 +139,7 @@ export default function Home() {
       <Navbar />
 
       {/* Hero */}
-      <header className="py-24 px-6 md:px-12 max-w-4xl mx-auto text-center">
+      <header className="py-24 px-4 md:px-12 max-w-4xl mx-auto text-center">
         <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 text-zinc-900 leading-[1.1]">
           System Architecture <br/>
           <span className="text-zinc-400">Visualized.</span>
@@ -172,7 +172,7 @@ export default function Home() {
       </header>
 
       {/* How it Works Section */}
-      <section className="px-6 md:px-12 max-w-5xl mx-auto mb-20 animate-fade-in-up">
+      <section className="px-4 md:px-12 max-w-5xl mx-auto mb-20 animate-fade-in-up">
         <div className="bg-zinc-50 rounded-2xl p-8 md:p-12 border border-zinc-100">
            <h2 className="text-2xl font-bold text-center mb-10 text-zinc-900">How BackendMap Works</h2>
            <div className="grid md:grid-cols-3 gap-8">
@@ -208,7 +208,7 @@ export default function Home() {
       </section>
 
       {/* Content - Technical List */}
-      <main className="px-6 md:px-12 pb-32 max-w-5xl mx-auto animate-fade-in-up">
+      <main className="px-4 md:px-12 pb-32 max-w-5xl mx-auto animate-fade-in-up">
         <div className="mb-6 flex items-end justify-between border-b border-zinc-100 pb-4">
           <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-900">Catalog</h2>
           <span className="text-xs font-mono text-zinc-400 bg-zinc-100 px-2 py-1 rounded">

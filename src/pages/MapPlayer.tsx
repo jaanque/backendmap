@@ -347,7 +347,7 @@ function MapPlayerInner() {
       <div className="w-full h-[50%] md:h-full md:w-[30%] bg-white border-t md:border-t-0 md:border-l border-zinc-200 flex flex-col z-20 shadow-[0_0_40px_-10px_rgba(0,0,0,0.05)]">
 
         {/* Scenario Header */}
-        <div className="px-6 py-5 border-b border-zinc-100 flex items-start justify-between">
+        <div className="px-4 md:px-6 py-5 border-b border-zinc-100 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
            <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className={`w-2 h-2 rounded-full ${isCompleted ? 'bg-zinc-900' : 'bg-green-500'}`}></span>
@@ -447,7 +447,7 @@ function MapPlayerInner() {
 
         {/* Fork Label */}
         {parentScenario && (
-             <div className="px-6 pb-2 pt-2 border-b border-zinc-100 bg-zinc-50/50">
+             <div className="px-4 md:px-6 pb-2 pt-2 border-b border-zinc-100 bg-zinc-50/50">
                  <p className="text-xs text-zinc-500 flex items-center gap-1.5">
                      <GitFork size={14} className="text-indigo-500" />
                      <span>Forked from</span>
@@ -459,12 +459,12 @@ function MapPlayerInner() {
         )}
 
         {/* Reactions Section (Discreet) */}
-        <div className="px-6 pt-2">
+        <div className="px-4 md:px-6 pt-2">
             <Reactions scenarioId={scenario.id} />
         </div>
 
         {/* Step Content */}
-        <div className="px-6 py-6 flex-grow overflow-y-auto">
+        <div className="px-4 md:px-6 py-6 flex-grow overflow-y-auto">
           {isCompleted ? (
             <div className="flex flex-col items-center justify-center h-full text-center animate-fade-in-up">
               <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mb-4 text-green-600">
@@ -512,7 +512,7 @@ function MapPlayerInner() {
 
         {/* Navigation Controls */}
         {!isCompleted && (
-          <div className="p-6 border-t border-zinc-100 bg-zinc-50/50">
+          <div className="p-4 md:p-6 border-t border-zinc-100 bg-zinc-50/50">
             <div className="flex gap-3">
               <button
                 onClick={handlePrev}
