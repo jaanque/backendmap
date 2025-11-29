@@ -49,6 +49,7 @@ function CreateScenario() {
   // Steps State
   const [steps, setSteps] = useState<StepInput[]>([]);
   const [selectedStepIndex, setSelectedStepIndex] = useState<number | null>(null);
+  const [draggedStepIndex, setDraggedStepIndex] = useState<number | null>(null);
 
   // Form State
   const [title, setTitle] = useState('');
@@ -221,6 +222,49 @@ function CreateScenario() {
     if (selectedStepIndex !== null && selectedStepIndex > index) setSelectedStepIndex(selectedStepIndex - 1);
   };
 
+  const handleStepDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedStepIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+    // Identify this as a step drag
+    e.dataTransfer.setData('application/json', JSON.stringify({ type: 'step', index }));
+  };
+
+  const handleStepDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleStepDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    if (draggedStepIndex === null) return;
+    if (draggedStepIndex === dropIndex) {
+        setDraggedStepIndex(null);
+        return;
+    }
+
+    const newSteps = [...steps];
+    const [removed] = newSteps.splice(draggedStepIndex, 1);
+    newSteps.splice(dropIndex, 0, removed);
+
+    const reorderedSteps = newSteps.map((s, i) => ({ ...s, order_index: i + 1 }));
+    setSteps(reorderedSteps);
+
+    // Update selection
+    if (selectedStepIndex === draggedStepIndex) {
+        setSelectedStepIndex(dropIndex);
+    } else if (selectedStepIndex !== null) {
+        let newSelected = selectedStepIndex;
+        if (draggedStepIndex < selectedStepIndex && dropIndex >= selectedStepIndex) {
+            newSelected--;
+        } else if (draggedStepIndex > selectedStepIndex && dropIndex <= selectedStepIndex) {
+            newSelected++;
+        }
+        setSelectedStepIndex(newSelected);
+    }
+
+    setDraggedStepIndex(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -377,13 +421,18 @@ function CreateScenario() {
                       steps.map((step, index) => (
                         <div
                           key={index}
-                          className={`border rounded-xl transition-all ${selectedStepIndex === index ? 'border-indigo-600 shadow-sm ring-1 ring-indigo-600 bg-white' : 'border-zinc-200 bg-zinc-50/50 hover:border-zinc-300'}`}
+                          draggable
+                          onDragStart={(e) => handleStepDragStart(e, index)}
+                          onDragOver={(e) => handleStepDragOver(e)}
+                          onDrop={(e) => handleStepDrop(e, index)}
+                          className={`border rounded-xl transition-all ${selectedStepIndex === index ? 'border-indigo-600 shadow-sm ring-1 ring-indigo-600 bg-white' : 'border-zinc-200 bg-zinc-50/50 hover:border-zinc-300'} ${draggedStepIndex === index ? 'opacity-50' : ''}`}
                         >
                             <div
                               className="p-3 cursor-pointer flex items-center justify-between"
                               onClick={() => setSelectedStepIndex(index)}
                             >
                                 <span className="font-semibold text-sm text-zinc-900 flex items-center gap-2">
+                                  <GripVertical size={14} className="text-zinc-400 cursor-grab active:cursor-grabbing" />
                                   <span className="w-5 h-5 rounded-full bg-zinc-200 flex items-center justify-center text-[10px]">{index + 1}</span>
                                   {step.title}
                                 </span>
