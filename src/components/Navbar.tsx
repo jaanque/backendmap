@@ -78,10 +78,14 @@ export default function Navbar() {
               <div className="absolute right-0 mt-3 w-64 bg-white border border-zinc-200 rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] py-2 z-50 animate-in fade-in zoom-in-95 duration-100 origin-top-right ring-1 ring-black/5">
 
                 {/* User Info Header */}
-                <div className="px-4 py-3 border-b border-zinc-100 mb-1">
-                  <p className="text-xs font-semibold text-zinc-900">Signed in as</p>
+                <Link
+                  to="/me"
+                  className="block px-4 py-3 border-b border-zinc-100 mb-1 hover:bg-zinc-50 transition-colors group/header"
+                  onClick={() => setIsDropdownOpen(false)}
+                >
+                  <p className="text-xs font-semibold text-zinc-900 group-hover/header:text-indigo-600 transition-colors">Signed in as</p>
                   <p className="text-sm text-zinc-500 truncate mt-0.5">{user.email}</p>
-                </div>
+                </Link>
 
                 {/* Menu Items */}
                 <div className="py-1">

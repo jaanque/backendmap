@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import Profile from './pages/Profile';
+import ViewProfile from './pages/ViewProfile';
 import Achievements from './pages/Achievements';
 import Users from './pages/Users';
 import CreateScenario from './pages/CreateScenario';
@@ -30,6 +31,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/me" element={<ViewProfile />} />
             <Route path="/achievements" element={<Achievements />} />
             <Route path="/users" element={<Users />} />
             <Route path="/create" element={<CreateScenario />} />
