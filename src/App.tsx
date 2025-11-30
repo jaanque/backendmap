@@ -14,7 +14,6 @@ import Achievements from './pages/Achievements';
 import Users from './pages/Users';
 import CreateScenario from './pages/CreateScenario';
 import MyScenarios from './pages/MyScenarios';
-import Activity from './pages/Activity';
 import { AuthProvider } from './lib/auth';
 import { ToastProvider } from './lib/toast';
 
@@ -38,7 +37,6 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/me" element={<ViewProfile />} />
             <Route path="/achievements" element={<Achievements />} />
-            <Route path="/activity" element={<Activity />} />
             <Route path="/users" element={<Users />} />
             <Route path="/create" element={<CreateScenario />} />
             <Route path="/my-scenarios" element={<MyScenarios />} />
