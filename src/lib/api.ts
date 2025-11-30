@@ -4,26 +4,41 @@ import type { Scenario, Step, UserProgress, Profile, Achievement, Organization }
 export async function getUserOrganizations(userId: string): Promise<Organization[]> {
   if (!supabase) throw new Error("Supabase client is not initialized.");
 
-  // Get organization IDs where user is owner or admin
-  const { data: memberships, error } = await supabase
+  // 1. Get orgs via memberships (owner/admin)
+  const { data: memberships, error: memberError } = await supabase
     .from('organization_members')
     .select('organization_id')
     .eq('user_id', userId)
     .in('role', ['owner', 'admin']);
 
-  if (error) throw error;
-  if (!memberships || memberships.length === 0) return [];
+  if (memberError) throw memberError;
+  const memberOrgIds = memberships?.map(m => m.organization_id) || [];
 
-  const orgIds = memberships.map(m => m.organization_id);
-
-  // Fetch organization details
-  const { data: orgs, error: orgsError } = await supabase
+  // 2. Fetch organizations where user is owner
+  const { data: ownedOrgs, error: ownedError } = await supabase
     .from('organizations')
     .select('*')
-    .in('id', orgIds);
+    .eq('owner_id', userId);
 
-  if (orgsError) throw orgsError;
-  return orgs || [];
+  if (ownedError) throw ownedError;
+
+  // 3. Fetch organizations from memberships
+  let memberOrgs: Organization[] = [];
+  if (memberOrgIds.length > 0) {
+      const { data, error } = await supabase
+          .from('organizations')
+          .select('*')
+          .in('id', memberOrgIds);
+      if (error) throw error;
+      memberOrgs = data || [];
+  }
+
+  // 4. Merge and Deduplicate
+  const allOrgs = [...(ownedOrgs || []), ...memberOrgs];
+  // Deduplicate by ID
+  const uniqueOrgs = Array.from(new Map(allOrgs.map(org => [org.id, org])).values());
+
+  return uniqueOrgs;
 }
 
 export async function getPublicOrganizations(): Promise<Organization[]> {
@@ -77,6 +92,24 @@ export async function createOrganization(org: Omit<Organization, 'id' | 'created
     .single();
 
   if (error) throw error;
+
+  // Ensure membership exists (Owner)
+  // We use upsert to be safe against race conditions with triggers
+  const { error: memberError } = await supabase
+    .from('organization_members')
+    .upsert({
+        organization_id: data.id,
+        user_id: org.owner_id,
+        role: 'owner'
+    } as any, { onConflict: 'organization_id,user_id' });
+
+  if (memberError) {
+      console.warn("Failed to ensure owner membership for organization:", memberError);
+      // We don't throw here to avoid failing the whole operation if just the redundant member add fails,
+      // but strictly speaking, if this fails, the user might not be able to manage the org properly
+      // unless the trigger worked.
+  }
+
   return data;
 }
 
