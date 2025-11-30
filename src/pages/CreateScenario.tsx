@@ -583,9 +583,15 @@ function CreateScenario() {
                     {isEditMode ? 'Update Scenario' : 'Publish Scenario'}
                 </button>
 
-                {isEditMode && userRole === 'owner' && (
+                {( !isEditMode || (isEditMode && userRole === 'owner') ) && (
                     <button
-                        onClick={() => setIsShareModalOpen(true)}
+                        onClick={() => {
+                            if (!isEditMode || !editingScenarioId) {
+                                alert("Please save the scenario first to enable sharing.");
+                                return;
+                            }
+                            setIsShareModalOpen(true);
+                        }}
                         className="w-full btn-pro btn-secondary py-2.5 flex items-center justify-center gap-2"
                     >
                         <UsersIcon size={16} />
