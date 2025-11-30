@@ -60,7 +60,7 @@ export default function CreateOrganization() {
         owner_id: user.id
       });
       showToast('Organization created successfully!', { type: 'success' });
-      navigate('/'); // Redirect to dashboard or org page (TBD)
+      navigate(`/org/${slug}`);
     } catch (error: any) {
       console.error(error);
       showToast(error.message || 'Failed to create organization', { type: 'error' });

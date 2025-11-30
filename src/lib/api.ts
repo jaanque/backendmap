@@ -1,6 +1,35 @@
 import { supabase } from './supabase';
 import type { Scenario, Step, UserProgress, Profile, Achievement, Organization } from '../types';
 
+export async function getPublicOrganizations(): Promise<Organization[]> {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  // Fetch all organizations (assuming public for now as per SQL policy)
+  const { data, error } = await supabase
+    .from('organizations')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+}
+
+export async function getOrganizationBySlug(slug: string): Promise<Organization | null> {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  const { data, error } = await supabase
+    .from('organizations')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
 export async function checkOrganizationSlugAvailability(slug: string): Promise<boolean> {
   if (!supabase) throw new Error("Supabase client is not initialized.");
 
