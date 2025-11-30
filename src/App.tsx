@@ -12,6 +12,7 @@ import ViewProfile from './pages/ViewProfile';
 import Achievements from './pages/Achievements';
 import Users from './pages/Users';
 import CreateScenario from './pages/CreateScenario';
+import CreateOrganization from './pages/CreateOrganization';
 import MyScenarios from './pages/MyScenarios';
 import { AuthProvider } from './lib/auth';
 import { ToastProvider } from './lib/toast';
@@ -38,6 +39,7 @@ function App() {
             <Route path="/achievements" element={<Achievements />} />
             <Route path="/users" element={<Users />} />
             <Route path="/create" element={<CreateScenario />} />
+            <Route path="/create-organization" element={<CreateOrganization />} />
             <Route path="/my-scenarios" element={<MyScenarios />} />
             <Route path="/edit/:slug" element={<CreateScenario />} />
             <Route path="/map/:slug" element={<MapPlayer />} />

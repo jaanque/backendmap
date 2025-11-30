@@ -85,6 +85,23 @@ export interface Profile {
   updated_at: string;
 }
 
+export interface Organization {
+  id: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  owner_id: string;
+  created_at: string;
+}
+
+export interface OrganizationMember {
+  id: string;
+  organization_id: string;
+  user_id: string;
+  role: 'owner' | 'admin' | 'member';
+  created_at: string;
+}
+
 export type Database = {
   public: {
     Tables: {
@@ -127,6 +144,16 @@ export type Database = {
         Row: ScenarioReaction;
         Insert: Omit<ScenarioReaction, 'id' | 'created_at'>;
         Update: Partial<ScenarioReaction>;
+      };
+      organizations: {
+        Row: Organization;
+        Insert: Omit<Organization, 'id' | 'created_at'>;
+        Update: Partial<Organization>;
+      };
+      organization_members: {
+        Row: OrganizationMember;
+        Insert: Omit<OrganizationMember, 'id' | 'created_at'>;
+        Update: Partial<OrganizationMember>;
       };
     };
     Functions: {

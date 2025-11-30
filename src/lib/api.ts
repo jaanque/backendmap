@@ -1,5 +1,30 @@
 import { supabase } from './supabase';
-import type { Scenario, Step, UserProgress, Profile, Achievement } from '../types';
+import type { Scenario, Step, UserProgress, Profile, Achievement, Organization } from '../types';
+
+export async function checkOrganizationSlugAvailability(slug: string): Promise<boolean> {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  const { count, error } = await supabase
+    .from('organizations')
+    .select('id', { count: 'exact', head: true })
+    .eq('slug', slug);
+
+  if (error) throw error;
+  return count === 0;
+}
+
+export async function createOrganization(org: Omit<Organization, 'id' | 'created_at'>): Promise<Organization> {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  const { data, error } = await supabase
+    .from('organizations')
+    .insert(org as any)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
 
 export async function getAllAchievements(): Promise<Achievement[]> {
   if (!supabase) {

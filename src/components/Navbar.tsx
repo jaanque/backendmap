@@ -94,9 +94,9 @@ export default function Navbar() {
                     <span>New Scenario</span>
                   </Link>
                   <Link
-                    to="#"
-                    className="w-full text-left px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 flex items-center gap-3 transition-colors opacity-50 cursor-not-allowed"
-                    onClick={(e) => e.preventDefault()}
+                    to="/create-organization"
+                    className="w-full text-left px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 flex items-center gap-3 transition-colors"
+                    onClick={() => setIsCreateDropdownOpen(false)}
                   >
                     <div className="w-4 h-4 rounded border-2 border-zinc-400 dark:border-zinc-500 flex items-center justify-center">
                         <span className="text-[8px] font-bold">O</span>
