@@ -99,7 +99,8 @@ export default function Navbar() {
                 </Link>
 
                 {/* Menu Items - Section 1: Personal */}
-                <div className="py-1">
+                <div className="px-4 py-2 text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Personal</div>
+                <div className="pb-1">
                   <Link
                     to="/me"
                     className="w-full text-left px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 flex items-center gap-3 transition-colors"
@@ -142,10 +143,11 @@ export default function Navbar() {
                   </Link>
                 </div>
 
-                <div className="h-px bg-zinc-100 my-1 mx-2"></div>
+                <div className="h-px bg-zinc-200 my-2 mx-0"></div>
 
                 {/* Menu Items - Section 2: Configuration */}
-                <div className="py-1">
+                <div className="px-4 py-2 text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Settings</div>
+                <div className="pb-1">
                   <Link
                     to="/profile"
                     className="w-full text-left px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 flex items-center gap-3 transition-colors"
@@ -160,10 +162,10 @@ export default function Navbar() {
                   </button>
                 </div>
 
-                <div className="h-px bg-zinc-100 my-1 mx-2"></div>
+                <div className="h-px bg-zinc-200 my-2 mx-0"></div>
 
                 {/* Sign Out */}
-                <div className="py-1">
+                <div className="py-1 pt-2">
                   <button
                     onClick={() => {
                       signOut();
