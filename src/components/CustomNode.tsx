@@ -1,5 +1,5 @@
 import { Handle, Position, type NodeProps } from '@xyflow/react';
-import { Monitor, Server, Cpu, Database, Cloud } from 'lucide-react';
+import { Monitor, Server, Cpu, Database, Cloud, Smartphone, Tablet, HardDrive, Router, Shield, Globe, Laptop } from 'lucide-react';
 import { memo, type ElementType } from 'react';
 
 const icons = {
@@ -7,7 +7,14 @@ const icons = {
   server: Server,
   cpu: Cpu,
   database: Database,
-  cloud: Cloud
+  cloud: Cloud,
+  smartphone: Smartphone,
+  tablet: Tablet,
+  harddrive: HardDrive,
+  router: Router,
+  shield: Shield,
+  globe: Globe,
+  laptop: Laptop
 };
 
 const CustomNode = ({ data, selected }: NodeProps) => {

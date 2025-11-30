@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { ReactFlow, ReactFlowProvider, addEdge, useNodesState, useEdgesState, Controls, Background, useReactFlow, type Node, type Edge, type Connection, BackgroundVariant, useOnSelectionChange } from '@xyflow/react';
+import { ReactFlow, ReactFlowProvider, addEdge, useNodesState, useEdgesState, Controls, Background, useReactFlow, type Node, type Edge, type Connection, BackgroundVariant, useOnSelectionChange, Panel } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import CustomNode from '../components/CustomNode';
 import PacketEdge from '../components/PacketEdge';
@@ -7,7 +7,7 @@ import Navbar from '../components/Navbar';
 import { useAuth } from '../lib/auth';
 import { checkSlugAvailability, createScenario, updateScenario, createSteps, deleteSteps, getScenarioBySlug, getSteps } from '../lib/api';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { Monitor, Server, Cpu, Database, Cloud, Save, X, Loader2, GripVertical, ListOrdered, Layers, Trash2, Plus, Target, Lock, Globe } from 'lucide-react';
+import { Monitor, Server, Cpu, Database, Cloud, Save, X, Loader2, GripVertical, ListOrdered, Layers, Trash2, Plus, Target, Lock, Globe, Smartphone, Tablet, HardDrive, Router, Shield, Laptop, ZoomIn, ZoomOut, Maximize, MousePointer2 } from 'lucide-react';
 import type { StepInput } from '../types';
 import { supabase } from '../lib/supabase';
 
@@ -41,11 +41,14 @@ function CreateScenario() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-  const { screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition, zoomIn, zoomOut, fitView } = useReactFlow();
 
   const [activeTab, setActiveTab] = useState<'build' | 'steps'>('build');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Selection State
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
   // Steps State
   const [steps, setSteps] = useState<StepInput[]>([]);
@@ -117,11 +120,14 @@ function CreateScenario() {
   // Helper to highlight active node/edge for selected step
   useOnSelectionChange({
     onChange: ({ nodes: selectedNodes, edges: selectedEdges }) => {
+      const activeNode = selectedNodes[0]?.id || null;
+      const activeEdge = selectedEdges[0]?.id || null;
+
+      // Update selection state
+      setSelectedNodeId(activeNode);
+
       // If we are in steps mode and a step is selected, allows updating active elements
       if (activeTab === 'steps' && selectedStepIndex !== null) {
-        const activeNode = selectedNodes[0]?.id || null;
-        const activeEdge = selectedEdges[0]?.id || null;
-
         if (activeNode || activeEdge) {
            setSteps(prev => prev.map((step, idx) =>
              idx === selectedStepIndex
@@ -223,6 +229,27 @@ function CreateScenario() {
     });
     if (selectedStepIndex === index) setSelectedStepIndex(null);
     if (selectedStepIndex !== null && selectedStepIndex > index) setSelectedStepIndex(selectedStepIndex - 1);
+  };
+
+  const handleUpdateNodeLabel = (label: string) => {
+    if (!selectedNodeId) return;
+    setNodes((nds) =>
+      nds.map((node) => {
+        if (node.id === selectedNodeId) {
+          return {
+            ...node,
+            data: { ...node.data, label },
+          };
+        }
+        return node;
+      })
+    );
+  };
+
+  const handleDeleteNode = () => {
+      if (!selectedNodeId) return;
+      setNodes((nds) => nds.filter((node) => node.id !== selectedNodeId));
+      setSelectedNodeId(null);
   };
 
   const handleStepDragStart = (e: React.DragEvent, index: number) => {
@@ -343,11 +370,18 @@ function CreateScenario() {
   };
 
   const sidebarItems = [
+    { type: 'custom', icon: 'monitor', label: 'Client', Icon: Monitor },
+    { type: 'custom', icon: 'smartphone', label: 'Mobile', Icon: Smartphone },
+    { type: 'custom', icon: 'tablet', label: 'Tablet', Icon: Tablet },
+    { type: 'custom', icon: 'laptop', label: 'Laptop', Icon: Laptop },
     { type: 'custom', icon: 'server', label: 'Server', Icon: Server },
     { type: 'custom', icon: 'database', label: 'Database', Icon: Database },
-    { type: 'custom', icon: 'monitor', label: 'Client', Icon: Monitor },
     { type: 'custom', icon: 'cloud', label: 'Cloud', Icon: Cloud },
     { type: 'custom', icon: 'cpu', label: 'Compute', Icon: Cpu },
+    { type: 'custom', icon: 'harddrive', label: 'Storage', Icon: HardDrive },
+    { type: 'custom', icon: 'router', label: 'Load Balancer', Icon: Router },
+    { type: 'custom', icon: 'shield', label: 'Firewall', Icon: Shield },
+    { type: 'custom', icon: 'globe', label: 'Internet', Icon: Globe },
   ];
 
   return (
@@ -379,25 +413,64 @@ function CreateScenario() {
             {/* Build Content */}
             {activeTab === 'build' && (
               <>
-                <div className="p-4 border-b border-zinc-100">
-                    <p className="text-xs text-zinc-500">Drag components to the canvas to build your architecture.</p>
-                </div>
-                <div className="p-4 space-y-3 overflow-y-auto flex-grow">
-                    {sidebarItems.map((item) => (
-                        <div
-                            key={item.icon}
-                            className="flex items-center gap-3 p-3 rounded-lg border border-zinc-200 bg-zinc-50 hover:border-indigo-300 hover:bg-indigo-50/50 hover:text-indigo-600 transition-all cursor-grab active:cursor-grabbing group"
-                            onDragStart={(event) => onDragStart(event, item.type, item.icon)}
-                            draggable
-                        >
-                            <GripVertical size={16} className="text-zinc-300 group-hover:text-indigo-300" />
-                            <div className="p-1.5 bg-white rounded-md border border-zinc-200 shadow-sm text-zinc-500 group-hover:text-indigo-600 group-hover:border-indigo-100">
-                                <item.Icon size={16} />
+                {selectedNodeId ? (
+                   <div className="flex flex-col h-full animate-fade-in-up">
+                      <div className="p-4 border-b border-zinc-100 bg-zinc-50/50 flex items-center justify-between">
+                          <h3 className="font-semibold text-sm text-zinc-900 flex items-center gap-2">
+                              <MousePointer2 size={16} className="text-indigo-600" />
+                              Selected Node
+                          </h3>
+                          <button
+                            onClick={() => setSelectedNodeId(null)}
+                            className="text-xs text-zinc-500 hover:text-zinc-900 underline"
+                          >
+                            Back to list
+                          </button>
+                      </div>
+                      <div className="p-4 space-y-6">
+                          <div>
+                              <label className="block text-xs font-medium text-zinc-500 mb-2 uppercase tracking-wide">Label</label>
+                              <input
+                                type="text"
+                                value={(nodes.find(n => n.id === selectedNodeId)?.data.label as string) || ''}
+                                onChange={(e) => handleUpdateNodeLabel(e.target.value)}
+                                className="w-full px-3 py-2 rounded-lg border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all text-sm font-medium"
+                              />
+                          </div>
+
+                          <div className="pt-4 border-t border-zinc-100">
+                              <button
+                                onClick={handleDeleteNode}
+                                className="w-full btn-pro border border-red-200 text-red-600 hover:bg-red-50 flex items-center justify-center gap-2 py-2"
+                              >
+                                  <Trash2 size={16} />
+                                  Delete Node
+                              </button>
+                          </div>
+                      </div>
+                   </div>
+                ) : (
+                  <>
+                    <div className="p-4 border-b border-zinc-100">
+                        <p className="text-xs text-zinc-500">Drag components to the canvas to build your architecture.</p>
+                    </div>
+                    <div className="p-4 space-y-3 overflow-y-auto flex-grow grid grid-cols-2 gap-2 !space-y-0">
+                        {sidebarItems.map((item) => (
+                            <div
+                                key={item.icon}
+                                className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-zinc-200 bg-white hover:border-indigo-300 hover:shadow-md hover:text-indigo-600 transition-all cursor-grab active:cursor-grabbing group text-center"
+                                onDragStart={(event) => onDragStart(event, item.type, item.icon)}
+                                draggable
+                            >
+                                <div className="p-2 bg-zinc-50 rounded-lg group-hover:bg-indigo-50 text-zinc-500 group-hover:text-indigo-600 transition-colors">
+                                    <item.Icon size={20} />
+                                </div>
+                                <span className="text-xs font-medium text-zinc-600 group-hover:text-indigo-700">{item.label}</span>
                             </div>
-                            <span className="text-sm font-medium">{item.label}</span>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                  </>
+                )}
               </>
             )}
 
@@ -522,7 +595,17 @@ function CreateScenario() {
                 fitView
             >
                 <Background color="#e5e5e5" gap={24} size={1} variant={BackgroundVariant.Dots} />
-                <Controls className="!bg-white !border-zinc-200 !shadow-sm !rounded-lg [&>button]:!border-b-zinc-100 hover:[&>button]:!bg-zinc-50 !fill-zinc-700" />
+                <Panel position="bottom-center" className="bg-white p-1 rounded-lg border border-zinc-200 shadow-sm flex items-center gap-1 mb-6">
+                    <button onClick={() => zoomOut()} className="p-2 hover:bg-zinc-100 rounded-md text-zinc-600 transition-colors" title="Zoom Out">
+                        <ZoomOut size={16} />
+                    </button>
+                    <button onClick={() => fitView()} className="p-2 hover:bg-zinc-100 rounded-md text-zinc-600 transition-colors" title="Fit View">
+                        <Maximize size={16} />
+                    </button>
+                    <button onClick={() => zoomIn()} className="p-2 hover:bg-zinc-100 rounded-md text-zinc-600 transition-colors" title="Zoom In">
+                        <ZoomIn size={16} />
+                    </button>
+                </Panel>
             </ReactFlow>
         </div>
       </div>
