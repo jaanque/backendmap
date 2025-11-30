@@ -15,18 +15,16 @@ import CreateScenario from './pages/CreateScenario';
 import MyScenarios from './pages/MyScenarios';
 import { AuthProvider } from './lib/auth';
 import { ToastProvider } from './lib/toast';
-import { ThemeProvider } from './lib/theme';
 
 function App() {
   return (
     <AuthProvider>
-      <ThemeProvider>
-        <ToastProvider>
-          <Router>
-            <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 px-4 py-2 bg-black text-white rounded font-bold shadow-lg">
-              Skip to main content
-            </a>
-            <Routes>
+      <ToastProvider>
+        <Router>
+          <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 px-4 py-2 bg-black text-white rounded font-bold shadow-lg">
+            Skip to main content
+          </a>
+          <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/favorites" element={<Favorites />} />
@@ -43,11 +41,10 @@ function App() {
             <Route path="/my-scenarios" element={<MyScenarios />} />
             <Route path="/edit/:slug" element={<CreateScenario />} />
             <Route path="/map/:slug" element={<MapPlayer />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Router>
-        </ToastProvider>
-      </ThemeProvider>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Router>
+      </ToastProvider>
     </AuthProvider>
   );
 }
