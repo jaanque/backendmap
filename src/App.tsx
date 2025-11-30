@@ -34,7 +34,8 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/profile" element={<Navigate to="/profile/general" replace />} />
+            <Route path="/profile/:section" element={<Profile />} />
             <Route path="/me" element={<ViewProfile />} />
             <Route path="/achievements" element={<Achievements />} />
             <Route path="/users" element={<Users />} />

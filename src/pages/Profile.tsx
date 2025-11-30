@@ -3,7 +3,7 @@ import { useAuth } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../lib/toast';
 import { useTheme } from '../lib/theme';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { User, Mail, Save, Loader2, Lock, Github, Link as LinkIcon, Trophy, Award, Footprints, DraftingCompass, Brain, Sun, Bug, BadgeCheck, ShieldAlert, Moon, Palette } from 'lucide-react';
@@ -30,8 +30,10 @@ export default function Profile() {
   const { theme, setTheme } = useTheme();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const { section } = useParams<{ section: string }>();
 
-  const [activeSection, setActiveSection] = useState<Section>('general');
+  // Determine active section from URL param
+  const activeSection = (section as Section) || 'general';
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -271,9 +273,9 @@ export default function Profile() {
                  const Icon = tab.icon;
                  const isActive = activeSection === tab.id;
                  return (
-                   <button
+                   <Link
                      key={tab.id}
-                     onClick={() => setActiveSection(tab.id as Section)}
+                     to={`/profile/${tab.id}`}
                      className={`flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors text-left ${
                        isActive
                         ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white'
@@ -282,7 +284,7 @@ export default function Profile() {
                    >
                      <Icon size={18} className={isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-400 dark:text-zinc-500'} />
                      {tab.label}
-                   </button>
+                   </Link>
                  )
                })}
              </nav>
