@@ -29,7 +29,9 @@ const CustomNode = ({ data, selected }: NodeProps) => {
       }
       ${selected ? 'ring-2 ring-zinc-500 ring-offset-2' : ''}
     `}>
-      <Handle type="target" position={Position.Left} className={`w-2 h-2 !bg-white !border-2 transition-colors ${isActive ? '!border-zinc-900' : '!border-zinc-400'}`} />
+      {/* Target Handles (Inputs) - Top and Left */}
+      <Handle type="target" position={Position.Top} id="t-top" className={`w-3 h-3 !bg-zinc-100 !border-2 !border-zinc-400 hover:!bg-indigo-500 hover:!border-indigo-500 transition-all ${isActive ? '!border-zinc-900' : ''} !-top-1.5`} />
+      <Handle type="target" position={Position.Left} id="t-left" className={`w-3 h-3 !bg-zinc-100 !border-2 !border-zinc-400 hover:!bg-indigo-500 hover:!border-indigo-500 transition-all ${isActive ? '!border-zinc-900' : ''} !-left-1.5`} />
 
       <div className="flex flex-col items-center gap-3">
         <div className={`p-2 rounded-md transition-colors duration-300 ${isActive ? 'bg-zinc-100 text-zinc-900' : 'bg-white text-zinc-400'}`}>
@@ -43,7 +45,9 @@ const CustomNode = ({ data, selected }: NodeProps) => {
         </span>
       </div>
 
-      <Handle type="source" position={Position.Right} className={`w-2 h-2 !bg-white !border-2 transition-colors ${isActive ? '!border-zinc-900' : '!border-zinc-400'}`} />
+      {/* Source Handles (Outputs) - Bottom and Right */}
+      <Handle type="source" position={Position.Right} id="s-right" className={`w-3 h-3 !bg-indigo-500 !border-2 !border-white opacity-0 hover:opacity-100 transition-opacity z-10 !-right-1.5`} />
+      <Handle type="source" position={Position.Bottom} id="s-bottom" className={`w-3 h-3 !bg-indigo-500 !border-2 !border-white opacity-0 hover:opacity-100 transition-opacity z-10 !-bottom-1.5`} />
     </div>
   );
 };
