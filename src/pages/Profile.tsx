@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../lib/toast';
+import { useTheme } from '../lib/theme';
 import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { User, Mail, Save, Loader2, Lock, Github, Link as LinkIcon, Trophy, Award, Footprints, DraftingCompass, Brain, Sun, Bug, BadgeCheck, ShieldAlert, CreditCard } from 'lucide-react';
+import { User, Mail, Save, Loader2, Lock, Github, Link as LinkIcon, Trophy, Award, Footprints, DraftingCompass, Brain, Sun, Bug, BadgeCheck, ShieldAlert, Moon, Palette } from 'lucide-react';
 import { getProfile, updateProfile, getAllAchievements, getUserAchievements, getFollowersCount, getFollowingCount } from '../lib/api';
 import { checkAchievements } from '../lib/achievements';
 import UserListModal from '../components/UserListModal';
@@ -22,10 +23,11 @@ const IconMap: Record<string, React.ElementType> = {
   'Bug': Bug
 };
 
-type Section = 'general' | 'achievements' | 'connections' | 'security';
+type Section = 'general' | 'achievements' | 'connections' | 'security' | 'appearance';
 
 export default function Profile() {
   const { user, loading } = useAuth();
+  const { theme, setTheme } = useTheme();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
@@ -245,19 +247,20 @@ export default function Profile() {
 
   const tabs = [
     { id: 'general', label: 'General', icon: User },
+    { id: 'appearance', label: 'Appearance', icon: Palette },
     { id: 'achievements', label: 'Achievements', icon: Trophy },
     { id: 'connections', label: 'Connections', icon: LinkIcon },
     { id: 'security', label: 'Security', icon: Lock },
   ];
 
   return (
-    <div className="min-h-screen bg-white font-sans text-zinc-900 flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-zinc-950 font-sans text-zinc-900 dark:text-zinc-100 flex flex-col transition-colors duration-300">
       <Navbar />
 
       <main className="flex-grow px-6 md:px-12 py-12 w-full animate-fade-in-up">
         <div className="mb-10">
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Account Settings</h1>
-          <p className="text-zinc-500 mt-2">Manage your profile and account preferences.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">Account Settings</h1>
+          <p className="text-zinc-500 dark:text-zinc-400 mt-2">Manage your profile and account preferences.</p>
         </div>
 
         <div className="flex flex-col md:flex-row gap-8 items-start">
@@ -273,11 +276,11 @@ export default function Profile() {
                      onClick={() => setActiveSection(tab.id as Section)}
                      className={`flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors text-left ${
                        isActive
-                        ? 'bg-zinc-100 text-zinc-900'
-                        : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50'
+                        ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white'
+                        : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
                      }`}
                    >
-                     <Icon size={18} className={isActive ? 'text-indigo-600' : 'text-zinc-400'} />
+                     <Icon size={18} className={isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-400 dark:text-zinc-500'} />
                      {tab.label}
                    </button>
                  )
@@ -290,10 +293,10 @@ export default function Profile() {
 
             {/* General Section */}
             {activeSection === 'general' && (
-              <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-right-4 duration-300">
-                <div className="p-6 border-b border-zinc-100 bg-zinc-50/50 flex justify-between items-center">
-                  <h2 className="font-semibold text-lg flex items-center gap-2">
-                      <User size={18} className="text-indigo-600" />
+              <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden animate-in fade-in slide-in-from-right-4 duration-300 transition-colors">
+                <div className="p-6 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 flex justify-between items-center transition-colors">
+                  <h2 className="font-semibold text-lg flex items-center gap-2 text-zinc-900 dark:text-white">
+                      <User size={18} className="text-indigo-600 dark:text-indigo-400" />
                       Profile Information
                   </h2>
                   <div className="flex items-center gap-4">
@@ -553,6 +556,70 @@ export default function Profile() {
                           Connect
                         </button>
                       )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Appearance Section */}
+            {activeSection === 'appearance' && (
+              <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden animate-in fade-in slide-in-from-right-4 duration-300 transition-colors">
+                <div className="p-6 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50">
+                  <h2 className="font-semibold text-lg flex items-center gap-2 text-zinc-900 dark:text-white">
+                      <Palette size={18} className="text-indigo-600 dark:text-indigo-400" />
+                      Appearance
+                  </h2>
+                </div>
+                <div className="p-6">
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-sm font-medium text-zinc-900 dark:text-white mb-4">Interface Theme</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <button
+                          onClick={() => setTheme('light')}
+                          className={`relative p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3 ${
+                            theme === 'light'
+                              ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-900/20'
+                              : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 bg-white dark:bg-zinc-800'
+                          }`}
+                        >
+                          <div className="w-10 h-10 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center">
+                            <Sun size={20} />
+                          </div>
+                          <div className="text-center">
+                            <p className={`font-semibold text-sm ${theme === 'light' ? 'text-indigo-900 dark:text-indigo-300' : 'text-zinc-900 dark:text-zinc-100'}`}>Light Mode</p>
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Default appearance</p>
+                          </div>
+                          {theme === 'light' && (
+                            <div className="absolute top-3 right-3 text-indigo-600">
+                              <BadgeCheck size={18} className="fill-indigo-100" />
+                            </div>
+                          )}
+                        </button>
+
+                        <button
+                          onClick={() => setTheme('dark')}
+                          className={`relative p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-3 ${
+                            theme === 'dark'
+                              ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-900/20'
+                              : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 bg-white dark:bg-zinc-800'
+                          }`}
+                        >
+                          <div className="w-10 h-10 rounded-full bg-slate-800 text-slate-200 flex items-center justify-center">
+                            <Moon size={20} />
+                          </div>
+                          <div className="text-center">
+                            <p className={`font-semibold text-sm ${theme === 'dark' ? 'text-indigo-900 dark:text-indigo-300' : 'text-zinc-900 dark:text-zinc-100'}`}>Dark Mode</p>
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Easier on the eyes</p>
+                          </div>
+                          {theme === 'dark' && (
+                            <div className="absolute top-3 right-3 text-indigo-600 dark:text-indigo-400">
+                              <BadgeCheck size={18} className="fill-indigo-100 dark:fill-indigo-900" />
+                            </div>
+                          )}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
