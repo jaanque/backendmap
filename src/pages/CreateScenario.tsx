@@ -5,10 +5,10 @@ import CustomNode from '../components/CustomNode';
 import PacketEdge from '../components/PacketEdge';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../lib/auth';
-import { checkSlugAvailability, createScenario, updateScenario, createSteps, deleteSteps, getScenarioBySlug, getSteps } from '../lib/api';
+import { checkSlugAvailability, createScenario, updateScenario, createSteps, deleteSteps, getScenarioBySlug, getSteps, getUserOrganizations } from '../lib/api';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { Monitor, Server, Cpu, Database, Cloud, Save, X, Loader2, GripVertical, ListOrdered, Layers, Trash2, Plus, Target, Lock, Globe, Smartphone, Tablet, HardDrive, Router, Shield, Laptop, ZoomIn, ZoomOut, Maximize, MousePointer2 } from 'lucide-react';
-import type { StepInput } from '../types';
+import { Monitor, Server, Cpu, Database, Cloud, Save, X, Loader2, GripVertical, ListOrdered, Layers, Trash2, Plus, Target, Lock, Globe, Smartphone, Tablet, HardDrive, Router, Shield, Laptop, ZoomIn, ZoomOut, Maximize, MousePointer2, Building2, User } from 'lucide-react';
+import type { StepInput, Organization } from '../types';
 import { supabase } from '../lib/supabase';
 
 const nodeTypes = {
@@ -67,6 +67,19 @@ function CreateScenario() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingScenarioId, setEditingScenarioId] = useState<string | null>(null);
   const [parentScenarioId, setParentScenarioId] = useState<string | null>(null);
+
+  // Publish Options
+  const [userOrganizations, setUserOrganizations] = useState<Organization[]>([]);
+  const [publishOwner, setPublishOwner] = useState<'user' | string>('user'); // 'user' or orgId
+
+  // Load User Organizations on mount
+  useEffect(() => {
+    if (user) {
+        getUserOrganizations(user.id)
+            .then(setUserOrganizations)
+            .catch(err => console.error("Failed to load organizations", err));
+    }
+  }, [user]);
 
   // Load Existing Scenario (Edit Mode) or Fork Source
   useEffect(() => {
@@ -316,6 +329,7 @@ function CreateScenario() {
     try {
       if (isEditMode && editingScenarioId) {
         // Update existing scenario
+        // Note: We deliberately DO NOT update the owner/organization_id here as per requirements.
         await updateScenario(editingScenarioId, {
           title,
           slug,
@@ -326,7 +340,7 @@ function CreateScenario() {
               initialNodes: nodes,
               initialEdges: edges
           },
-          // Don't update author_id or created_at
+          // Don't update author_id, organization_id or created_at
         });
 
         // Update steps: brute force delete and recreate
@@ -351,6 +365,7 @@ function CreateScenario() {
           },
           tags: ['Community'],
           author_id: user.id,
+          organization_id: publishOwner === 'user' ? null : publishOwner,
           parent_scenario_id: parentScenarioId
         });
 
@@ -650,6 +665,52 @@ function CreateScenario() {
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                    {/* Owner Selection (Only for new scenarios) */}
+                    {!isEditMode && userOrganizations.length > 0 && (
+                        <div>
+                            <label className="block text-sm font-medium text-zinc-700 mb-1.5">Publish As</label>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setPublishOwner('user')}
+                                    className={`p-3 rounded-lg border flex items-center gap-3 transition-all text-left ${
+                                        publishOwner === 'user'
+                                            ? 'border-indigo-600 bg-indigo-50 text-indigo-700 ring-1 ring-indigo-600'
+                                            : 'border-zinc-200 hover:border-zinc-300 text-zinc-600'
+                                    }`}
+                                >
+                                    <div className="w-8 h-8 rounded-full bg-white border border-zinc-200 flex items-center justify-center text-zinc-500">
+                                        <User size={16} />
+                                    </div>
+                                    <div className="overflow-hidden">
+                                        <div className="text-sm font-bold truncate">Me</div>
+                                        <div className="text-[10px] opacity-80 truncate">Personal</div>
+                                    </div>
+                                </button>
+                                {userOrganizations.map(org => (
+                                    <button
+                                        key={org.id}
+                                        type="button"
+                                        onClick={() => setPublishOwner(org.id)}
+                                        className={`p-3 rounded-lg border flex items-center gap-3 transition-all text-left ${
+                                            publishOwner === org.id
+                                                ? 'border-indigo-600 bg-indigo-50 text-indigo-700 ring-1 ring-indigo-600'
+                                                : 'border-zinc-200 hover:border-zinc-300 text-zinc-600'
+                                        }`}
+                                    >
+                                        <div className="w-8 h-8 rounded-full bg-white border border-zinc-200 flex items-center justify-center text-zinc-500">
+                                            <Building2 size={16} />
+                                        </div>
+                                        <div className="overflow-hidden">
+                                            <div className="text-sm font-bold truncate">{org.name}</div>
+                                            <div className="text-[10px] opacity-80 truncate">Organization</div>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     <div>
                         <label className="block text-sm font-medium text-zinc-700 mb-1.5">Scenario Title</label>
                         <input

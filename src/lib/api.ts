@@ -1,6 +1,31 @@
 import { supabase } from './supabase';
 import type { Scenario, Step, UserProgress, Profile, Achievement, Organization } from '../types';
 
+export async function getUserOrganizations(userId: string): Promise<Organization[]> {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  // Get organization IDs where user is owner or admin
+  const { data: memberships, error } = await supabase
+    .from('organization_members')
+    .select('organization_id')
+    .eq('user_id', userId)
+    .in('role', ['owner', 'admin']);
+
+  if (error) throw error;
+  if (!memberships || memberships.length === 0) return [];
+
+  const orgIds = memberships.map(m => m.organization_id);
+
+  // Fetch organization details
+  const { data: orgs, error: orgsError } = await supabase
+    .from('organizations')
+    .select('*')
+    .in('id', orgIds);
+
+  if (orgsError) throw orgsError;
+  return orgs || [];
+}
+
 export async function getPublicOrganizations(): Promise<Organization[]> {
   if (!supabase) throw new Error("Supabase client is not initialized.");
 

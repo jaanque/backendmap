@@ -13,6 +13,7 @@ export interface Scenario {
   tags?: string[];
   author_id?: string;
   author?: Profile;
+  organization_id?: string | null;
   parent_scenario_id?: string | null;
   favorites_count?: number;
   forks_count?: number;
