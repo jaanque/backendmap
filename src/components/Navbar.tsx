@@ -64,7 +64,16 @@ export default function Navbar() {
 
       <div className="flex items-center gap-4 text-sm font-medium text-zinc-500 dark:text-zinc-400">
         {user ? (
-          <div className="relative" ref={dropdownRef}>
+          <div className="flex items-center gap-4">
+            <Link
+              to="/create"
+              className="hidden md:flex items-center gap-2 btn-pro btn-primary px-4 py-2 text-xs text-white hover:text-white dark:text-black dark:bg-white dark:hover:bg-zinc-200 transition-colors"
+            >
+              <PlusSquare size={16} />
+              <span>Create Scenario</span>
+            </Link>
+
+            <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="flex items-center gap-2 hover:text-black dark:hover:text-white transition-colors focus:outline-none group cursor-pointer"
@@ -75,7 +84,7 @@ export default function Navbar() {
                <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 group-hover:border-zinc-300 dark:group-hover:border-zinc-600 transition-colors">
                   <User size={16} />
                </div>
-               <span className="hidden md:inline-block text-xs text-zinc-600 dark:text-zinc-300 font-medium max-w-[150px] truncate group-hover:text-zinc-900 dark:group-hover:text-white">{displayName || user.email}</span>
+               <span className="hidden lg:inline-block text-xs text-zinc-600 dark:text-zinc-300 font-medium max-w-[150px] truncate group-hover:text-zinc-900 dark:group-hover:text-white">{displayName || user.email}</span>
                <ChevronDown size={14} className={`text-zinc-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180 text-zinc-600 dark:text-zinc-300' : 'group-hover:text-zinc-600 dark:group-hover:text-zinc-300'}`} />
             </button>
 
@@ -109,9 +118,10 @@ export default function Navbar() {
                     <User size={16} className="text-zinc-400 dark:text-zinc-500" />
                     My Profile
                   </Link>
+                  {/* Mobile-only Create Scenario link since desktop has button */}
                   <Link
                     to="/create"
-                    className="w-full text-left px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 flex items-center gap-3 transition-colors"
+                    className="md:hidden w-full text-left px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 flex items-center gap-3 transition-colors"
                     onClick={() => setIsDropdownOpen(false)}
                   >
                     <PlusSquare size={16} className="text-zinc-400 dark:text-zinc-500" />
@@ -179,6 +189,7 @@ export default function Navbar() {
                 </div>
               </div>
             )}
+            </div>
           </div>
         ) : (
           <div className="flex items-center gap-4">
