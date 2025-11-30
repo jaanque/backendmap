@@ -369,19 +369,39 @@ function CreateScenario() {
     }
   };
 
-  const sidebarItems = [
-    { type: 'custom', icon: 'monitor', label: 'Client', Icon: Monitor },
-    { type: 'custom', icon: 'smartphone', label: 'Mobile', Icon: Smartphone },
-    { type: 'custom', icon: 'tablet', label: 'Tablet', Icon: Tablet },
-    { type: 'custom', icon: 'laptop', label: 'Laptop', Icon: Laptop },
-    { type: 'custom', icon: 'server', label: 'Server', Icon: Server },
-    { type: 'custom', icon: 'database', label: 'Database', Icon: Database },
-    { type: 'custom', icon: 'cloud', label: 'Cloud', Icon: Cloud },
-    { type: 'custom', icon: 'cpu', label: 'Compute', Icon: Cpu },
-    { type: 'custom', icon: 'harddrive', label: 'Storage', Icon: HardDrive },
-    { type: 'custom', icon: 'router', label: 'Load Balancer', Icon: Router },
-    { type: 'custom', icon: 'shield', label: 'Firewall', Icon: Shield },
-    { type: 'custom', icon: 'globe', label: 'Internet', Icon: Globe },
+  const sidebarCategories = [
+    {
+      title: 'User / Devices',
+      items: [
+        { type: 'custom', icon: 'monitor', label: 'Client', Icon: Monitor },
+        { type: 'custom', icon: 'smartphone', label: 'Mobile', Icon: Smartphone },
+        { type: 'custom', icon: 'tablet', label: 'Tablet', Icon: Tablet },
+        { type: 'custom', icon: 'laptop', label: 'Laptop', Icon: Laptop },
+      ]
+    },
+    {
+      title: 'Compute',
+      items: [
+        { type: 'custom', icon: 'server', label: 'Server', Icon: Server },
+        { type: 'custom', icon: 'cpu', label: 'Compute', Icon: Cpu },
+        { type: 'custom', icon: 'cloud', label: 'Cloud', Icon: Cloud },
+      ]
+    },
+    {
+      title: 'Data',
+      items: [
+        { type: 'custom', icon: 'database', label: 'Database', Icon: Database },
+        { type: 'custom', icon: 'harddrive', label: 'Storage', Icon: HardDrive },
+      ]
+    },
+    {
+      title: 'Network',
+      items: [
+        { type: 'custom', icon: 'router', label: 'Load Balancer', Icon: Router },
+        { type: 'custom', icon: 'shield', label: 'Firewall', Icon: Shield },
+        { type: 'custom', icon: 'globe', label: 'Internet', Icon: Globe },
+      ]
+    }
   ];
 
   return (
@@ -454,18 +474,25 @@ function CreateScenario() {
                     <div className="p-4 border-b border-zinc-100">
                         <p className="text-xs text-zinc-500">Drag components to the canvas to build your architecture.</p>
                     </div>
-                    <div className="p-4 space-y-3 overflow-y-auto flex-grow grid grid-cols-2 gap-2 !space-y-0">
-                        {sidebarItems.map((item) => (
-                            <div
-                                key={item.icon}
-                                className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-zinc-200 bg-white hover:border-indigo-300 hover:shadow-md hover:text-indigo-600 transition-all cursor-grab active:cursor-grabbing group text-center"
-                                onDragStart={(event) => onDragStart(event, item.type, item.icon)}
-                                draggable
-                            >
-                                <div className="p-2 bg-zinc-50 rounded-lg group-hover:bg-indigo-50 text-zinc-500 group-hover:text-indigo-600 transition-colors">
-                                    <item.Icon size={20} />
+                    <div className="p-4 space-y-6 overflow-y-auto flex-grow">
+                        {sidebarCategories.map((category) => (
+                            <div key={category.title}>
+                                <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">{category.title}</h4>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {category.items.map((item) => (
+                                        <div
+                                            key={item.icon}
+                                            className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-zinc-200 bg-white hover:border-indigo-300 hover:shadow-md hover:text-indigo-600 transition-all cursor-grab active:cursor-grabbing group text-center"
+                                            onDragStart={(event) => onDragStart(event, item.type, item.icon)}
+                                            draggable
+                                        >
+                                            <div className="p-2 bg-zinc-50 rounded-lg group-hover:bg-indigo-50 text-zinc-500 group-hover:text-indigo-600 transition-colors">
+                                                <item.Icon size={20} />
+                                            </div>
+                                            <span className="text-xs font-medium text-zinc-600 group-hover:text-indigo-700">{item.label}</span>
+                                        </div>
+                                    ))}
                                 </div>
-                                <span className="text-xs font-medium text-zinc-600 group-hover:text-indigo-700">{item.label}</span>
                             </div>
                         ))}
                     </div>
