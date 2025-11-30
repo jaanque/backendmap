@@ -410,22 +410,22 @@ function CreateScenario() {
 
       <div className="flex-grow flex overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-80 bg-white border-r border-zinc-200 flex flex-col z-10 shadow-[4px_0_24px_-4px_rgba(0,0,0,0.05)]">
+        <aside className="w-80 bg-white border-r border-zinc-200 flex flex-col z-10 shadow-xl">
 
             {/* Tabs */}
             <div className="flex border-b border-zinc-200">
                 <button
                   onClick={() => setActiveTab('build')}
-                  className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 border-b-2 transition-colors ${activeTab === 'build' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-zinc-500 hover:text-zinc-700'}`}
+                  className={`flex-1 py-4 text-sm font-semibold flex items-center justify-center gap-2 border-b-2 transition-all duration-200 ${activeTab === 'build' ? 'border-indigo-600 text-indigo-600 bg-indigo-50/10' : 'border-transparent text-zinc-500 hover:text-zinc-800 hover:bg-zinc-50'}`}
                 >
-                    <Layers size={16} />
+                    <Layers size={18} />
                     Components
                 </button>
                 <button
                   onClick={() => setActiveTab('steps')}
-                  className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 border-b-2 transition-colors ${activeTab === 'steps' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-zinc-500 hover:text-zinc-700'}`}
+                  className={`flex-1 py-4 text-sm font-semibold flex items-center justify-center gap-2 border-b-2 transition-all duration-200 ${activeTab === 'steps' ? 'border-indigo-600 text-indigo-600 bg-indigo-50/10' : 'border-transparent text-zinc-500 hover:text-zinc-800 hover:bg-zinc-50'}`}
                 >
-                    <ListOrdered size={16} />
+                    <ListOrdered size={18} />
                     Steps ({steps.length})
                 </button>
             </div>
@@ -435,61 +435,62 @@ function CreateScenario() {
               <>
                 {selectedNodeId ? (
                    <div className="flex flex-col h-full animate-fade-in-up">
-                      <div className="p-4 border-b border-zinc-100 bg-zinc-50/50 flex items-center justify-between">
-                          <h3 className="font-semibold text-sm text-zinc-900 flex items-center gap-2">
+                      <div className="p-5 border-b border-zinc-100 bg-zinc-50 flex items-center justify-between">
+                          <h3 className="font-bold text-sm text-zinc-900 flex items-center gap-2">
                               <MousePointer2 size={16} className="text-indigo-600" />
-                              Selected Node
+                              Edit Component
                           </h3>
                           <button
                             onClick={() => setSelectedNodeId(null)}
-                            className="text-xs text-zinc-500 hover:text-zinc-900 underline"
+                            className="text-xs font-medium text-zinc-500 hover:text-indigo-600 hover:underline transition-colors"
                           >
-                            Back to list
+                            Close
                           </button>
                       </div>
-                      <div className="p-4 space-y-6">
+                      <div className="p-5 space-y-6">
                           <div>
-                              <label className="block text-xs font-medium text-zinc-500 mb-2 uppercase tracking-wide">Label</label>
+                              <label className="block text-xs font-bold text-zinc-500 mb-2 uppercase tracking-wider">Component Label</label>
                               <input
                                 type="text"
                                 value={(nodes.find(n => n.id === selectedNodeId)?.data.label as string) || ''}
                                 onChange={(e) => handleUpdateNodeLabel(e.target.value)}
-                                className="w-full px-3 py-2 rounded-lg border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all text-sm font-medium"
+                                className="w-full px-3 py-2.5 rounded-lg border border-zinc-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all text-sm font-medium shadow-sm"
+                                placeholder="Name your component..."
                               />
                           </div>
 
-                          <div className="pt-4 border-t border-zinc-100">
+                          <div className="pt-6 border-t border-zinc-100 mt-auto">
                               <button
                                 onClick={handleDeleteNode}
-                                className="w-full btn-pro border border-red-200 text-red-600 hover:bg-red-50 flex items-center justify-center gap-2 py-2"
+                                className="w-full btn-pro border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 flex items-center justify-center gap-2 py-2.5 font-medium transition-all shadow-sm hover:shadow"
                               >
-                                  <Trash2 size={16} />
-                                  Delete Node
+                                  <Trash2 size={18} />
+                                  Delete Component
                               </button>
                           </div>
                       </div>
                    </div>
                 ) : (
                   <>
-                    <div className="p-4 border-b border-zinc-100">
-                        <p className="text-xs text-zinc-500">Drag components to the canvas to build your architecture.</p>
+                    <div className="px-5 py-4 border-b border-zinc-100 bg-zinc-50/30">
+                        <p className="text-xs font-medium text-zinc-500 leading-relaxed">Drag and drop components onto the canvas to design your architecture.</p>
                     </div>
-                    <div className="p-4 space-y-6 overflow-y-auto flex-grow">
+                    <div className="p-5 space-y-8 overflow-y-auto flex-grow custom-scrollbar">
                         {sidebarCategories.map((category) => (
                             <div key={category.title}>
-                                <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2">{category.title}</h4>
-                                <div className="grid grid-cols-2 gap-2">
+                                <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3 pl-1">{category.title}</h4>
+                                <div className="grid grid-cols-2 gap-3">
                                     {category.items.map((item) => (
                                         <div
                                             key={item.icon}
-                                            className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-zinc-200 bg-white hover:border-indigo-300 hover:shadow-md hover:text-indigo-600 transition-all cursor-grab active:cursor-grabbing group text-center"
+                                            className="flex flex-col items-center justify-center gap-2.5 p-4 rounded-xl border border-zinc-200 bg-white hover:border-indigo-400 hover:shadow-lg hover:shadow-indigo-500/10 hover:-translate-y-0.5 transition-all duration-200 cursor-grab active:cursor-grabbing group text-center"
                                             onDragStart={(event) => onDragStart(event, item.type, item.icon)}
                                             draggable
                                         >
-                                            <div className="p-2 bg-zinc-50 rounded-lg group-hover:bg-indigo-50 text-zinc-500 group-hover:text-indigo-600 transition-colors">
-                                                <item.Icon size={20} />
+                                            <div className="p-2.5 bg-zinc-50 rounded-lg group-hover:bg-indigo-50 group-hover:text-indigo-600 text-zinc-500 transition-colors duration-200">
+                                                <item.Icon size={24} strokeWidth={1.5} />
                                             </div>
-                                            <span className="text-xs font-medium text-zinc-600 group-hover:text-indigo-700">{item.label}</span>
+                                            <span className="text-xs font-semibold text-zinc-600 group-hover:text-indigo-700 transition-colors">{item.label}</span>
                                         </div>
                                     ))}
                                 </div>
