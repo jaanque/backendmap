@@ -656,17 +656,17 @@ function CreateScenario() {
       {/* Publish Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
-                <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-lg flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
+                <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50 flex-shrink-0">
                     <h3 className="font-bold text-lg text-zinc-900">{isEditMode ? 'Update Scenario' : 'Publish Scenario'}</h3>
                     <button onClick={() => setIsModalOpen(false)} className="text-zinc-400 hover:text-zinc-600 transition-colors">
                         <X size={20} />
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                <form onSubmit={handleSubmit} className="p-6 space-y-6 overflow-y-auto">
                     {/* Owner Selection (Only for new scenarios) */}
-                    {!isEditMode && userOrganizations.length > 0 && (
+                    {!isEditMode && (
                         <div>
                             <label className="block text-sm font-medium text-zinc-700 mb-1.5">Publish As</label>
                             <div className="grid grid-cols-2 gap-3">
