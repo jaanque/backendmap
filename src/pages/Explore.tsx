@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { getScenarios, getUserProgress, getUserFavorites, setFavorite } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { useToast } from '../lib/toast';
@@ -11,14 +12,42 @@ import SearchFilters from '../components/SearchFilters';
 export default function Explore() {
   const { user } = useAuth();
   const { showToast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [userProgress, setUserProgress] = useState<Record<string, UserProgress>>({});
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterDifficulty, setFilterDifficulty] = useState('All');
-  const [sortOrder, setSortOrder] = useState('newest');
+
+  // Derived state from URL params
+  const searchQuery = searchParams.get('q') || '';
+  const filterDifficulty = searchParams.get('difficulty') || 'All';
+  const sortOrder = searchParams.get('sort') || 'newest';
+
+  // Setters wrapper to update URL
+  const setSearchQuery = (val: string) => {
+    setSearchParams(prev => {
+        if (val) prev.set('q', val);
+        else prev.delete('q');
+        return prev;
+    });
+  };
+
+  const setFilterDifficulty = (val: string) => {
+    setSearchParams(prev => {
+        if (val && val !== 'All') prev.set('difficulty', val);
+        else prev.delete('difficulty');
+        return prev;
+    });
+  };
+
+  const setSortOrder = (val: string) => {
+    setSearchParams(prev => {
+        if (val && val !== 'newest') prev.set('sort', val);
+        else prev.delete('sort');
+        return prev;
+    });
+  };
 
   useEffect(() => {
     setLoading(true);
