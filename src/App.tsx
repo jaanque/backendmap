@@ -1,5 +1,4 @@
-// CAMBIO 1: Importa HashRouter en lugar de BrowserRouter
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import Explore from './pages/Explore';
 import Favorites from './pages/Favorites';
@@ -21,7 +20,6 @@ function App() {
   return (
     <AuthProvider>
       <ToastProvider>
-        {/* CAMBIO 2: Router ahora es HashRouter gracias al alias en el import */}
         <Router>
           <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 px-4 py-2 bg-black text-white rounded font-bold shadow-lg">
             Skip to main content
