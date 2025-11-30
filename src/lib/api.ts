@@ -1,5 +1,66 @@
 import { supabase } from './supabase';
-import type { Scenario, Step, UserProgress, Profile, Achievement } from '../types';
+import type { Scenario, Step, UserProgress, Profile, Achievement, ScenarioCollaborator } from '../types';
+
+export async function addCollaborator(scenarioId: string, userId: string, role: 'editor' | 'viewer') {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  const { error } = await supabase
+    .from('scenario_collaborators')
+    .insert({ scenario_id: scenarioId, user_id: userId, role } as any);
+
+  if (error) throw error;
+}
+
+export async function removeCollaborator(scenarioId: string, userId: string) {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  const { error } = await supabase
+    .from('scenario_collaborators')
+    .delete()
+    .eq('scenario_id', scenarioId)
+    .eq('user_id', userId);
+
+  if (error) throw error;
+}
+
+export async function updateCollaboratorRole(scenarioId: string, userId: string, newRole: 'editor' | 'viewer') {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  const { error } = await supabase
+    .from('scenario_collaborators')
+    .update({ role: newRole } as any)
+    .eq('scenario_id', scenarioId)
+    .eq('user_id', userId);
+
+  if (error) throw error;
+}
+
+export async function getCollaborators(scenarioId: string): Promise<ScenarioCollaborator[]> {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  const { data, error } = await supabase
+    .from('scenario_collaborators')
+    .select('*, profile:profiles(*)')
+    .eq('scenario_id', scenarioId);
+
+  if (error) throw error;
+  return data || [];
+}
+
+export async function searchUsers(query: string): Promise<Profile[]> {
+  if (!supabase) throw new Error("Supabase client is not initialized.");
+
+  if (query.length < 2) return [];
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .or(`email.ilike.%${query}%,first_name.ilike.%${query}%,last_name.ilike.%${query}%`)
+    .limit(10);
+
+  if (error) throw error;
+  return data || [];
+}
 
 export async function getAllAchievements(): Promise<Achievement[]> {
   if (!supabase) {
