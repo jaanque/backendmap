@@ -114,42 +114,6 @@ function CreateScenario() {
             setEditingScenarioId(data.id);
             setSlug(data.slug);
             setUserRole(role);
-
-            // Subscribe to Realtime Updates if editing
-            const channel = supabase!.channel(`scenario:${data.id}`);
-            channel
-              .on(
-                'postgres_changes',
-                {
-                  event: 'UPDATE',
-                  schema: 'public',
-                  table: 'scenarios',
-                  filter: `id=eq.${data.id}`,
-                },
-                (payload) => {
-                  const newData = payload.new as any;
-                  // Merge changes if they differ from local state
-                  // This is naive "Last Writer Wins" reflection
-                  if (newData.flow_data) {
-                      // Only update if we are not currently dragging?
-                      // Or just force update.
-                      // ReactFlow controls handles position.
-                      // We update state.
-                      if (JSON.stringify(newData.flow_data.initialNodes) !== JSON.stringify(nodes)) {
-                          setNodes(newData.flow_data.initialNodes);
-                      }
-                      if (JSON.stringify(newData.flow_data.initialEdges) !== JSON.stringify(edges)) {
-                          setEdges(newData.flow_data.initialEdges);
-                      }
-                  }
-                }
-              )
-              .subscribe();
-
-            return () => {
-                supabase!.removeChannel(channel);
-            };
-
         } else {
             // Fork Mode
             setTitle(`${data.title} (Fork)`);
@@ -181,29 +145,6 @@ function CreateScenario() {
         loadScenario(forkSlug, 'fork');
     }
   }, [routeSlug, forkSlug, user, navigate, setNodes, setEdges]);
-
-  // Realtime Broadcast of Local Changes
-  // Debounce this to avoid spamming DB
-  useEffect(() => {
-    if (!isEditMode || !editingScenarioId || !userRole) return;
-
-    // We only auto-save/broadcast if we have a way to do partial updates or broadcast channel
-    // For now, let's rely on explicit save for persistence,
-    // BUT the requirement asked for "realtime".
-    // Implementing full realtime sync requires broadcasting state changes via Supabase Broadcast (not just DB Update).
-
-    // Let's use Broadcast for cursor/position changes without saving to DB constantly.
-    // And use DB SAVE for permanent storage.
-
-    // However, the prompt says "if user has option to edit... edit in realtime".
-    // Usually implies DB persistence or state sync.
-    // We implemented DB listener above.
-    // If we want others to see OUR changes, we must Save to DB or Broadcast.
-    // Saving to DB on every drag is too heavy.
-    // We will just stick to "Explicit Save" updates the view for others,
-    // OR we implement a "Broadcast" channel for live positions.
-
-  }, [nodes, edges, isEditMode, editingScenarioId]);
 
   // Helper to highlight active node/edge for selected step
   useOnSelectionChange({
