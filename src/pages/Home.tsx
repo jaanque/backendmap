@@ -149,7 +149,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-white font-sans text-zinc-900 selection:bg-black selection:text-white">
+    <div className="min-h-screen bg-white dark:bg-zinc-950 font-sans text-zinc-900 dark:text-zinc-100 selection:bg-black dark:selection:bg-white selection:text-white dark:selection:text-black transition-colors duration-300">
       <Helmet>
         <title>BackendMap - Visualize System Architecture</title>
         <meta name="description" content="Interactive platform to learn, design and visualize backend flows. Understand how data moves through databases, queues, and microservices." />
@@ -161,21 +161,21 @@ export default function Home() {
 
       {/* Hero */}
       <header id="main-content" className="py-24 px-4 md:px-12 max-w-4xl mx-auto text-center">
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 text-zinc-900 leading-[1.1]">
+        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 text-zinc-900 dark:text-white leading-[1.1]">
           System Architecture <br/>
-          <span className="text-zinc-400">Visualized.</span>
+          <span className="text-zinc-400 dark:text-zinc-500">Visualized.</span>
         </h1>
-        <p className="text-xl text-zinc-500 mb-10 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-xl text-zinc-500 dark:text-zinc-400 mb-10 max-w-2xl mx-auto leading-relaxed">
           The interactive platform to learn, design and visualize backend flows.<br/>
           See exactly how data moves through databases, queues, and microservices.
         </p>
 
         {!user && (
           <div className="flex justify-center gap-4 mb-12">
-            <Link to="/register" className="px-8 py-3 bg-zinc-900 text-white rounded-full font-semibold hover:bg-black transition-all hover:shadow-lg hover:scale-105 active:scale-95">
+            <Link to="/register" className="px-8 py-3 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-full font-semibold hover:bg-black dark:hover:bg-zinc-200 transition-all hover:shadow-lg hover:scale-105 active:scale-95">
               Get Started Free
             </Link>
-            <Link to="/explore" className="px-8 py-3 bg-zinc-100 text-zinc-700 rounded-full font-semibold hover:bg-zinc-200 transition-all hover:shadow active:scale-95">
+            <Link to="/explore" className="px-8 py-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 rounded-full font-semibold hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all hover:shadow active:scale-95">
               Explore Catalog
             </Link>
           </div>
@@ -194,33 +194,33 @@ export default function Home() {
 
       {/* How it Works Section */}
       <section className="px-4 md:px-12 max-w-5xl mx-auto mb-20 animate-fade-in-up">
-        <div className="bg-zinc-50 rounded-2xl p-8 md:p-12 border border-zinc-100">
-           <h2 className="text-2xl font-bold text-center mb-10 text-zinc-900">How BackendMap Works</h2>
+        <div className="bg-zinc-50 dark:bg-zinc-900 rounded-2xl p-8 md:p-12 border border-zinc-100 dark:border-zinc-800 transition-colors">
+           <h2 className="text-2xl font-bold text-center mb-10 text-zinc-900 dark:text-white">How BackendMap Works</h2>
            <div className="grid md:grid-cols-3 gap-8">
               <div className="flex flex-col items-center text-center">
-                 <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-zinc-200 flex items-center justify-center text-indigo-600 mb-4">
+                 <div className="w-12 h-12 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-4 transition-colors">
                     <BookOpen size={24} />
                  </div>
-                 <h3 className="font-bold text-lg mb-2">1. Choose a Scenario</h3>
-                 <p className="text-zinc-500 text-sm leading-relaxed">
+                 <h3 className="font-bold text-lg mb-2 text-zinc-900 dark:text-white">1. Choose a Scenario</h3>
+                 <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
                    Browse our catalog of real-world architecture patterns, from simple APIs to complex microservices.
                  </p>
               </div>
               <div className="flex flex-col items-center text-center">
-                 <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-zinc-200 flex items-center justify-center text-indigo-600 mb-4">
+                 <div className="w-12 h-12 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-4 transition-colors">
                     <PlayCircle size={24} />
                  </div>
-                 <h3 className="font-bold text-lg mb-2">2. Watch the Flow</h3>
-                 <p className="text-zinc-500 text-sm leading-relaxed">
+                 <h3 className="font-bold text-lg mb-2 text-zinc-900 dark:text-white">2. Watch the Flow</h3>
+                 <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
                    Step through the request lifecycle. See exactly how data travels between servers, queues, and databases.
                  </p>
               </div>
               <div className="flex flex-col items-center text-center">
-                 <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-zinc-200 flex items-center justify-center text-indigo-600 mb-4">
+                 <div className="w-12 h-12 bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-4 transition-colors">
                     <Share2 size={24} />
                  </div>
-                 <h3 className="font-bold text-lg mb-2">3. Master & Share</h3>
-                 <p className="text-zinc-500 text-sm leading-relaxed">
+                 <h3 className="font-bold text-lg mb-2 text-zinc-900 dark:text-white">3. Master & Share</h3>
+                 <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
                    Complete scenarios to unlock achievements, track your progress, and share your profile with the community.
                  </p>
               </div>
@@ -230,9 +230,9 @@ export default function Home() {
 
       {/* Content - Technical List */}
       <main className="px-4 md:px-12 pb-32 max-w-5xl mx-auto animate-fade-in-up">
-        <div className="mb-6 flex items-end justify-between border-b border-zinc-100 pb-4">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-900">Catalog</h2>
-          <span className="text-xs font-mono text-zinc-400 bg-zinc-100 px-2 py-1 rounded">
+        <div className="mb-6 flex items-end justify-between border-b border-zinc-100 dark:border-zinc-800 pb-4">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">Catalog</h2>
+          <span className="text-xs font-mono text-zinc-400 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-900 px-2 py-1 rounded">
             {filteredScenarios.length + (dailyHighlights.length > 0 ? dailyHighlights.length : 0)} ITEMS
           </span>
         </div>
