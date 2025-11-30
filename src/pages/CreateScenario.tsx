@@ -4,11 +4,10 @@ import '@xyflow/react/dist/style.css';
 import CustomNode from '../components/CustomNode';
 import PacketEdge from '../components/PacketEdge';
 import Navbar from '../components/Navbar';
-import ShareModal from '../components/ShareModal';
 import { useAuth } from '../lib/auth';
 import { checkSlugAvailability, createScenario, updateScenario, createSteps, deleteSteps, getScenarioBySlug, getSteps } from '../lib/api';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { Monitor, Server, Cpu, Database, Cloud, Save, X, Loader2, GripVertical, ListOrdered, Layers, Trash2, Plus, Target, Lock, Globe, Users as UsersIcon } from 'lucide-react';
+import { Monitor, Server, Cpu, Database, Cloud, Save, X, Loader2, GripVertical, ListOrdered, Layers, Trash2, Plus, Target, Lock, Globe } from 'lucide-react';
 import type { StepInput } from '../types';
 import { supabase } from '../lib/supabase';
 
@@ -46,7 +45,6 @@ function CreateScenario() {
 
   const [activeTab, setActiveTab] = useState<'build' | 'steps'>('build');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Steps State
@@ -66,7 +64,6 @@ function CreateScenario() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingScenarioId, setEditingScenarioId] = useState<string | null>(null);
   const [parentScenarioId, setParentScenarioId] = useState<string | null>(null);
-  const [userRole, setUserRole] = useState<'owner' | 'editor' | 'viewer' | null>(null);
 
   // Load Existing Scenario (Edit Mode) or Fork Source
   useEffect(() => {
@@ -75,36 +72,8 @@ function CreateScenario() {
         if (!data) return;
 
         if (mode === 'edit') {
-             // Check permission (Owner or Editor)
-             // Ideally we check DB, but simplified:
-             // If author_id matches user -> Owner
-             // Else we let RLS handle it, but for UI feedback:
-             // We can check collaborators table or assume if `getScenarioBySlug` returned data (RLS allows select)
-             // and we are trying to edit, we should check write access.
-
-             // However, getScenarioBySlug returns data for viewers too.
-             // We need to know if we are editor.
-             // Ideally api returns `my_role` field.
-
-             let role: 'owner' | 'editor' | 'viewer' = 'viewer';
-             if (user && data.author_id === user.id) {
-                 role = 'owner';
-             } else if (user) {
-                 // Check collaboration role
-                 // We can assume we might be editor if not owner
-                 // For now, let's just proceed. The save will fail if no permission.
-                 // Ideally fetch role.
-                 const { data: collab } = await supabase!
-                    .from('scenario_collaborators')
-                    .select('role')
-                    .eq('scenario_id', data.id)
-                    .eq('user_id', user.id)
-                    .maybeSingle();
-
-                 if (collab?.role === 'editor') role = 'editor';
-             }
-
-             if (role === 'viewer') {
+             // Check permission (Owner)
+             if (!user || data.author_id !== user.id) {
                  alert("You do not have permission to edit this scenario.");
                  navigate(`/map/${slugToLoad}`);
                  return;
@@ -113,7 +82,6 @@ function CreateScenario() {
             setIsEditMode(true);
             setEditingScenarioId(data.id);
             setSlug(data.slug);
-            setUserRole(role);
         } else {
             // Fork Mode
             setTitle(`${data.title} (Fork)`);
@@ -523,22 +491,6 @@ function CreateScenario() {
                     <Save size={16} />
                     {isEditMode ? 'Update Scenario' : 'Publish Scenario'}
                 </button>
-
-                {( !isEditMode || (isEditMode && userRole === 'owner') ) && (
-                    <button
-                        onClick={() => {
-                            if (!isEditMode || !editingScenarioId) {
-                                alert("Please save the scenario first to enable sharing.");
-                                return;
-                            }
-                            setIsShareModalOpen(true);
-                        }}
-                        className="w-full btn-pro btn-secondary py-2.5 flex items-center justify-center gap-2"
-                    >
-                        <UsersIcon size={16} />
-                        Share / Collaborate
-                    </button>
-                )}
             </div>
         </aside>
 
@@ -574,15 +526,6 @@ function CreateScenario() {
             </ReactFlow>
         </div>
       </div>
-
-      {/* Share Modal */}
-      {editingScenarioId && (
-          <ShareModal
-            isOpen={isShareModalOpen}
-            onClose={() => setIsShareModalOpen(false)}
-            scenarioId={editingScenarioId}
-          />
-      )}
 
       {/* Publish Modal */}
       {isModalOpen && (

@@ -73,15 +73,6 @@ export interface ScenarioReaction {
   created_at: string;
 }
 
-export interface ScenarioCollaborator {
-  id: string;
-  scenario_id: string;
-  user_id: string;
-  role: 'editor' | 'viewer';
-  created_at: string;
-  profile?: Profile; // For joining profile data
-}
-
 export interface Profile {
   id: string;
   first_name: string | null;
@@ -136,11 +127,6 @@ export type Database = {
         Row: ScenarioReaction;
         Insert: Omit<ScenarioReaction, 'id' | 'created_at'>;
         Update: Partial<ScenarioReaction>;
-      };
-      scenario_collaborators: {
-        Row: ScenarioCollaborator;
-        Insert: Omit<ScenarioCollaborator, 'id' | 'created_at'>;
-        Update: Partial<ScenarioCollaborator>;
       };
     };
     Functions: {
