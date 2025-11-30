@@ -21,6 +21,24 @@
   --font-mono: "JetBrains Mono", monospace;
 }
 
+:root {
+  --color-background: #ffffff;
+  --color-foreground: #09090b;
+}
+
+:root.dark {
+  --color-background: #09090b;
+  --color-foreground: #fafafa;
+  --color-muted: #a1a1aa;
+  --color-muted-light: #27272a;
+  --color-border: #27272a;
+  --color-border-hover: #3f3f46;
+  --color-primary: #fafafa;
+  --color-primary-foreground: #09090b;
+  --color-accent: #fafafa;
+  --color-accent-light: #27272a;
+}
+
 body {
   margin: 0;
   font-family: var(--font-sans);
@@ -28,6 +46,7 @@ body {
   color: var(--color-foreground);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -73,7 +92,7 @@ code, pre {
 }
 
 .card-pro {
-  background: white;
+  background: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: 12px;
   transition: all 0.2s ease-out;
@@ -104,17 +123,17 @@ code, pre {
   color: var(--color-primary-foreground);
 }
 .btn-primary:hover {
-  background-color: #27272a; /* Zinc 800 */
+  opacity: 0.9;
   transform: translateY(-1px);
 }
 .btn-secondary {
-  background-color: white;
+  background-color: transparent;
   border: 1px solid var(--color-border);
   color: var(--color-foreground);
 }
 .btn-secondary:hover {
   background-color: var(--color-muted-light);
-  border-color: #d4d4d8;
+  border-color: var(--color-border-hover);
 }
 
 /* Scrollbar */
