@@ -12,7 +12,7 @@ export async function getUserOrganizations(userId: string): Promise<Organization
     .in('role', ['owner', 'admin']);
 
   if (memberError) throw memberError;
-  const memberOrgIds = memberships?.map(m => m.organization_id) || [];
+  const memberOrgIds = (memberships as any[])?.map(m => m.organization_id) || [];
 
   // 2. Fetch organizations where user is owner
   const { data: ownedOrgs, error: ownedError } = await supabase
@@ -98,7 +98,7 @@ export async function createOrganization(org: Omit<Organization, 'id' | 'created
   const { error: memberError } = await supabase
     .from('organization_members')
     .upsert({
-        organization_id: data.id,
+        organization_id: (data as any).id,
         user_id: org.owner_id,
         role: 'owner'
     } as any, { onConflict: 'organization_id,user_id' });
@@ -401,9 +401,9 @@ export async function updateScenario(id: string, updates: Partial<Scenario>): Pr
     throw new Error("Supabase client is not initialized.");
   }
 
-  const { error } = await supabase
-    .from('scenarios')
-    .update(updates as any)
+  const { error } = await (supabase
+    .from('scenarios') as any)
+    .update(updates)
     .eq('id', id);
 
   if (error) throw error;
@@ -552,7 +552,7 @@ export async function setFavorite(userId: string, scenarioId: string, shouldBeFa
 export async function incrementScenarioViews(scenarioId: string): Promise<void> {
   if (!supabase) throw new Error("Supabase client is not initialized.");
 
-  const { error } = await supabase.rpc('increment_scenario_views', { scenario_id: scenarioId });
+  const { error } = await supabase.rpc('increment_scenario_views', { scenario_id: scenarioId } as any);
   if (error) {
       console.error("Failed to increment views:", error);
       // Don't throw, just log. Views are non-critical.

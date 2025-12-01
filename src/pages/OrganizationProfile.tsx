@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { getOrganizationBySlug } from '../lib/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Building2, Calendar, MapPin, Link as LinkIcon, Users as UsersIcon } from 'lucide-react';
+import { Building2, Calendar, Users as UsersIcon } from 'lucide-react';
 import type { Organization } from '../types';
 
 export default function OrganizationProfile() {

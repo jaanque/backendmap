@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { ReactFlow, ReactFlowProvider, addEdge, useNodesState, useEdgesState, Controls, Background, useReactFlow, type Node, type Edge, type Connection, BackgroundVariant, useOnSelectionChange, Panel } from '@xyflow/react';
+import { ReactFlow, ReactFlowProvider, addEdge, useNodesState, useEdgesState, Background, useReactFlow, type Node, type Edge, type Connection, BackgroundVariant, useOnSelectionChange, Panel } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import CustomNode from '../components/CustomNode';
 import PacketEdge from '../components/PacketEdge';
@@ -9,7 +9,6 @@ import { checkSlugAvailability, createScenario, updateScenario, createSteps, del
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Monitor, Server, Cpu, Database, Cloud, Save, X, Loader2, GripVertical, ListOrdered, Layers, Trash2, Plus, Target, Lock, Globe, Smartphone, Tablet, HardDrive, Router, Shield, Laptop, ZoomIn, ZoomOut, Maximize, MousePointer2, Building2, User } from 'lucide-react';
 import type { StepInput, Organization } from '../types';
-import { supabase } from '../lib/supabase';
 
 const nodeTypes = {
   custom: CustomNode,

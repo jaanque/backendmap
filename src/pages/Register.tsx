@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
-import { CheckCircle, Zap, Shield, Layers, ArrowLeft, Github, Eye, EyeOff, Lock, AlertCircle } from 'lucide-react';
+import { CheckCircle, Zap, Shield, Layers, ArrowLeft, Github, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 export default function Register() {
   const { user } = useAuth();
