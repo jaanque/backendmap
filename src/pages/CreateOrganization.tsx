@@ -70,33 +70,33 @@ export default function CreateOrganization() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950 font-sans text-zinc-900 dark:text-zinc-100 flex flex-col transition-colors duration-300">
+    <div className="min-h-screen bg-white  font-sans text-zinc-900  flex flex-col transition-colors duration-300">
       <Navbar />
 
       <main className="flex-grow px-6 md:px-12 py-12 w-full max-w-2xl mx-auto animate-fade-in-up">
         <div className="mb-10 text-center">
-          <div className="w-12 h-12 bg-zinc-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center mx-auto mb-4 text-zinc-600 dark:text-zinc-400">
+          <div className="w-12 h-12 bg-zinc-100  rounded-xl flex items-center justify-center mx-auto mb-4 text-zinc-600 ">
             <Building2 size={24} />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">Create Organization</h1>
-          <p className="text-zinc-500 dark:text-zinc-400 mt-2">Establish a new organization to collaborate with your team.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 ">Create Organization</h1>
+          <p className="text-zinc-500  mt-2">Establish a new organization to collaborate with your team.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6 bg-white dark:bg-zinc-900 p-8 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+        <form onSubmit={handleSubmit} className="space-y-6 bg-white  p-8 rounded-2xl border border-zinc-200  shadow-sm">
           <div>
-            <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Organization Name</label>
+            <label className="block text-sm font-bold text-zinc-700  mb-2">Organization Name</label>
             <input
               type="text"
               value={name}
               onChange={handleNameChange}
               required
               placeholder="e.g. Acme Corp"
-              className="w-full px-4 py-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all text-sm"
+              className="w-full px-4 py-3 rounded-lg border border-zinc-200  bg-white  focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all text-sm"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Slug (URL)</label>
+            <label className="block text-sm font-bold text-zinc-700  mb-2">Slug (URL)</label>
             <div className="relative">
                 <input
                 type="text"
@@ -104,12 +104,12 @@ export default function CreateOrganization() {
                 onChange={handleSlugChange}
                 required
                 placeholder="acme-corp"
-                className={`w-full px-4 py-3 rounded-lg border bg-white dark:bg-zinc-950 outline-none transition-all text-sm ${
+                className={`w-full px-4 py-3 rounded-lg border bg-white  outline-none transition-all text-sm ${
                     slugAvailable === false
                     ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/10'
                     : slugAvailable === true
                     ? 'border-green-300 focus:border-green-500 focus:ring-4 focus:ring-green-500/10'
-                    : 'border-zinc-200 dark:border-zinc-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10'
+                    : 'border-zinc-200  focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10'
                 }`}
                 />
                 <div className="absolute right-4 top-1/2 -translate-y-1/2">
@@ -124,7 +124,7 @@ export default function CreateOrganization() {
             </div>
             {slug && (
                 <p className="mt-2 text-xs text-zinc-500">
-                    Your organization will be accessible at: <span className="font-mono text-zinc-700 dark:text-zinc-300">backendmap.io/org/{slug}</span>
+                    Your organization will be accessible at: <span className="font-mono text-zinc-700 ">backendmap.io/org/{slug}</span>
                 </p>
             )}
             {slugAvailable === false && (
@@ -133,13 +133,13 @@ export default function CreateOrganization() {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Description <span className="font-normal text-zinc-400">(Optional)</span></label>
+            <label className="block text-sm font-bold text-zinc-700  mb-2">Description <span className="font-normal text-zinc-400">(Optional)</span></label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
               placeholder="What is this organization about?"
-              className="w-full px-4 py-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all text-sm resize-none"
+              className="w-full px-4 py-3 rounded-lg border border-zinc-200  bg-white  focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all text-sm resize-none"
             />
           </div>
 

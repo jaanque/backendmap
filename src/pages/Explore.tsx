@@ -168,7 +168,7 @@ export default function Explore() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950 font-sans text-zinc-900 dark:text-zinc-100 selection:bg-black dark:selection:bg-white selection:text-white dark:selection:text-black transition-colors duration-300">
+    <div className="min-h-screen bg-white  font-sans text-zinc-900  selection:bg-black  selection:text-white  transition-colors duration-300">
       <Navbar />
 
       <div className="px-6 md:px-12 py-12 max-w-7xl mx-auto flex flex-col md:flex-row gap-12 items-start" id="main-content">
@@ -187,14 +187,14 @@ export default function Explore() {
 
         {/* Content List */}
         <main className="flex-grow w-full min-w-0 animate-fade-in-up">
-          <div className="mb-6 flex items-end justify-between border-b border-zinc-100 dark:border-zinc-800 pb-4">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-900 dark:text-white">All Scenarios</h2>
-            <span className="text-xs font-mono text-zinc-400 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-900 px-2 py-1 rounded">{filteredScenarios.length} ITEMS</span>
+          <div className="mb-6 flex items-end justify-between border-b border-zinc-100  pb-4">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-900 ">All Scenarios</h2>
+            <span className="text-xs font-mono text-zinc-400  bg-zinc-100  px-2 py-1 rounded">{filteredScenarios.length} ITEMS</span>
           </div>
 
           {loading ? (
             <div className="flex justify-center py-24">
-               <div className="w-8 h-8 border-2 border-zinc-200 dark:border-zinc-800 border-t-zinc-800 dark:border-t-white rounded-full animate-spin"></div>
+               <div className="w-8 h-8 border-2 border-zinc-200  border-t-zinc-800  rounded-full animate-spin"></div>
             </div>
           ) : filteredScenarios.length > 0 ? (
             <div className="flex flex-col gap-4">
@@ -211,9 +211,9 @@ export default function Explore() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-24 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/30 dark:bg-zinc-900/30">
-               <p className="text-zinc-500 dark:text-zinc-400 font-medium">No scenarios match your search.</p>
-               <button onClick={() => setSearchQuery('')} className="mt-4 text-zinc-900 dark:text-white font-semibold hover:underline text-sm">Clear filter</button>
+            <div className="text-center py-24 border border-dashed border-zinc-200  rounded-xl bg-zinc-50/30 ">
+               <p className="text-zinc-500  font-medium">No scenarios match your search.</p>
+               <button onClick={() => setSearchQuery('')} className="mt-4 text-zinc-900  font-semibold hover:underline text-sm">Clear filter</button>
             </div>
           )}
         </main>
